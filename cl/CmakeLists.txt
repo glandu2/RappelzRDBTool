@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 2.8)
+project(RappelzRDBToolCl)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/../CMakeLists.txt)
+	
+file(GLOB RappelzRDBTool_src *.cpp *.h)
+set(RappelzRDBTool_target ${PROJECT_NAME})
+
+include_directories(${PROJECT_SOURCE_DIR}/Base)
+link_directories(${LIBRARY_OUTPUT_PATH})
+
+add_definitions(-DBUILDING_CLIENT -DAPPNAME=\"${RappelzRDBTool_target}\")
+add_executable(${RappelzRDBTool_target} ${RappelzRDBTool_src})
+target_link_libraries(${RappelzRDBTool_target} RpzRdbBase)
+install(TARGETS ${RappelzRDBTool_target} DESTINATION ./)

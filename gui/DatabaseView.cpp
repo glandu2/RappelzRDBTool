@@ -1,0 +1,320 @@
+#include "DatabaseView.h"
+#include "ui_DatabaseView.h"
+#include "DatabaseTableModel.h"
+#include "../Base/IDatabase.h"
+
+#include <QMessageBox>
+#include <QFileInfo>
+
+DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel, QWidget *parent) :
+	QWidget(parent),
+	ui(new Ui::DatabaseView),
+	dbDescriptionListModel(dbDescriptionListModel)
+{
+	ui->setupUi(this);
+	lastPercentage = -1;
+	db = NULL;
+
+	databaseModel = new DatabaseTableModel(this);
+	statusBarLabel = new QLabel(this);
+	statusBarLabel->hide();
+	setStatus(TS_NoDbDescLoaded);
+
+	ui->databaseTable->setModel(databaseModel);
+	ui->progressBar->reset();
+	ui->dbStructCombo->setModel(dbDescriptionListModel);
+
+	ui->dbLoadClose->setMinimumWidth(ui->dbLoadClose->sizeHint().width());
+	setDbDescButtonChecked(false);
+
+	savedData = true;
+	loadedDatabaseName = "<No database>";
+	setWindowTitle(loadedDatabaseName);
+
+	searchNotFoundStyleTimer.setInterval(2000);
+	searchNotFoundStyleTimer.setSingleShot(true);
+
+	connect(&searchNotFoundStyleTimer, SIGNAL(timeout()), this, SLOT(onSearchResetStyle()));
+
+	connect(ui->searchButton, SIGNAL(clicked()), this, SLOT(onSearch()));
+	connect(ui->searchTextEdit, SIGNAL(returnPressed()), this, SLOT(onSearch()));
+	connect(databaseModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onModifyDb(QModelIndex, QModelIndex)));
+	connect(ui->dbLoadClose, SIGNAL(clicked(bool)), this, SLOT(loadCloseDbDescriptionFile(bool)));
+	connect(ui->dbStructCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentDbDescChanged(int)));
+	connect(ui->dbStructCombo, SIGNAL(highlighted(int)), this, SIGNAL(onHighlightDbStruct(int)));
+	connect(ui->dbStructCombo, SIGNAL(activated(int)), this, SIGNAL(onHighlightDbStruct()));
+}
+
+DatabaseView::~DatabaseView()
+{
+	delete ui;
+	if(db)
+		delete db;
+}
+
+void DatabaseView::setDbDescButtonChecked(bool checked) {
+	ui->dbLoadClose->setChecked(checked);
+	if(checked)
+		ui->dbLoadClose->setText("Loaded");
+	else
+		ui->dbLoadClose->setText("Load");
+}
+
+bool DatabaseView::loadCloseDbDescriptionFile(bool isLoad) {
+	//Db description already loaded, nothing to do
+	if(isLoad && db && db->getDatabaseDescription() == dbDescriptionListModel->getDbDescription(ui->dbStructCombo->currentIndex()))
+		return true;
+
+	if(db != NULL) {
+		if(closeDb() == false) {
+			ui->dbLoadClose->setChecked(false);
+			return false;
+		}
+
+		delete db;
+		db = NULL;
+		setStatus(TS_NoDbDescLoaded);
+	}
+
+	if(isLoad) {
+		if(ui->dbStructCombo->currentIndex() == -1) {
+			QMessageBox::warning(this, QCoreApplication::applicationName(), QString("You must add Database Description files first !"));
+			setDbDescButtonChecked(false);
+			return false;
+		}
+
+		setStatus(TS_LoadingDbDesc);
+		IDatabaseDescription* dbDescription = dbDescriptionListModel->getDbDescription(ui->dbStructCombo->currentIndex());
+
+		db = createDatabase(dbDescription);
+		if(!db) {
+			ui->dbLoadClose->setChecked(false);
+			setStatus(TS_NoDbDescLoaded);
+			return false;
+		}
+		db->setUserData(this);
+		setStatus(TS_NoDbLoaded);
+	}
+
+	setDbDescButtonChecked(isLoad);
+	return true;
+}
+
+void DatabaseView::onCurrentDbDescChanged(int index) {
+	IDatabaseDescription* dbDescription = dbDescriptionListModel->getDbDescription(index);
+
+	if(!db)
+		return;
+
+	if(dbDescription == db->getDatabaseDescription())
+		setDbDescButtonChecked(true);
+	else
+		setDbDescButtonChecked(false);
+}
+
+void DatabaseView::progressBarUpdateCallback(void *database, int itemProceeded, int totalItem) {
+	DatabaseView *dbView = reinterpret_cast<DatabaseView*>(database);
+
+	dbView->progressBarUpdate(itemProceeded, totalItem);
+}
+
+void DatabaseView::progressBarUpdate(int itemProceeded, int totalItem) {
+	int newPercentage;
+
+	if(!totalItem) return;
+
+	newPercentage = itemProceeded*100/totalItem;
+
+	if(newPercentage != lastPercentage) {
+		ui->progressBar->setValue(progressBarOffset + newPercentage);
+		lastPercentage = newPercentage;
+
+		QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+	}
+}
+
+int DatabaseView::loadDb(eDataSourceType type, QString filename, QString location, QString username, QString password) {
+	int result;
+	const char* locationStr;
+	const char* usernameStr;
+	const char* passwordStr;
+
+
+	ui->progressBar->setValue(0);
+	if(db->getRowCount() > 0) {
+		ui->progressBar->setMaximum(200);
+		progressBarOffset = 0;
+
+		if(closeDb() == false) {
+			ui->progressBar->setMaximum(100);
+			return 0;
+		}
+
+		progressBarOffset = 100;
+	} else {
+		ui->progressBar->setMaximum(100);
+		progressBarOffset = 0;
+	}
+
+	if(!location.isEmpty())
+		locationStr = location.toLatin1().constData();
+	else locationStr = 0;
+	if(!username.isEmpty())
+		usernameStr = username.toLatin1().constData();
+	else usernameStr = 0;
+	if(!password.isEmpty())
+		passwordStr = password.toLatin1().constData();
+	else passwordStr = 0;
+
+	setStatus(TS_LoadingDB);
+
+	result = db->readData(type, filename.toLatin1().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr);
+	savedData = true;
+
+	if(result != 0) {
+		closeDb();
+		setStatus(TS_NoDbLoaded);
+		ui->progressBar->reset();
+		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't load the database file: %1").arg(strerror(result)));
+	} else {
+		loadedDatabaseName = QFileInfo(filename).fileName();
+		setWindowTitle(loadedDatabaseName);
+
+		databaseModel->bindToDatabase(db);
+
+		ui->databaseTable->setEnabled(true);
+
+		ui->searchColumnCombo->clear();
+		for(int i = 0; i<databaseModel->columnCount(); i++) {
+			ui->searchColumnCombo->addItem(databaseModel->headerData(i, Qt::Horizontal).toString());
+		}
+
+		ui->progressBar->setValue(100);
+		setStatus(TS_DbLoaded);
+	}
+	ui->progressBar->setMaximum(100);
+	progressBarOffset = 0;
+
+	return result;
+}
+
+int DatabaseView::saveDb(eDataSourceType type, QString filename, QString location, QString username, QString password) {
+	int result;
+	const char* locationStr;
+	const char* usernameStr;
+	const char* passwordStr;
+
+	setStatus(TS_SavingDB);
+
+	ui->progressBar->setValue(0);
+	ui->databaseTable->setEnabled(false);
+
+	if(!location.isEmpty())
+		locationStr = location.toLatin1().constData();
+	else locationStr = 0;
+	if(!username.isEmpty())
+		usernameStr = username.toLatin1().constData();
+	else usernameStr = 0;
+	if(!password.isEmpty())
+		passwordStr = password.toLatin1().constData();
+	else passwordStr = 0;
+
+	result = db->writeData(type, filename.toLatin1().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr);
+
+	setStatus(TS_DbLoaded);
+
+	if(result != 0) {
+		ui->progressBar->reset();
+		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't save the database file: %1").arg(strerror(result)));
+	} else {
+		savedData = true;
+		loadedDatabaseName = QFileInfo(filename).fileName();
+		setWindowTitle(loadedDatabaseName);
+	}
+	ui->databaseTable->setEnabled(true);
+
+	return result;
+}
+
+bool DatabaseView::closeDb(bool force) {
+	if(db) {
+		if(!force && savedData == false) {
+			QMessageBox::StandardButton button;
+			button = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?").arg(loadedDatabaseName), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+			if(button == QMessageBox::No)
+				return false;
+		}
+
+		setStatus(TS_ClosingDB);
+		ui->databaseTable->setEnabled(false);
+		databaseModel->unbindDatabase();
+		db->close(&progressBarUpdateCallback, this);
+		progressBarUpdate(100, 100);
+		loadedDatabaseName = "<No database>";
+		setWindowTitle(loadedDatabaseName);
+		setStatus(TS_NoDbLoaded);
+		savedData = true;
+	}
+
+	return true;
+}
+
+void DatabaseView::onSearch() {
+	if(!db || db->getRowCount() < 1)
+		return;
+
+	int i, column = ui->searchColumnCombo->currentIndex(), rowCount = databaseModel->rowCount();
+	bool found = false;
+	QModelIndexList selection = ui->databaseTable->selectionModel()->selectedIndexes();
+
+
+	if(selection.isEmpty())
+		i = 0;
+	else i = selection.first().row()+1; //allow several search without changing selection with mouse
+	for(; i<rowCount; i++) {
+		QModelIndex modelIdx = databaseModel->index(i, column);
+		if(databaseModel->data(modelIdx).toString().contains(ui->searchTextEdit->text())) {
+			ui->databaseTable->selectionModel()->select(modelIdx, QItemSelectionModel::SelectCurrent);
+			ui->databaseTable->scrollTo(modelIdx, QAbstractItemView::PositionAtCenter);
+			found = true;
+			break;
+		}
+	}
+	if(!found) {
+		ui->searchTextEdit->setStyleSheet("background:#ff0000");
+		searchNotFoundStyleTimer.start();
+	}
+}
+
+void DatabaseView::onSearchResetStyle() {
+	ui->searchTextEdit->setStyleSheet("");
+}
+
+void DatabaseView::onModifyDb(QModelIndex, QModelIndex) {
+	savedData = false;
+	setWindowTitle(loadedDatabaseName + "*");
+}
+
+void DatabaseView::setStatus(eToolStatus newStatus) {
+	QString newMessage;
+
+	currentStatus = newStatus;
+
+	switch(currentStatus) {
+		case TS_NoDbDescLoaded: newMessage = "No Database Description Loaded";   break;
+		case TS_LoadingDbDesc:  newMessage = "Loading Database Description ..."; break;
+		case TS_NoDbLoaded:     newMessage = "No Database Loaded";               break;
+		case TS_LoadingDB:      newMessage = "Loading Database ...";             break;
+		case TS_DbLoaded:       newMessage = "Database loaded";                  break;
+		case TS_SavingDB:       newMessage = "Saving Database ...";              break;
+		case TS_ClosingDB:      newMessage = "Closing Database ...";             break;
+	}
+
+	if(!newMessage.isNull())
+		statusBarLabel->setText(newMessage);
+}
+
+void DatabaseView::setWindowTitle(const QString &title) {
+	QWidget::setWindowTitle(title);
+	emit titleChanged(this);
+}
