@@ -11,7 +11,7 @@ CONFIG -= app_bundle
 CONFIG += debug_and_release debug_and_release_target
 
 #QMAKE_CXXFLAGS += -march=pentium3 -mtune=generic -mfpmath=sse -msse -mmmx
-QMAKE_CXXFLAGS += -arch:SSE
+#QMAKE_CXXFLAGS += -arch:SSE
 
 DESTDIR = ../bin
 
