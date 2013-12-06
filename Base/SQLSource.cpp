@@ -418,7 +418,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 	IRowManipulator *row = getRowManipulator();
 	void *buffer;
 	int curCol, columnIndex, dummy;
-	SQLINTEGER dataSize;
+	SQLLEN dataSize;
 	SQLLEN isDataNull;
 
 	for(curCol=0, columnIndex=0; curCol<row->getColumnCount(); curCol++) {

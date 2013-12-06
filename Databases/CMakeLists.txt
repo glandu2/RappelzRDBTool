@@ -1,7 +1,4 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(RpzRdbDatabases)
-
-include(${CMAKE_CURRENT_SOURCE_DIR}/../CMakeLists.txt)
 
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
@@ -15,6 +12,6 @@ add_definitions(-DBUILDING_DATABASE)
 foreach(srcfile ${RappelzRDBTool_databasesdll_src})
 	string(REPLACE ".cpp" "" dllfile ${srcfile})
 	add_library(${dllfile} SHARED ${srcfile})
-	target_link_libraries(${dllfile} ${LIBRARY_OUTPUT_PATH}/RpzRdbBase.lib)
+	target_link_libraries(${dllfile} RpzRdbBase)
 	install(TARGETS ${dllfile} DESTINATION ./Databases/)
 endforeach()

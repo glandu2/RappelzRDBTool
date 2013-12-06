@@ -1,6 +1,6 @@
-#include "Base/IDatabase.h"
-#include "Base/IRowManipulator.h"
-#include "Base/IDatabaseDescription.h"
+#include "IDatabase.h"
+#include "IRowManipulator.h"
+#include "IDatabaseDescription.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -151,7 +151,7 @@ void tempFunction(IDatabase *database) {
 	}
 }
 
-int __cdecl main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	int i, result;
 	IDatabase *database = 0;

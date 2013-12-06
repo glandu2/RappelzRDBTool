@@ -24,7 +24,7 @@ class ExternDescriptedDatabase : public CImplement<IDatabaseDescription>
 		virtual const char* getFilename();
 
 	private:
-		int libHinst;
+		unsigned long long libHinst;
 
 		typedef void (DLLCALLCONV *DLLREGISTERSTRUCTPROC)(FieldDescriptor **dfm, int *size);
 		typedef const char* (DLLCALLCONV *DLLSQLORDERPROC)();

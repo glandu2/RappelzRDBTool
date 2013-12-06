@@ -1,19 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(RpzRdbBase)
-
-include(${PROJECT_SOURCE_DIR}/../CMakeLists.txt)
+set(TARGET_NAME RpzRdbBase)
 
 add_definitions(-DBUILDING_BASE)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 file(GLOB RappelzRDBTool_basedll_src *.cpp *.h)
-#SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--kill-at -Wl,--output-def,${LIBRARY_OUTPUT_PATH}/${PROJECT_NAME}.def" )
-#SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--kill-at -Wl,--output-def,${LIBRARY_OUTPUT_PATH}/${PROJECT_NAME}.def" )
+#SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--kill-at -Wl,--output-def,${LIBRARY_OUTPUT_PATH}/${TARGET_NAME}.def" )
+#SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--kill-at -Wl,--output-def,${LIBRARY_OUTPUT_PATH}/${TARGET_NAME}.def" )
 
-add_library(${PROJECT_NAME} SHARED ${RappelzRDBTool_basedll_src})
+add_library(${TARGET_NAME} SHARED ${RappelzRDBTool_basedll_src})
 if(WIN32)
-	target_link_libraries(${PROJECT_NAME} odbc32)
+	target_link_libraries(${TARGET_NAME} odbc32)
 else(WIN32)
-	target_link_libraries(${PROJECT_NAME} odbc)
+	target_link_libraries(${TARGET_NAME} odbc)
 endif(WIN32)
-install(TARGETS ${PROJECT_NAME} DESTINATION ./)
+install(TARGETS ${TARGET_NAME} DESTINATION ./)

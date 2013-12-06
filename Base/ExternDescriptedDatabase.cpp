@@ -16,14 +16,14 @@ ExternDescriptedDatabase::ExternDescriptedDatabase(const char* databaseName)
 {
 
 #ifdef __unix__
-	libHinst = (int)dlopen(databaseName, RTLD_NOW);
+	libHinst = (unsigned long long)dlopen(databaseName, RTLD_NOW);
 	if(!libHinst) {
 		char errorBuffer[256];
 		sprintf(errorBuffer, "Unable to load Database description DLL, last error: %s", dlerror());
 		throw errorBuffer;
 	}
 #else
-	libHinst = (int)LoadLibrary(databaseName);
+	libHinst = (unsigned long long)LoadLibrary(databaseName);
 	if(!libHinst) {
 		char errorBuffer[256];
 		sprintf(errorBuffer, "Unable to load Database description DLL, last error: 0x%08x", GetLastError());
