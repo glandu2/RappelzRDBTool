@@ -20,6 +20,7 @@ ExternDescriptedDatabase::ExternDescriptedDatabase(const char* databaseName)
 	if(!libHinst) {
 		char errorBuffer[256];
 		sprintf(errorBuffer, "Unable to load Database description DLL, last error: %s", dlerror());
+		puts(errorBuffer);
 		throw errorBuffer;
 	}
 #else
@@ -27,6 +28,7 @@ ExternDescriptedDatabase::ExternDescriptedDatabase(const char* databaseName)
 	if(!libHinst) {
 		char errorBuffer[256];
 		sprintf(errorBuffer, "Unable to load Database description DLL, last error: 0x%08x", GetLastError());
+		puts(errorBuffer);
 		throw errorBuffer;
 	}
 #endif
@@ -52,6 +54,7 @@ ExternDescriptedDatabase::ExternDescriptedDatabase(const char* databaseName)
 #else
 		FreeLibrary((HINSTANCE)libHinst);
 #endif
+		puts("Not a database description DLL");
 		throw "Not a Database Description DLL";
 	}
 }
