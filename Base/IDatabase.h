@@ -28,6 +28,8 @@ class IDatabase : public IObject
 		virtual void* DLLCALLCONV getUserData() = 0;
 
 		virtual IDatabaseDescription* DLLCALLCONV getDatabaseDescription() = 0;
+
+		virtual unsigned long long int DLLCALLCONV getDate() = 0;
 };
 
 #ifdef __cplusplus

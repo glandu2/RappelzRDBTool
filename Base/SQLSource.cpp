@@ -229,7 +229,8 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 		fputs(query, outputFile);
 		return ferror(outputFile) == 0;
 	} else {
-		if(!SQL_SUCCEEDED(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS))) {
+		int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+		if(!SQL_SUCCEEDED(result) && result != SQL_NO_DATA) {
 			fprintf(stderr, "SQL Query: %s\n", query);
 			commitTransaction = false;
 			return EILSEQ;
@@ -261,8 +262,20 @@ int SQLSource::writeRow() {
 	if(fileOutputMode) {
 		fputs(query, outputFile);
 	} else {
-		if(!SQL_SUCCEEDED(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS))) {
+		int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+		if(!SQL_SUCCEEDED(result) && result != SQL_NO_DATA) {
 			fprintf(stderr, "SQL Query: %s\n", query);
+			SQLCHAR     buffer[SQL_MAX_MESSAGE_LENGTH + 1];
+			SQLCHAR     sqlstate[SQL_SQLSTATE_SIZE + 1];
+			SQLINTEGER  sqlcode;
+			SQLSMALLINT length;
+			int i=1;
+			while ( SQLGetDiagRec( SQL_HANDLE_STMT, hstmt, i, sqlstate, &sqlcode, buffer, SQL_MAX_MESSAGE_LENGTH + 1, &length) == SQL_SUCCESS ) {
+				printf("SQLSTATE: %s\n", sqlstate);
+				printf("Native Error Code: %ld\n", sqlcode);
+				printf("buffer: %s \n\n", buffer);
+				i++;
+			}
 			commitTransaction = false;
 			return EILSEQ;
 		}

@@ -37,6 +37,8 @@ class Database : public CImplement<IDatabase>
 
 		virtual inline IDatabaseDescription* DLLCALLCONV getDatabaseDescription() { return databaseDescription; }
 
+		virtual unsigned long long int DLLCALLCONV getDate() { return date; }
+
 	protected:
 		void getDataSourceInfo(eDataSourceType type, IDataSource **ds, FieldOrder **associatedOrder, eDataFormat *associatedFormat);
 		static FieldOrder getFieldOrderFromColumnName(DataDescriptor *dataDescription, const char *columns);
@@ -48,6 +50,7 @@ class Database : public CImplement<IDatabase>
 		FieldOrder sqlOrder;
 		FieldOrder csvOrder;
 		IDatabaseDescription *databaseDescription;
+		unsigned long long int date;
 		void *userData;
 };
 

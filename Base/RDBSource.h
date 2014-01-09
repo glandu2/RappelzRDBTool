@@ -14,6 +14,8 @@ class RDBSource : public IDataSource
 		virtual int open(const char* source, eOpenMode openMode,  const char* location = 0, const char* user = 0, const char* password = 0, const char* options = 0);
 		virtual void close();
 
+		virtual unsigned long long int getDate() { return date; }
+
 		virtual int prepareRead(IRowManipulator *row);
 		virtual int prepareWrite(IRowManipulator *row, unsigned int rowCount);
 		virtual int readRow();
@@ -27,6 +29,7 @@ class RDBSource : public IDataSource
 		unsigned char bitAvailable;
 		unsigned int rowRead;
 		void *io_buffer;
+		unsigned long long int date;
 };
 
 } //namespace

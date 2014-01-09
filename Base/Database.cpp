@@ -133,6 +133,7 @@ int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCO
 	if(result) return result;
 
 	int rowProceed = 0;
+	date = ds->getDate();
 
 	dataList->reserve(ds->getRowNumber());
 

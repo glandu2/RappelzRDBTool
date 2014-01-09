@@ -5,6 +5,7 @@
 
 #include <QMessageBox>
 #include <QFileInfo>
+#include <QDate>
 
 DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel, QWidget *parent) :
 	QWidget(parent),
@@ -305,9 +306,13 @@ void DatabaseView::setStatus(eToolStatus newStatus) {
 		case TS_LoadingDbDesc:  newMessage = "Loading Database Description ..."; break;
 		case TS_NoDbLoaded:     newMessage = "No Database Loaded";               break;
 		case TS_LoadingDB:      newMessage = "Loading Database ...";             break;
-		case TS_DbLoaded:       newMessage = "Database loaded";                  break;
+		case TS_DbLoaded:       newMessage = QString("Database loaded, %1 rows").arg(db ? db->getRowCount() : 0);                  break;
 		case TS_SavingDB:       newMessage = "Saving Database ...";              break;
 		case TS_ClosingDB:      newMessage = "Closing Database ...";             break;
+	}
+
+	if(db && db->getDate() && currentStatus == TS_DbLoaded) {
+		newMessage += QString(" | Creation date: %1").arg(QDateTime::fromTime_t(db->getDate()).toString("yyyy/MM/dd"));
 	}
 
 	if(!newMessage.isNull())

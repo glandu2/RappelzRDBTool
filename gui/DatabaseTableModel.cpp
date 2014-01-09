@@ -20,10 +20,10 @@ void DatabaseTableModel::bindToDatabase(IDatabase *db) {
 
 	beginResetModel();
 
-	row = createRowManipulator(db->getRowManipulator()->getColumnType(), db->getRowManipulator()->getFieldOrder());
+	row = createRowManipulator(db->getRowManipulator()->getColumnType(), 0);
 
 	for(colCount=i=0; i<row->getColumnCount(); i++) {
-		if(row->getType(i) != TYPE_VARCHAR_SIZE) {
+		if(row->getType(i) != TYPE_VARCHAR_SIZE && (row->getIgnoreType(i) & TYPE_GUIIGNORE) == 0) {
 			columnBinding.resize(colCount+1);
 			columnBinding[colCount] = i;
 			colCount++;

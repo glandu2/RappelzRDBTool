@@ -4,10 +4,12 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 namespace RappelzRDBBase {
 
 RDBSource::RDBSource() {
+	date = 0;
 }
 
 int RDBSource::open(const char* source, eOpenMode openMode,  const char* location, const char* user, const char* password, const char* options) {
@@ -63,6 +65,16 @@ int RDBSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 
 int RDBSource::prepareRead(IRowManipulator *row) {
 	int rowNumber;
+	char dateBuffer[9];
+	fread(dateBuffer, 1, 8, rdbFile);
+	dateBuffer[8] = 0;
+
+	struct tm fileTime = {0};
+	sscanf(dateBuffer, "%4d%2d%2d", &fileTime.tm_year, &fileTime.tm_mon, &fileTime.tm_mday);
+	fileTime.tm_year -= 1900;
+	fileTime.tm_mon++;
+	date = mktime(&fileTime);
+
 	fseek(rdbFile, 0x80, SEEK_SET);
 	fread(&rowNumber, 4, 1, rdbFile);
 
