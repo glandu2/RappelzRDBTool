@@ -72,7 +72,7 @@ int RDBSource::prepareRead(IRowManipulator *row) {
 	struct tm fileTime = {0};
 	sscanf(dateBuffer, "%4d%2d%2d", &fileTime.tm_year, &fileTime.tm_mon, &fileTime.tm_mday);
 	fileTime.tm_year -= 1900;
-	fileTime.tm_mon++;
+	fileTime.tm_mon--;
 	date = mktime(&fileTime);
 
 	fseek(rdbFile, 0x80, SEEK_SET);
