@@ -1,11 +1,10 @@
 # Build results
 
-debug/
-release/
-x64/
-build/
-bin/
-obj/
+build*/
+bin*/
+obj*/
+project-*/
+internal*
 
 *.ilk
 *.exe
