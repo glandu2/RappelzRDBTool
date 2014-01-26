@@ -40,10 +40,10 @@ bool OpenSaveSource::getSource(bool save, QString *sourceName, eDataSourceType *
 		QString message;
 
 		if(save)
-			message = "Enter full SQL target table (like Telecaster.dbo.StringResource)\nWarning: the table will be overwritten without prompt if it already exists !";
-		else message = "Enter full SQL target table (like Telecaster.dbo.StringResource)";
+			message = "Enter full SQL target table (like Arcadia.dbo.StringResource)\nWarning: the table will be overwritten without prompt if it already exists !";
+		else message = "Enter full SQL target table (like Arcadia.dbo.StringResource)";
 
-		*sourceName = QInputDialog::getText(0, QCoreApplication::applicationName(), message, QLineEdit::Normal, QString("Telecaster.dbo."), &ok);
+        *sourceName = QInputDialog::getText(0, QCoreApplication::applicationName(), message, QLineEdit::Normal, QString("Arcadia.dbo."), &ok);
 		*sourceType = source;
 		return ok;
 	}

@@ -7,6 +7,20 @@
 #include <string.h>
 #include <math.h>
 
+void printOdbcStatus(SQLSMALLINT type, HSTMT hstmt) {
+	SQLCHAR     buffer[SQL_MAX_MESSAGE_LENGTH + 1];
+	SQLCHAR     sqlstate[SQL_SQLSTATE_SIZE + 1];
+	SQLINTEGER  sqlcode;
+	SQLSMALLINT length;
+	int i=1;
+	while ( SQLGetDiagRec( type, hstmt, i, sqlstate, &sqlcode, buffer, SQL_MAX_MESSAGE_LENGTH + 1, &length) == SQL_SUCCESS ) {
+		printf("SQLSTATE: %s\n", sqlstate);
+		printf("Native Error Code: %ld\n", sqlcode);
+		printf("buffer: %s \n\n", buffer);
+		i++;
+	}
+}
+
 namespace RappelzRDBBase {
 
 char *SQLSource::strreplace(const char *input, char c, const char *rep) {
@@ -81,6 +95,8 @@ int SQLSource::open(const char* source, eOpenMode openMode,  const char* locatio
 		SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 		result = SQLConnect(hdbc, (UCHAR*)location, SQL_NTS, (UCHAR*)user, SQL_NTS, (UCHAR*)password, SQL_NTS);
 		if(!SQL_SUCCEEDED(result)) {
+			printOdbcStatus(SQL_HANDLE_DBC, hdbc);
+			printf("%d\n", result);
 			SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
 			SQLFreeHandle(SQL_HANDLE_ENV, henv);
 			hdbc = 0;
@@ -130,8 +146,10 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 	//retreive row count
 	sprintf(query, "SELECT COUNT(*) FROM %s;", tableName);
 	SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-	if(!SQL_SUCCEEDED(SQLFetch(hstmt)))
+	if(!SQL_SUCCEEDED(SQLFetch(hstmt))) {
+		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
 		return EINVAL;
+	}
 	SQLGetData(hstmt, 1, SQL_C_LONG, &rowCount, sizeof(int), NULL);
 	setRowNumber(rowCount);
 
@@ -141,17 +159,7 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 
 	printf("Quering: \"%s\"\n", query);
 	if(!SQL_SUCCEEDED(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS))) {
-		SQLCHAR     buffer[SQL_MAX_MESSAGE_LENGTH + 1];
-		SQLCHAR     sqlstate[SQL_SQLSTATE_SIZE + 1];
-		SQLINTEGER  sqlcode;
-		SQLSMALLINT length;
-		int i=1;
-		while ( SQLGetDiagRec( SQL_HANDLE_STMT, hstmt, i, sqlstate, &sqlcode, buffer, SQL_MAX_MESSAGE_LENGTH + 1, &length) == SQL_SUCCESS ) {
-			printf("SQLSTATE: %s\n", sqlstate);
-			printf("Native Error Code: %ld\n", sqlcode);
-			printf("buffer: %s \n\n", buffer);
-			i++;
-		}
+		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
 		return ENOEXEC;
 	}
 
@@ -232,6 +240,7 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 		int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
 		if(!SQL_SUCCEEDED(result) && result != SQL_NO_DATA) {
 			fprintf(stderr, "SQL Query: %s\n", query);
+			printOdbcStatus(SQL_HANDLE_STMT, hstmt);
 			commitTransaction = false;
 			return EILSEQ;
 		}
@@ -265,17 +274,7 @@ int SQLSource::writeRow() {
 		int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
 		if(!SQL_SUCCEEDED(result) && result != SQL_NO_DATA) {
 			fprintf(stderr, "SQL Query: %s\n", query);
-			SQLCHAR     buffer[SQL_MAX_MESSAGE_LENGTH + 1];
-			SQLCHAR     sqlstate[SQL_SQLSTATE_SIZE + 1];
-			SQLINTEGER  sqlcode;
-			SQLSMALLINT length;
-			int i=1;
-			while ( SQLGetDiagRec( SQL_HANDLE_STMT, hstmt, i, sqlstate, &sqlcode, buffer, SQL_MAX_MESSAGE_LENGTH + 1, &length) == SQL_SUCCESS ) {
-				printf("SQLSTATE: %s\n", sqlstate);
-				printf("Native Error Code: %ld\n", sqlcode);
-				printf("buffer: %s \n\n", buffer);
-				i++;
-			}
+			printOdbcStatus(SQL_HANDLE_STMT, hstmt);
 			commitTransaction = false;
 			return EILSEQ;
 		}

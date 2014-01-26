@@ -136,9 +136,9 @@ void DatabaseView::progressBarUpdate(int itemProceeded, int totalItem) {
 
 int DatabaseView::loadDb(eDataSourceType type, QString filename, QString location, QString username, QString password) {
 	int result;
-	const char* locationStr;
-	const char* usernameStr;
-	const char* passwordStr;
+	QByteArray locationStr;
+	QByteArray usernameStr;
+	QByteArray passwordStr;
 
 
 	ui->progressBar->setValue(0);
@@ -158,14 +158,14 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 	}
 
 	if(!location.isEmpty())
-		locationStr = location.toLatin1().constData();
-	else locationStr = 0;
+		locationStr = location.toLatin1();
+
 	if(!username.isEmpty())
-		usernameStr = username.toLatin1().constData();
-	else usernameStr = 0;
+		usernameStr = username.toLatin1();
+
 	if(!password.isEmpty())
-		passwordStr = password.toLatin1().constData();
-	else passwordStr = 0;
+		passwordStr = password.toLatin1();
+
 
 	setStatus(TS_LoadingDB);
 
@@ -201,9 +201,9 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 
 int DatabaseView::saveDb(eDataSourceType type, QString filename, QString location, QString username, QString password) {
 	int result;
-	const char* locationStr;
-	const char* usernameStr;
-	const char* passwordStr;
+	QByteArray locationStr;
+	QByteArray usernameStr;
+	QByteArray passwordStr;
 
 	setStatus(TS_SavingDB);
 
@@ -211,16 +211,16 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 	ui->databaseTable->setEnabled(false);
 
 	if(!location.isEmpty())
-		locationStr = location.toLatin1().constData();
-	else locationStr = 0;
-	if(!username.isEmpty())
-		usernameStr = username.toLatin1().constData();
-	else usernameStr = 0;
-	if(!password.isEmpty())
-		passwordStr = password.toLatin1().constData();
-	else passwordStr = 0;
+		locationStr = location.toLatin1();
 
-	result = db->writeData(type, filename.toLatin1().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr);
+	if(!username.isEmpty())
+		usernameStr = username.toLatin1();
+
+	if(!password.isEmpty())
+		passwordStr = password.toLatin1();
+
+
+	result = db->writeData(type, filename.toLatin1().constData(), &progressBarUpdateCallback, this, locationStr.constData(), usernameStr.constData(), passwordStr.constData());
 
 	setStatus(TS_DbLoaded);
 
