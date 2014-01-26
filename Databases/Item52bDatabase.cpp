@@ -9,6 +9,10 @@
 extern "C" {
 #endif
 
+//Row size = 5976
+//82 row size = 6256
+// -280 bytes = -256 - 4 - 4 - 2 - 3 - 16 + 1 + 4
+
 static FieldDescriptor df[] =
 	{{1, TYPE_INT32 | TYPE_FLAG_KEY, "id"},
 	 {1, TYPE_INT32, "name_id"},
@@ -17,7 +21,6 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "class"},
 	 {1, TYPE_INT32, "set_id"},
 	 {1, TYPE_INT32, "set_part_flag"},
-	 {1, TYPE_INT8, "grade"},
 	 {1, TYPE_INT32, "rank"},
 	 {1, TYPE_INT32, "level"},
 	 {1, TYPE_INT32, "enhance"},
@@ -31,7 +34,6 @@ static FieldDescriptor df[] =
 	 {1, TYPE_FLOAT32, "weight"},
 	 {1, TYPE_INT32, "price"},
 	 {1, TYPE_INT32, "huntaholic_point"},
-	 {1, TYPE_INT32, "ethereal_durability"},
 	 {1, TYPE_INT32, "endurance"},
 	 {1, TYPE_INT32, "wear_type"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv0"},
@@ -50,22 +52,21 @@ static FieldDescriptor df[] =
 	 {1, TYPE_BIT, "limit_summoner"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv7"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv8"},
-	 {1, TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknownValue0"},
-		//{1, TYPE_INT32, "item_use_flag"},
-	 {1, TYPE_BIT, "flag_wear"},
+	 {1, TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv9"},
+	 {1, TYPE_BIT, "flag_cashitem"},  //0
+	 {1, TYPE_BIT, "flag_wear"},  //1
 	 {1, TYPE_BIT, "flag_storage"},
 	 {1, TYPE_BIT, "flag_enhance"},
 	 {1, TYPE_BIT, "flag_use"},
 	 {1, TYPE_BIT, "flag_card"},
 	 {1, TYPE_BIT, "flag_socket"},
-	 {1, TYPE_BIT, "flag_duplicate"},
+	 {1, TYPE_BIT, "flag_duplicate"},  //7
 	 {1, TYPE_BIT, "flag_target_use"},
 	 {1, TYPE_BIT, "flag_warp"},
 	 {1, TYPE_BIT, "flag_trade"},
 	 {1, TYPE_BIT, "flag_sell"},
 	 {1, TYPE_BIT, "flag_quest"},
 	 {1, TYPE_BIT, "flag_overweight"},
-	 {1, TYPE_BIT, "flag_cashitem"},
 	 {1, TYPE_BIT, "flag_riding"},
 	 {1, TYPE_BIT, "flag_drop"},
 	 {1, TYPE_BIT, "flag_move"},
@@ -78,16 +79,16 @@ static FieldDescriptor df[] =
 	 {1, TYPE_BIT, "flag_huntaholic_useable_only"},
 	 {1, TYPE_BIT, "flag_deathmatch"},
 	 {1, TYPE_BIT, "flag_deathmatch_useable_only"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv9"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv10"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv11"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv12"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv13"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv14"},
-	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "item_use_flag2"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv15"},
 	 {1, TYPE_INT32, "material"},
 	 {1, TYPE_INT32, "summon_id"},
 	 {1, TYPE_INT32, "throw_range"},
+	 {1, TYPE_CHAR,  "distribute_type"},
 	 {1, TYPE_INT16, "base_type_0"},
 	 {1, TYPE_INT16, "base_type_1"},
 	 {1, TYPE_INT16, "base_type_2"},
@@ -112,7 +113,6 @@ static FieldDescriptor df[] =
 	 {1, TYPE_FLOAT64, "opt_var2_1"},
 	 {1, TYPE_FLOAT64, "opt_var2_2"},
 	 {1, TYPE_FLOAT64, "opt_var2_3"},
-	 {1, TYPE_INT32, "effect_id"},
 	 {1, TYPE_INT16, "enhance_0_id"},
 	 {1, TYPE_INT16, "enhance_1_id"},
 	 {1, TYPE_FLOAT32, "enhance_0_01"},
@@ -127,12 +127,14 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "state_id"},
 	 {1, TYPE_INT32, "state_level"},
 	 {1, TYPE_INT32, "state_time"},
-	 {1, TYPE_INT8, "state_type"},
+	 {1, TYPE_INT8, "state_type?"},
 	 {1, TYPE_INT32, "cool_time"},
 	 {1, TYPE_INT16, "cool_time_group"},
 	 {1, TYPE_INT32, "available_period"},
-	 {1, TYPE_INT16, "decrease_type"},
-	 {1, TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknownValue1"},
+	 {1, TYPE_INT8, "decrease_type"},
+	 {1, TYPE_INT8 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknown3"},
+	 {1, TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknown4"},
+
 	 {1, TYPE_INT32, "model_type_dem"},
 	 {1, TYPE_INT32, "model_type_def"},
 	 {1, TYPE_INT32, "model_type_asm"},
@@ -158,7 +160,6 @@ static FieldDescriptor df[] =
 	 {256, TYPE_CHAR, "model_15"},
 	 {256, TYPE_CHAR, "model_16"},
 	 {256, TYPE_CHAR, "model_17"},
-	 {256, TYPE_CHAR, "texture_filename"},
 	 {256, TYPE_CHAR, "drop_type"},
 	 {3, TYPE_CHAR | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unkCatValue"},	//always "Cat"
 	 {1, TYPE_INT32, "icon_id"},
@@ -183,7 +184,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"wear_type\0"
 			"set_id\0"
 			"set_part_flag\0"
-			"grade\0"
+//			"grade\0"
 			"rank\0"
 			"level\0"
 			"enhance\0"
@@ -192,6 +193,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"limit_deva\0"
 			"limit_asura\0"
 			"limit_gaia\0"
+//			"job_depth\0"
 			"limit_fighter\0"
 			"limit_hunter\0"
 			"limit_magician\0"
@@ -204,40 +206,34 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"weight\0"
 			"price\0"
 			"huntaholic_point\0"
-			"ethereal_durability\0"
+//			"ethereal_durability\0"
 			"endurance\0"
 			"material\0"
 			"summon_id\0"
-			//"item_use_flag\0"
-			"flag_wear\0"
-			"flag_storage\0"
-			"flag_enhance\0"
-			"flag_use\0"
-			"flag_card\0"
-			"flag_socket\0"
-			"flag_duplicate\0"
-			"flag_target_use\0"
-			"flag_warp\0"
-			"flag_trade\0"
-			"flag_sell\0"
-			"flag_quest\0"
-			"flag_overweight\0"
-			"flag_cashitem\0"
-			"flag_riding\0"
-			"flag_drop\0"
-			"flag_move\0"
-			"flag_quest_distribute\0"
-			"flag_sit\0"
-			"flag_raid\0"
-			"flag_secroute\0"
-			"flag_eventmap\0"
-			"flag_huntaholic\0"
-			"flag_huntaholic_useable_only\0"
-			"flag_deathmatch\0"
-			"flag_deathmatch_useable_only\0"
+			"item_use_flag\0"
+//			"flag_cashitem\0"
+//			"flag_wear\0"
+//			"flag_use\0"
+//			"flag_target_use\0"
+//			"flag_duplicate\0"
+//			"flag_drop\0"
+//			"flag_trade\0"
+//			"flag_sell\0"
+//			"flag_storage\0"
+//			"flag_overweight\0"
+//			"flag_riding\0"
+//			"flag_move\0"
+//			"flag_sit\0"
+//			"flag_enhance\0"
+//			"flag_quest\0"
+//			"flag_raid\0"
+//			"flag_secroute\0"
+//			"flag_eventmap\0"
+//			"flag_huntaholic\0"
 			"available_period\0"
 			"decrease_type\0"
 			"throw_range\0"
+			"distribute_type\0" //
 			"base_type_0\0"
 			"base_var1_0\0"
 			"base_var2_0\0"
@@ -262,7 +258,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"opt_type_3\0"
 			"opt_var1_3\0"
 			"opt_var2_3\0"
-			"effect_id\0"
+//			"effect_id\0"
 			"enhance_0_id\0"
 			"enhance_0_01\0"
 			"enhance_0_02\0"
@@ -277,7 +273,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"state_id\0"
 			"state_level\0"
 			"state_time\0"
-			"state_type\0"
+			"state_type\0"         //
 			"cool_time\0"
 			"cool_time_group\0"
 			"model_type_dem\0"
@@ -305,7 +301,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"model_15\0"
 			"model_16\0"
 			"model_17\0"
-			"texture_filename\0"
+//			"texture_filename\0"
 			"drop_type\0"
 			"icon_id\0"
 			"icon_file_name\0"
@@ -316,42 +312,15 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Write && dst == DF_RDB) {
 		char *catValue = static_cast<char*>(row->getValuePtr("unkCatValue"));
-		catValue[0] = 'C';
-		catValue[1] = 'a';
-		catValue[2] = 't';
-		*static_cast<int*>(row->getValuePtr("item_use_flag2")) = 
-			 *static_cast<char*>(row->getValuePtr("flag_wear")) |
-			(*static_cast<char*>(row->getValuePtr("flag_storage")) << 1) |
-			(*static_cast<char*>(row->getValuePtr("flag_enhance")) << 2) |
-			(*static_cast<char*>(row->getValuePtr("flag_use")) << 3) |
-			(*static_cast<char*>(row->getValuePtr("flag_card")) << 4) |
-			(*static_cast<char*>(row->getValuePtr("flag_socket")) << 5) |
-			(*static_cast<char*>(row->getValuePtr("flag_duplicate")) << 6) |
-			(*static_cast<char*>(row->getValuePtr("flag_target_use")) << 7) |
-			(*static_cast<char*>(row->getValuePtr("flag_warp")) << 8) |
-			(*static_cast<char*>(row->getValuePtr("flag_trade")) << 9) |
-			(*static_cast<char*>(row->getValuePtr("flag_sell")) << 10) |
-			(*static_cast<char*>(row->getValuePtr("flag_quest")) << 11) |
-			(*static_cast<char*>(row->getValuePtr("flag_overweight")) << 12) |
-			(*static_cast<char*>(row->getValuePtr("flag_cashitem")) << 13) |
-			(*static_cast<char*>(row->getValuePtr("flag_riding")) << 14) |
-			(*static_cast<char*>(row->getValuePtr("flag_drop")) << 15) |
-			(*static_cast<char*>(row->getValuePtr("flag_move")) << 16) |
-			(*static_cast<char*>(row->getValuePtr("flag_quest_distribute")) << 17) |
-			(*static_cast<char*>(row->getValuePtr("flag_sit")) << 18) |
-			(*static_cast<char*>(row->getValuePtr("flag_raid")) << 19) |
-			(*static_cast<char*>(row->getValuePtr("flag_secroute")) << 20) |
-			(*static_cast<char*>(row->getValuePtr("flag_eventmap")) << 21) |
-			(*static_cast<char*>(row->getValuePtr("flag_huntaholic")) << 22) |
-			(*static_cast<char*>(row->getValuePtr("flag_huntaholic_useable_only")) << 23) |
-			(*static_cast<char*>(row->getValuePtr("flag_deathmatch")) << 24) |
-			(*static_cast<char*>(row->getValuePtr("flag_deathmatch_useable_only")) << 25);
-		*static_cast<short*>(row->getValuePtr("unknownValue0")) = 0;
-		*static_cast<short*>(row->getValuePtr("unknownValue1")) = 49;
+		catValue[0] = 'y';
+		catValue[1] = ' ';
+		catValue[2] = 'I';
+		*static_cast<char*>(row->getValuePtr("unknown3")) = 0;
+		*static_cast<short*>(row->getValuePtr("unknown4")) = 0;
 
-		char nvValues[5];
+		char nvValues[4];
 		int i;
-		for(i=0; i<15; i++) {
+		for(i=0; i<16; i++) {
 			sprintf(nvValues, "nv%d", i);
 			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
 		}

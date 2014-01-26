@@ -1,7 +1,7 @@
-#include "../Base/IRowManipulator.h"
+#include "IRowManipulator.h"
 #include <stdio.h>
-#include "../Base/DataType.h"
-#include "../Base/ExportDLL.h"
+#include "DataType.h"
+#include "ExportDLL.h"
 #include <stdlib.h>
 #include <string.h>
 

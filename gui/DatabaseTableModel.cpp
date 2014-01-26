@@ -91,15 +91,15 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 		case TYPE_CHAR: {     //avoid big strings in table
 			int i;
 			for(i=0; ((char*)buffer)[i] && i<count; i++) ;
-			return QVariant::fromValue(QString::fromLatin1((char*)buffer, i));
+			return QVariant::fromValue(QString::fromLocal8Bit((char*)buffer, i));
 			break;
 		}
 
 		case TYPE_VARCHAR_STR:
 			if(((char*)buffer)[count-1] == '\0')  //On ne met pas e 0 final dans le QString
-				return QVariant::fromValue(QString::fromLatin1((char*)buffer, count-1));
+				return QVariant::fromValue(QString::fromLocal8Bit((char*)buffer, count-1));
 			else
-				return QVariant::fromValue(QString::fromLatin1((char*)buffer, count));
+				return QVariant::fromValue(QString::fromLocal8Bit((char*)buffer, count));
 			break;
 
 		case TYPE_INT8:
@@ -154,7 +154,7 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 
 		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR) {
 			row->freeValue(realColumnIndex);
-			row->initData(realColumnIndex, value.toString().toLatin1().length()+1);
+			row->initData(realColumnIndex, value.toString().toLocal8Bit().length()+1);
 		}
 		void *buffer = row->getValuePtr(realColumnIndex);
 		bool result = false;
@@ -187,7 +187,7 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 
 			case TYPE_CHAR:
 				result = true;
-				qstrncpy((char*)buffer, value.toString().toLatin1().constData(), row->getDataCount(realColumnIndex));
+				qstrncpy((char*)buffer, value.toString().toLocal8Bit().constData(), row->getDataCount(realColumnIndex)+1);
 				break;
 
 			case TYPE_FLOAT32:
@@ -200,7 +200,7 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 
 			case TYPE_VARCHAR_STR:
 				result = true;
-				qstrncpy((char*)buffer, value.toString().toLatin1().constData(), row->getDataCount(realColumnIndex));
+				qstrncpy((char*)buffer, value.toString().toLocal8Bit().constData(), row->getDataCount(realColumnIndex)+1);
 				break;
 		}
 

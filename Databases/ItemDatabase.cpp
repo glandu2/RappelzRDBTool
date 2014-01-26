@@ -1,6 +1,6 @@
-#include "../Base/IRowManipulator.h"
-#include "../Base/DataType.h"
-#include "../Base/ExportDLL.h"
+#include "IRowManipulator.h"
+#include "DataType.h"
+#include "ExportDLL.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
