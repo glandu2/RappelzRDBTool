@@ -33,7 +33,7 @@ void DatabaseDescManageDialog::onAdd() {
 
 	for(int i = 0; i < fileToAdd.size(); i++) {
 		const QString& fileName = fileToAdd.at(i);
-		IDatabaseDescription* dbDesc = createExternDescriptedDatabase(fileName.toLatin1().constData());
+		IDatabaseDescription* dbDesc = createExternDescriptedDatabase(fileName.toLocal8Bit().constData());
 		if(dbDesc) {
 			dbDescriptionModel->append(dbDesc);
 		}

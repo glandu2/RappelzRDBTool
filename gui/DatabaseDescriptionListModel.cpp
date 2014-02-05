@@ -19,7 +19,7 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QSettings *settings, 
 #endif
 
 	while((value = options->value((optionGroupName + "/filepath/%1").arg(i)).toString()).isNull() == false) {
-		IDatabaseDescription* dbDesc = createExternDescriptedDatabase(value.toLatin1().constData());
+		IDatabaseDescription* dbDesc = createExternDescriptedDatabase(value.toLocal8Bit().constData());
 		if(dbDesc) {
 			dbDescriptions.append(dbDesc);
 		}
@@ -36,7 +36,7 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QSettings *settings, 
 		if(fileInfo.fileName().endsWith("Database.dll"))
 #endif
 		{
-			IDatabaseDescription* dbDesc = createExternDescriptedDatabase(fileInfo.absoluteFilePath().toLatin1().constData());
+			IDatabaseDescription* dbDesc = createExternDescriptedDatabase(fileInfo.absoluteFilePath().toLocal8Bit().constData());
 			if(dbDesc) {
 				append(dbDesc);
 			}

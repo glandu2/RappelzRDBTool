@@ -158,18 +158,18 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 	}
 
 	if(!location.isEmpty())
-		locationStr = location.toLatin1();
+		locationStr = location.toLocal8Bit();
 
 	if(!username.isEmpty())
-		usernameStr = username.toLatin1();
+		usernameStr = username.toLocal8Bit();
 
 	if(!password.isEmpty())
-		passwordStr = password.toLatin1();
+		passwordStr = password.toLocal8Bit();
 
 
 	setStatus(TS_LoadingDB);
 
-	result = db->readData(type, filename.toLatin1().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr);
+	result = db->readData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr);
 	savedData = true;
 
 	if(result != 0) {
@@ -211,16 +211,16 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 	ui->databaseTable->setEnabled(false);
 
 	if(!location.isEmpty())
-		locationStr = location.toLatin1();
+		locationStr = location.toLocal8Bit();
 
 	if(!username.isEmpty())
-		usernameStr = username.toLatin1();
+		usernameStr = username.toLocal8Bit();
 
 	if(!password.isEmpty())
-		passwordStr = password.toLatin1();
+		passwordStr = password.toLocal8Bit();
 
 
-	result = db->writeData(type, filename.toLatin1().constData(), &progressBarUpdateCallback, this, locationStr.constData(), usernameStr.constData(), passwordStr.constData());
+	result = db->writeData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr.constData(), usernameStr.constData(), passwordStr.constData());
 
 	setStatus(TS_DbLoaded);
 
