@@ -1,5 +1,6 @@
 #include "ExternDescriptedDatabase.h"
 #include "SpecialDatabaseRules.h"
+#include <errno.h>
 
 #ifdef __linux__
 #  include <dlfcn.h>
@@ -11,25 +12,27 @@
 
 namespace RappelzRDBBase {
 
-ExternDescriptedDatabase::ExternDescriptedDatabase(const char* databaseName)
-	: filename(databaseName)
-{
+ExternDescriptedDatabase::ExternDescriptedDatabase()
+{}
+
+int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
+    int dummy;
+    if(!systemError) systemError = &dummy;
+	*systemError = 0;
 
 #ifdef __unix__
 	libHinst = (unsigned long long)dlopen(databaseName, RTLD_NOW);
-	if(!libHinst) {
-		char errorBuffer[256];
-		sprintf(errorBuffer, "Unable to load Database description DLL, last error: %s", dlerror());
-		puts(errorBuffer);
-		throw errorBuffer;
+    if(!libHinst) {
+		*systemError = errno;
+		fprintf(stderr, "Unable to load Database description DLL, last error: %s", dlerror());
+        return ENOENT;
 	}
 #else
 	libHinst = (unsigned long long)LoadLibrary(databaseName);
-	if(!libHinst) {
-		char errorBuffer[256];
-		sprintf(errorBuffer, "Unable to load Database description DLL, last error: 0x%08x", GetLastError());
-		puts(errorBuffer);
-		throw errorBuffer;
+    if(!libHinst) {
+        *systemError = GetLastError();
+		fprintf(stderr, "Unable to load Database description DLL, last error: 0x%08x", *systemError);
+        return ENOENT;
 	}
 #endif
 
@@ -54,17 +57,23 @@ ExternDescriptedDatabase::ExternDescriptedDatabase(const char* databaseName)
 #else
 		FreeLibrary((HINSTANCE)libHinst);
 #endif
-		puts("Not a database description DLL");
-		throw "Not a Database Description DLL";
+		fputs("Not a database description DLL", stderr);
+        return EINVAL;
 	}
+
+    filename = databaseName;
+
+	return 0;
 }
 
 ExternDescriptedDatabase::~ExternDescriptedDatabase() {
-#ifdef __unix__
-	dlclose((void*)libHinst);
-#else
-	FreeLibrary((HINSTANCE)libHinst);
-#endif
+    if(libHinst) {
+    #ifdef __unix__
+        dlclose((void*)libHinst);
+    #else
+        FreeLibrary((HINSTANCE)libHinst);
+    #endif
+    }
 }
 
 void ExternDescriptedDatabase::registerDBStructure(FieldDescriptor **dfm, int *size) {

@@ -12,9 +12,10 @@ namespace RappelzRDBBase {
 class ExternDescriptedDatabase : public CImplement<IDatabaseDescription>
 {
 	public:
-		ExternDescriptedDatabase(const char* databaseName);
+        ExternDescriptedDatabase();
 		~ExternDescriptedDatabase();
 
+        virtual int DLLCALLCONV open(const char* databaseName, int* systemError);
 		virtual void DLLCALLCONV registerDBStructure(FieldDescriptor **dfm, int *size);
 		virtual const char * DLLCALLCONV getSQLColumnOrder();
 		virtual const char * DLLCALLCONV getCSVColumnOrder();

@@ -10,7 +10,7 @@ class IDatabaseDescription;
 extern "C" {
 #endif
 
-EBASEDLL IDatabaseDescription * DLLCALLCONV createExternDescriptedDatabase(const char* databaseName);
+EBASEDLL IDatabaseDescription * DLLCALLCONV createExternDescriptedDatabase();
 
 #ifdef __cplusplus
 }
@@ -21,7 +21,7 @@ class IRowManipulator;
 class IDatabaseDescription : public IObject
 {
 	public:
-
+		virtual int DLLCALLCONV open(const char* databaseName, int* systemError) = 0;
 		virtual void DLLCALLCONV registerDBStructure(FieldDescriptor **dfm, int *size) = 0;
 		virtual const char * DLLCALLCONV getSQLColumnOrder() = 0;
 		virtual const char * DLLCALLCONV getCSVColumnOrder() = 0;

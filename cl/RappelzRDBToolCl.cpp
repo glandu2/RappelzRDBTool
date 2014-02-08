@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
+#include <errno.h>
 
 #ifdef __unix__
 #	include <sys/ioctl.h>
@@ -187,7 +188,21 @@ int main(int argc, char *argv[])
 			return 0;
 		} else if(!strcmp(argv[i], "--dbtype") && i+1 < argc) {
 			try {
-				dbDescription = createExternDescriptedDatabase(argv[i+1]);
+				dbDescription = createExternDescriptedDatabase();
+				switch(dbDescription->open(argv[i+1], 0)) {
+					case 0:
+						break;
+
+					case ENOENT:
+						throw "Db description file cannot be loaded";
+
+					case EINVAL:
+						throw "File is not a db description file";
+
+					default:
+						throw "Unknown error";
+				}
+
 				database = createDatabase(dbDescription);
 			} catch(const char *errorStr) {
 				fprintf(stderr, "Error Db type %s: %s\n", argv[i+1], errorStr);
