@@ -1,6 +1,6 @@
 #include "DataType.h"
 #include "ExportDLL.h"
-#include "../Base/SpecialDatabaseRules.h"
+#include "IRowManipulator.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -374,6 +374,13 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"is_projectile\0"
 			"projectile_speed\0"
 			"projectile_acceleration\0";
+}
+
+#pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
+	if(mode == DCT_Read && dst == DF_RDB) {
+		*static_cast<int*>(row->getValuePtr("desc_id")) = 0;
+	}
 }
 
 #ifdef __cplusplus

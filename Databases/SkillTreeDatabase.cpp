@@ -1,6 +1,6 @@
 #include "DataType.h"
 #include "ExportDLL.h"
-#include "../Base/SpecialDatabaseRules.h"
+#include "SpecialDatabaseRules.h"
 #include <stdlib.h>
 #include <string.h>
 

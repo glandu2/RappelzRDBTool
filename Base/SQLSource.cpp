@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <locale.h>
 
 void printOdbcStatus(SQLSMALLINT type, HSTMT hstmt) {
 	SQLCHAR     buffer[SQL_MAX_MESSAGE_LENGTH + 1];
@@ -57,6 +58,7 @@ SQLSource::SQLSource(SQLLanguage *language) {
 	sqlLanguage = language;
 	outputFile = 0;
 	fileOutputMode = false;
+	setlocale(LC_ALL, "C");
 }
 
 SQLSource::~SQLSource() {
