@@ -34,10 +34,10 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
-/*#pragma comment(linker, "/EXPORT:getSpecialCaseID=_getSpecialCaseID@0")
+#pragma comment(linker, "/EXPORT:getSpecialCaseID=_getSpecialCaseID@0")
 int EDATABASEDLL DLLCALLCONV getSpecialCaseID() {
 	return SPECIALCASE_DOUBLEFORRDB;
-}*/
+}
 
 #ifdef __cplusplus
 }
