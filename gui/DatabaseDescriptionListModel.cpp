@@ -7,7 +7,7 @@
 #include <QFileInfoList>
 
 bool compareDbDescriptionNameLessThan(IDatabaseDescription* a, IDatabaseDescription* b) {
-	return stricmp(a->getFilename(), b->getFilename()) < 0;
+	return strcmp(a->getFilename(), b->getFilename()) < 0;
 }
 
 DatabaseDescriptionListModel::DatabaseDescriptionListModel(QSettings *settings, QObject *parent) :

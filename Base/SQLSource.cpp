@@ -440,7 +440,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 		columnIndex++;	//do not count ignored columns
 
 		if(row->getType(curCol) == TYPE_VARCHAR_STR) {
-			SQLGetData(hstmt, columnIndex, SQL_C_BINARY, &dummy, 0, &dataSize);
+			SQLGetData(hstmt, columnIndex, SQL_C_CHAR, &dummy, 0, &dataSize);
 			row->initData(curCol, dataSize+1);	//dataSize+1 as some odbc implementation does not count the ending '\0'
 		} else row->initData(curCol);
 

@@ -101,15 +101,15 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 		case TYPE_CHAR: {     //avoid big strings in table
 			int i;
 			for(i=0; ((char*)buffer)[i] && i<count; i++) ;
-			return QVariant::fromValue(currentLocale->toUnicode((char*)buffer, i));
+            return QVariant::fromValue(currentLocale->toUnicode(QByteArray::fromRawData((char*)buffer, i)));
 			break;
 		}
 
 		case TYPE_VARCHAR_STR:
 			if(((char*)buffer)[count-1] == '\0')  //On ne met pas de 0 final dans le QString
-				return QVariant::fromValue(currentLocale->toUnicode((char*)buffer, count-1));
+                return QVariant::fromValue(currentLocale->toUnicode(QByteArray::fromRawData((char*)buffer, count-1)));
 			else
-				return QVariant::fromValue(currentLocale->toUnicode((char*)buffer, count));
+                return QVariant::fromValue(currentLocale->toUnicode(QByteArray::fromRawData((char*)buffer, count)));
 			break;
 
 		case TYPE_INT8:
