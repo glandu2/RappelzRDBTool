@@ -6,6 +6,11 @@
 #include <QMessageBox>
 #include <QFileInfo>
 #include <QDate>
+#include <QTextCodec>
+
+bool sortStringCaseInsensitive( QByteArray a, QByteArray b ) {
+	return qstricmp(a.constData(), b.constData()) < 0;
+}
 
 DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel, QWidget *parent) :
 	QWidget(parent),
@@ -36,6 +41,20 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 	searchNotFoundStyleTimer.setSingleShot(true);
 
 	connect(&searchNotFoundStyleTimer, SIGNAL(timeout()), this, SLOT(onSearchResetStyle()));
+
+	QList<QByteArray> codecList = QTextCodec::availableCodecs();
+	QByteArray localeCodecName = QTextCodec::codecForLocale()->name();
+	int codecsInserted = 0;
+
+	qSort(codecList.begin(), codecList.end(), &sortStringCaseInsensitive);
+	foreach(QByteArray codec, codecList) {
+		ui->localeCombo->insertItem(codecsInserted, QString::fromAscii(codec));
+		if(codec == localeCodecName)
+			ui->localeCombo->setCurrentIndex(codecsInserted);
+		codecsInserted++;
+	}
+
+	connect(ui->localeCombo, SIGNAL(currentIndexChanged(QString)), databaseModel, SLOT(onChangeLocale(QString)));
 
 	connect(ui->searchButton, SIGNAL(clicked()), this, SLOT(onSearch()));
 	connect(ui->searchTextEdit, SIGNAL(returnPressed()), this, SLOT(onSearch()));

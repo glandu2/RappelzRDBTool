@@ -29,7 +29,7 @@ void OpenSaveSource::setAutoDetectSourceType() {
 	autoDetectSourceType = true;
 }
 
-bool OpenSaveSource::getSource(bool save, QString *sourceName, eDataSourceType *sourceType) {
+bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceName, eDataSourceType *sourceType) {
 	eDataSourceType dummySource = DST_CSV;
 
 	if(sourceType == 0)
@@ -43,7 +43,7 @@ bool OpenSaveSource::getSource(bool save, QString *sourceName, eDataSourceType *
 			message = "Enter full SQL target table (like Arcadia.dbo.StringResource)\nWarning: the table will be overwritten without prompt if it already exists !";
 		else message = "Enter full SQL target table (like Arcadia.dbo.StringResource)";
 
-        *sourceName = QInputDialog::getText(0, QCoreApplication::applicationName(), message, QLineEdit::Normal, QString("Arcadia.dbo."), &ok);
+		*sourceName = QInputDialog::getText(0, QCoreApplication::applicationName(), message, QLineEdit::Normal, defaultName, &ok);
 		*sourceType = source;
 		return ok;
 	}
@@ -52,21 +52,21 @@ bool OpenSaveSource::getSource(bool save, QString *sourceName, eDataSourceType *
 	QString filter;
 	QString selectedFilter;
 	if(autoDetectSourceType)
-		filterList << "All files (*.*)";
+		filterList << "All files(*.*)";
 	if(source == DST_RDB || autoDetectSourceType)
-		filterList << "Client Database (*.rdb)" << "Hashed Client Database file (*.*)";
+		filterList << "Client Database(*.rdb " + defaultName + ")";
 	if(source == DST_CSV || autoDetectSourceType)
-		filterList << "Tabulation separated table (*.csv *.tsv *.txt)";
+		filterList << "Tabulation separated table(*.csv *.tsv *.txt)";
 
 	selectedFilter = filterList.first();
 	filter = filterList.join(";;");
 
 	if(save) {
-		*sourceName = QFileDialog::getSaveFileName(0, tr("Choose Database Source"), defaultDirSourceSave.value(defaultDirSourceOpen.value()).toString(), filter, &selectedFilter);
+		*sourceName = QFileDialog::getSaveFileName(0, tr("Choose Database Source"), defaultDirSourceSave.value(defaultDirSourceOpen.value()).toString() + "/" + defaultName, filter, &selectedFilter);
 		if(!sourceName->isNull())
 			defaultDirSourceSave = QFileInfo(*sourceName).absolutePath();
 	} else {
-		*sourceName = QFileDialog::getOpenFileName(0, tr("Choose Database Source"), defaultDirSourceOpen.value().toString(), filter, &selectedFilter);
+		*sourceName = QFileDialog::getOpenFileName(0, tr("Choose Database Source"), defaultDirSourceOpen.value().toString() + "/" + defaultName, filter, &selectedFilter);
 		if(!sourceName->isNull())
 			defaultDirSourceOpen = QFileInfo(*sourceName).absolutePath();
 	}

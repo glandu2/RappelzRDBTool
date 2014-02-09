@@ -30,11 +30,12 @@ class IDatabaseDescription : public IObject
 
 		virtual const char* getFilename() = 0;
 
+		virtual const char* getDefaultFileName() = 0;    //get the default filename, like db_string for StringDatabase (without extension).
+		virtual const char* getDefaultTableName() = 0;   //get the default table name for use with sql servers. (without dbo. or anything before that)
+
 		//Incoming version:
 		/*
 		virtual int getDBStructVersion();            //get the database description object version. To prevent version mismash and crashs. Might also used for a compatibility layer.
-		virtual const char* getDefaultFileName();    //get the default filename, like db_string for StringDatabase (without extension).
-		virtual const char* getDefaultTableName();   //get the default table name for use with sql servers. Can contain the database name as well.
 		*/
 };
 

@@ -64,7 +64,7 @@ class Maingui : public QMainWindow
 		void onDbStructHighlighted(int index);
 
 	protected:
-		void loadSaveDbFile(bool save, eSourceType srcType);
+		void loadSaveDbFile(bool save, eSourceType srcType, bool hashedFilename);
 		virtual void closeEvent(QCloseEvent *event);
 
 	private:

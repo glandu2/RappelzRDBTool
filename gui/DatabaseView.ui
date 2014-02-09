@@ -6,22 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>731</width>
-    <height>459</height>
+    <width>725</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Database View</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="2">
-    <widget class="QLabel" name="dbStructLabel">
-     <property name="text">
-      <string>Choose database structure:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2" colspan="2">
+   <item row="0" column="3" colspan="2">
     <widget class="QComboBox" name="dbStructCombo">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -34,7 +27,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="4">
+   <item row="0" column="5">
     <widget class="QPushButton" name="dbLoadClose">
      <property name="statusTip">
       <string>Load/Unload the selected database structure</string>
@@ -47,14 +40,50 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3">
-    <widget class="QLineEdit" name="searchTextEdit">
+   <item row="1" column="5">
+    <widget class="QPushButton" name="searchButton">
+     <property name="maximumSize">
+      <size>
+       <width>75</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="statusTip">
-      <string>Write the text to be searched</string>
+      <string>Search the written text from the current row</string>
+     </property>
+     <property name="text">
+      <string>Search</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
+   <item row="0" column="1" colspan="2">
+    <widget class="QLabel" name="dbStructLabel">
+     <property name="text">
+      <string>Choose database structure:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLabel" name="progressLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Progress:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" colspan="4">
+    <widget class="QProgressBar" name="progressBar">
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
     <widget class="QComboBox" name="searchColumnCombo">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -70,23 +99,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="4">
-    <widget class="QPushButton" name="searchButton">
-     <property name="maximumSize">
-      <size>
-       <width>75</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="statusTip">
-      <string>Search the written text from the current cursor position</string>
-     </property>
-     <property name="text">
-      <string>Search</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="5">
+   <item row="2" column="0" colspan="6">
     <widget class="QTableView" name="databaseTable">
      <property name="enabled">
       <bool>false</bool>
@@ -129,23 +142,27 @@
      </attribute>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="progressLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Progress:</string>
+   <item row="1" column="3">
+    <widget class="QLineEdit" name="searchTextEdit">
+     <property name="statusTip">
+      <string>Write the text to be searched</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1" colspan="4">
-    <widget class="QProgressBar" name="progressBar">
-     <property name="value">
-      <number>0</number>
+   <item row="1" column="2">
+    <widget class="QComboBox" name="localeCombo">
+     <property name="statusTip">
+      <string>The locale to use to display text data</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="localeLabel">
+     <property name="text">
+      <string>Locale:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
    </item>

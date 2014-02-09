@@ -1,9 +1,14 @@
 #include "DatabaseDescriptionListModel.h"
 #include "../Base/IDatabaseDescription.h"
+#include "NameToHash.h"
 
 #include <QSettings>
 #include <QDir>
 #include <QFileInfoList>
+
+bool compareDbDescriptionNameLessThan(IDatabaseDescription* a, IDatabaseDescription* b) {
+	return stricmp(a->getFilename(), b->getFilename()) < 0;
+}
 
 DatabaseDescriptionListModel::DatabaseDescriptionListModel(QSettings *settings, QObject *parent) :
 	QAbstractTableModel(parent),
@@ -46,12 +51,16 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QSettings *settings, 
 			}
 		}
 	}
+
+	beginResetModel();
+	qSort(dbDescriptions.begin(), dbDescriptions.end(), &compareDbDescriptionNameLessThan);
+	endResetModel();
 }
 
 DatabaseDescriptionListModel::~DatabaseDescriptionListModel() {
 	options->remove(optionGroupName + "/filepath");
 	for(int i = 0; i < dbDescriptions.size(); i++)
-		options->setValue((optionGroupName + "/filepath/%1").arg(i), QString(dbDescriptions.at(i)->getFilename()));
+		options->setValue((optionGroupName + "/filepath/%1").arg(i), QString::fromLocal8Bit(dbDescriptions.at(i)->getFilename()));
 }
 
 void DatabaseDescriptionListModel::append(IDatabaseDescription* value) {
@@ -78,17 +87,20 @@ void DatabaseDescriptionListModel::remove(int index) {
 int DatabaseDescriptionListModel::columnCount(const QModelIndex& parent) const {
 	if(parent.isValid())
 		return 0;
-	return 2;
+	return 5;
 }
 
 QVariant DatabaseDescriptionListModel::headerData(int section, Qt::Orientation orientation, int role) const {
 	if(orientation == Qt::Vertical || role != Qt::DisplayRole)
 		return QVariant();
 
-	if(section == 0)
-		return QVariant("Name");
-	else if(section == 1)
-		return QVariant("File name");
+	switch(section) {
+		case 0: return QVariant("Name");
+		case 1: return QVariant("File name");
+		case 2: return QVariant("Default DB file base name");
+		case 3: return QVariant("Default DB table");
+		case 4: return QVariant("Default RDB hash");
+	}
 
 	return QVariant();
 }
@@ -103,10 +115,18 @@ QVariant DatabaseDescriptionListModel::data(const QModelIndex& index, int role) 
 	if(!index.isValid() || index.parent().isValid() || role != Qt::DisplayRole)
 		return QVariant();
 
-	if(index.column() == 0)
-		return QFileInfo(QString(dbDescriptions.at(index.row())->getFilename())).fileName();
-	else if(index.column() == 1)
-		return QString(dbDescriptions.at(index.row())->getFilename());
+	switch(index.column()) {
+		case 0: return QFileInfo(QString::fromLocal8Bit(dbDescriptions.at(index.row())->getFilename())).fileName();
+		case 1: return QString::fromLocal8Bit(dbDescriptions.at(index.row())->getFilename());
+		case 2: return QString::fromLocal8Bit(dbDescriptions.at(index.row())->getDefaultFileName());
+		case 3: return QString::fromLocal8Bit(dbDescriptions.at(index.row())->getDefaultTableName());
+		case 4: {
+			QByteArray defaultFileName = QByteArray(dbDescriptions.at(index.row())->getDefaultFileName()) + ".rdb";
+			QByteArray hash(defaultFileName.size() + 2, 0);
+			convertNameToHash(defaultFileName.constData(), hash.data(), LEGACY_SEED);
+			return QString::fromLocal8Bit(hash);
+		}
+	}
 
 	return QVariant();
 }

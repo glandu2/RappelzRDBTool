@@ -24,6 +24,9 @@ class ExternDescriptedDatabase : public CImplement<IDatabaseDescription>
 
 		virtual const char* getFilename();
 
+		virtual const char* getDefaultFileName();
+		virtual const char* getDefaultTableName();
+
 	private:
 		unsigned long long libHinst;
 
@@ -32,14 +35,19 @@ class ExternDescriptedDatabase : public CImplement<IDatabaseDescription>
 		typedef const char* (DLLCALLCONV *DLLCSVORDERPROC)();
 		typedef void (DLLCALLCONV *DLLCONVERTDATAPROC)(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum);
 		typedef int (DLLCALLCONV *DLLISSPECIALPROC)();
+		typedef const char* (DLLCALLCONV *DLLDEFAULTFILENAMEPROC)();
+		typedef const char* (DLLCALLCONV *DLLDEFAULTTABLENAMEPROC)();
 
 		DLLREGISTERSTRUCTPROC DLLregisterDBStructure;
 		DLLSQLORDERPROC DLLgetSQLColumnOrder;
 		DLLCSVORDERPROC DLLgetCSVColumnOrder;
 		DLLCONVERTDATAPROC DLLconvertData;
 		DLLISSPECIALPROC DLLgetSpecialCaseID;
+		DLLDEFAULTFILENAMEPROC DLLgetDefaultFileName;
+		DLLDEFAULTTABLENAMEPROC DLLgetDefaultTableName;
 
 		std::string filename;
+		std::string fallbackDefaultFileName, fallbackDefaultTableName;
 };
 
 } //namespace

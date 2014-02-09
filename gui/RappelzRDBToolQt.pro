@@ -38,7 +38,8 @@ SOURCES += \
     DatabaseDescriptionListModel.cpp \
     OpenSaveSource.cpp \
     TabBarEventFilter.cpp \
-    DatabaseDescManageDialog.cpp
+    DatabaseDescManageDialog.cpp \
+    NameToHash.c
 
 HEADERS += \
     Maingui.h \
@@ -56,5 +57,6 @@ HEADERS += \
     DatabaseDescriptionListModel.h \
     OpenSaveSource.h \
     TabBarEventFilter.h \
-    DatabaseDescManageDialog.h
+    DatabaseDescManageDialog.h \
+    NameToHash.h
 

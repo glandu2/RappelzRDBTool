@@ -1,6 +1,8 @@
 #include "ExternDescriptedDatabase.h"
 #include "SpecialDatabaseRules.h"
 #include <errno.h>
+#include <string.h>
+#include <algorithm>
 
 #ifdef __linux__
 #  include <dlfcn.h>
@@ -43,12 +45,16 @@ int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
 	DLLgetCSVColumnOrder = (DLLCSVORDERPROC) dlsym((void*)libHinst, "getCSVColumnOrder");
 	DLLconvertData = (DLLCONVERTDATAPROC) dlsym((void*)libHinst, "convertData");
 	DLLgetSpecialCaseID = (DLLISSPECIALPROC) dlsym((void*)libHinst, "getSpecialCaseID");
+	DLLgetDefaultFileName = (DLLDEFAULTFILENAMEPROC) dlsym((void*)libHinst, "getDefaultFileName");
+	DLLgetDefaultTableName = (DLLDEFAULTTABLENAMEPROC) dlsym((void*)libHinst, "getDefaultTableName");
 #else
 	DLLregisterDBStructure = (DLLREGISTERSTRUCTPROC) GetProcAddress((HINSTANCE)libHinst, "registerDBStructure");
 	DLLgetSQLColumnOrder = (DLLSQLORDERPROC) GetProcAddress((HINSTANCE)libHinst, "getSQLColumnOrder");
 	DLLgetCSVColumnOrder = (DLLCSVORDERPROC) GetProcAddress((HINSTANCE)libHinst, "getCSVColumnOrder");
 	DLLconvertData = (DLLCONVERTDATAPROC) GetProcAddress((HINSTANCE)libHinst, "convertData");
 	DLLgetSpecialCaseID = (DLLISSPECIALPROC) GetProcAddress((HINSTANCE)libHinst, "getSpecialCaseID");
+	DLLgetDefaultFileName = (DLLDEFAULTFILENAMEPROC) GetProcAddress((HINSTANCE)libHinst, "getDefaultFileName");
+	DLLgetDefaultTableName = (DLLDEFAULTTABLENAMEPROC) GetProcAddress((HINSTANCE)libHinst, "getDefaultTableName");
 #endif
 
 	if(DLLregisterDBStructure == 0) {
@@ -104,6 +110,51 @@ int ExternDescriptedDatabase::getSpecialCaseID() {
 
 const char* ExternDescriptedDatabase::getFilename() {
 	return filename.c_str();
+}
+
+const char* ExternDescriptedDatabase::getDefaultFileName() {
+	if(DLLgetDefaultFileName)
+		return DLLgetDefaultFileName();
+
+	if(fallbackDefaultFileName.size() > 0)
+		return fallbackDefaultFileName.c_str();
+
+	size_t endPos = filename.find("Database.");
+	if(endPos == std::string::npos)
+		endPos = filename.find_last_of('.');
+	size_t beginPos = filename.find_last_of("/\\");
+
+	if(beginPos == std::string::npos || beginPos > endPos)
+		beginPos = 0;
+	else
+		beginPos++;
+
+	fallbackDefaultFileName = std::string("db_") + filename.substr(beginPos, endPos - beginPos);
+	std::transform(fallbackDefaultFileName.begin() + 3, fallbackDefaultFileName.end(), fallbackDefaultFileName.begin() + 3, ::tolower);
+
+	return fallbackDefaultFileName.c_str();
+}
+
+const char* ExternDescriptedDatabase::getDefaultTableName() {
+	if(DLLgetDefaultTableName)
+		return DLLgetDefaultTableName();
+
+	if(fallbackDefaultTableName.size() > 0)
+		return fallbackDefaultTableName.c_str();
+
+	size_t endPos = filename.find("Database.");
+	if(endPos == std::string::npos)
+		endPos = filename.find_last_of('.');
+	size_t beginPos = filename.find_last_of("/\\");
+
+	if(beginPos == std::string::npos || beginPos > endPos)
+		beginPos = 0;
+	else
+		beginPos++;
+
+	fallbackDefaultTableName = filename.substr(beginPos, endPos - beginPos) + "Resource";
+
+	return fallbackDefaultTableName.c_str();
 }
 
 } //namespace

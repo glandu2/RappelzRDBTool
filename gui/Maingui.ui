@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>758</width>
-    <height>506</height>
+    <width>756</width>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>758</width>
+     <width>756</width>
      <height>21</height>
     </rect>
    </property>
@@ -83,6 +83,7 @@
      <string>&amp;Options</string>
     </property>
     <addaction name="actionSQL_Options"/>
+    <addaction name="actionUse_hashed_files"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOptions"/>
@@ -105,6 +106,7 @@
    <addaction name="separator"/>
    <addaction name="actionManage_Db_Description_files"/>
    <addaction name="actionSQL_Options"/>
+   <addaction name="actionUse_hashed_files"/>
   </widget>
   <action name="actionLoad_from_RDB">
    <property name="text">
@@ -240,6 +242,17 @@
    </property>
    <property name="statusTip">
     <string>Load database description file(s)</string>
+   </property>
+  </action>
+  <action name="actionUse_hashed_files">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Use hashed files</string>
+   </property>
+   <property name="toolTip">
+    <string>Use the hashed name when opening / saving RDB file as the default file name</string>
    </property>
   </action>
  </widget>

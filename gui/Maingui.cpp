@@ -10,6 +10,7 @@
 #include "OpenSaveSource.h"
 #include "TabBarEventFilter.h"
 #include "DatabaseDescManageDialog.h"
+#include "NameToHash.h"
 
 #include <QMessageBox>
 #include <QStringList>
@@ -30,6 +31,8 @@ Maingui::Maingui(QWidget *parent) :
 	sqlConfigDialog = new SqlConfigDialog(options);
 	dbDescriptionModel = new DatabaseDescriptionListModel(options);
 	dbDescriptionManageDialog = new DatabaseDescManageDialog(dbDescriptionModel, this);
+
+	ui->actionUse_hashed_files->setChecked(options->value("useHashedFilename").toBool());
 
 	currentStatusBarLabel = 0;
 
@@ -65,6 +68,7 @@ Maingui::Maingui(QWidget *parent) :
 
 Maingui::~Maingui()
 {
+	options->setValue("useHashedFilename", ui->actionUse_hashed_files->isChecked());
 	delete dbDescriptionModel;
 	delete sqlConfigDialog;
 	delete options;
@@ -158,11 +162,12 @@ void Maingui::onLoadDbStructDLL() {
 	currentView->loadCloseDbDescriptionFile(true);
 }
 
-void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
+void Maingui::loadSaveDbFile(bool save, eSourceType srcType, bool hashedFilename) {
 	OpenSaveSource *openSaveSource;
 	bool ok;
 	bool autoDetectType;
 	QString sourceName;
+	QByteArray defaultSourceName;
 	eDataSourceType sourceType;
 	DatabaseView *currentView = databaseViews.value(ui->databaseTab->currentIndex(), 0);
 
@@ -189,18 +194,36 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 	switch(srcType) {
 		case ST_None:
 			autoDetectType = true;
+			defaultSourceName = currentView->getDefaultFileName() + ".rdb";
+			if(hashedFilename) {
+				QByteArray hashed(defaultSourceName.size() + 2, 0);
+				convertNameToHash(defaultSourceName.constData(), hashed.data(), LEGACY_SEED);
+				defaultSourceName = hashed;
+			}
 			break;
 
 		case ST_Rdb:
 			sourceType = DST_RDB;
+			defaultSourceName = currentView->getDefaultFileName() + ".rdb";
+			if(hashedFilename) {
+				QByteArray hashed(defaultSourceName.size() + 2, 0);
+				convertNameToHash(defaultSourceName.constData(), hashed.data(), LEGACY_SEED);
+				defaultSourceName = hashed;
+			}
+
 			break;
 
 		case ST_Csv:
 			sourceType = DST_CSV;
+			defaultSourceName = currentView->getDefaultFileName() + ".csv";
 			break;
 
 		case ST_Sql:
 			sourceType = sqlConfigDialog->getServerType();
+			if(sourceType == DST_SQLServer)
+				defaultSourceName = QByteArray("Arcadia.dbo.") + currentView->getDefaultTableName();
+			else
+				defaultSourceName = QByteArray("Arcadia.") + currentView->getDefaultTableName();
 			break;
 	}
 
@@ -211,7 +234,7 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 	else
 		openSaveSource->setSourceType(sourceType);
 
-	ok = openSaveSource->getSource(save, &sourceName, &sourceType);
+	ok = openSaveSource->getSource(save, defaultSourceName, &sourceName, &sourceType);
 
 	delete openSaveSource;
 
@@ -249,36 +272,36 @@ void Maingui::closeEvent(QCloseEvent *event)
 }
 
 void Maingui::onLoadFile() {
-	loadSaveDbFile(false, ST_None);
+	loadSaveDbFile(false, ST_None, ui->actionUse_hashed_files->isChecked());
 }
 
 void Maingui::onLoadRDB() {
-	loadSaveDbFile(false, ST_Rdb);
+	loadSaveDbFile(false, ST_Rdb, ui->actionUse_hashed_files->isChecked());
 }
 
 void Maingui::onLoadCSV() {
-	loadSaveDbFile(false, ST_Csv);
+	loadSaveDbFile(false, ST_Csv, ui->actionUse_hashed_files->isChecked());
 }
 
 void Maingui::onLoadSQL() {
-	loadSaveDbFile(false, ST_Sql);
+	loadSaveDbFile(false, ST_Sql, ui->actionUse_hashed_files->isChecked());
 }
 
 
 void Maingui::onSaveFile() {
-	loadSaveDbFile(true, ST_None);
+	loadSaveDbFile(true, ST_None, ui->actionUse_hashed_files->isChecked());
 }
 
 void Maingui::onSaveRDB() {
-	loadSaveDbFile(true, ST_Rdb);
+	loadSaveDbFile(true, ST_Rdb, ui->actionUse_hashed_files->isChecked());
 }
 
 void Maingui::onSaveCSV() {
-	loadSaveDbFile(true, ST_Csv);
+	loadSaveDbFile(true, ST_Csv, ui->actionUse_hashed_files->isChecked());
 }
 
 void Maingui::onSaveSQL() {
-	loadSaveDbFile(true, ST_Sql);
+	loadSaveDbFile(true, ST_Sql, ui->actionUse_hashed_files->isChecked());
 }
 
 void Maingui::onSQLOptions() {

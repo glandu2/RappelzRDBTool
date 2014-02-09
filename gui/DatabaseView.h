@@ -39,7 +39,10 @@ class DatabaseView : public QWidget
 		DatabaseView(DatabaseDescriptionListModel* dbDescriptionListModel, QWidget *parent = 0);
 		~DatabaseView();
 
-		QString getDescriptionFileName() { return db->getDatabaseDescription()->getFilename(); }
+		QString getDescriptionFileName() { return QString::fromLocal8Bit(db->getDatabaseDescription()->getFilename()); }
+		QByteArray getDefaultFileName() { return QByteArray(db->getDatabaseDescription()->getDefaultFileName()); }
+		QByteArray getDefaultTableName() { return QByteArray(db->getDatabaseDescription()->getDefaultTableName()); }
+
 		const QString& getLoadedDatabaseName() { return loadedDatabaseName; }
 		QLabel *getStatusLabel() { return statusBarLabel; }
 

@@ -6,6 +6,7 @@
 
 class IDatabase;
 class IRowManipulator;
+class QTextCodec;
 
 class DatabaseTableModel : public QAbstractTableModel
 {
@@ -25,10 +26,14 @@ class DatabaseTableModel : public QAbstractTableModel
 
 		virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
+	public slots:
+		void onChangeLocale(QString newLocale);
+
 	private:
 		IDatabase *db;
 		IRowManipulator *row;
 		QVector<int> columnBinding;
+		QTextCodec *currentLocale;
 		
 };
 
