@@ -5,12 +5,11 @@
 #include <QList>
 
 class IDatabaseDescription;
-class QSettings;
 
 class DatabaseDescriptionListModel : public QAbstractTableModel
 {
 	public:
-		DatabaseDescriptionListModel(QSettings *settings, QObject *parent = 0);
+		DatabaseDescriptionListModel(QObject *parent = 0);
 		~DatabaseDescriptionListModel();
 
 		void append(IDatabaseDescription* value);
@@ -25,7 +24,6 @@ class DatabaseDescriptionListModel : public QAbstractTableModel
 
 	private:
 		QList<IDatabaseDescription*> dbDescriptions;
-		QSettings *options;
 		QString optionGroupName;
 
 };

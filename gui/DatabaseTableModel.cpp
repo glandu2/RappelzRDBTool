@@ -1,22 +1,27 @@
 #include "DatabaseTableModel.h"
 #include "../Base/IDatabase.h"
 #include "../Base/IRowManipulator.h"
+#include "../Base/ICharsetConverter.h"
+#include <errno.h>
+#include "Settings.h"
 
 #include <math.h>
 #include <stdio.h>
 #include <QByteArray>
 #include <vector>
-#include <QTextCodec>
 
-DatabaseTableModel::DatabaseTableModel(QObject *parent) :
-	QAbstractTableModel(parent), currentLocale(QTextCodec::codecForLocale())
+DatabaseTableModel::DatabaseTableModel(QByteArray charset, QObject *parent) :
+	QAbstractTableModel(parent)
 {
 	db = NULL;
 	row = NULL;
+	currentLocale = createCharsetConverter(charset.constData());
+	if(currentLocale == 0)
+		currentLocale = createCharsetConverter("CP1252");
 }
 
-void DatabaseTableModel::onChangeLocale(QString newLocale) {
-	QTextCodec *newTextLocale = QTextCodec::codecForName(newLocale.toAscii());
+void DatabaseTableModel::changeLocale(QByteArray newLocale) {
+	ICharsetConverter* newTextLocale = createCharsetConverter(newLocale.constData());
 	if(newTextLocale) {
 		beginResetModel();
 		currentLocale = newTextLocale;
@@ -49,7 +54,8 @@ void DatabaseTableModel::bindToDatabase(IDatabase *db) {
 void DatabaseTableModel::unbindDatabase() {
 	beginResetModel();
 	db = NULL;
-	delete row;
+	if(row)
+		row->destroy();
 	row = NULL;
 	endResetModel();
 }
@@ -70,6 +76,30 @@ int DatabaseTableModel::rowCount(const QModelIndex& parent) const {
 	if(parent.isValid() || !db)
 		return 0;
 	else return db->getRowCount();
+}
+
+QString DatabaseTableModel::toUnicode(const char* data, int size) const {
+	ICharsetConverter::ConvertedString in, out;
+	in.data = (char*)data;
+	in.size = size;
+	currentLocale->convertToUtf16(in, &out);
+	QString ret((const QChar*)out.data, out.size/2);
+
+	free(out.data);
+
+	return ret;
+}
+
+QByteArray DatabaseTableModel::fromUnicode(QString data) const {
+	ICharsetConverter::ConvertedString in, out;
+	in.data = (char*)data.data();
+	in.size = data.size()*2;
+	currentLocale->convertFromUtf16(in, &out);
+	QByteArray ret(out.data, out.size);
+
+	free(out.data);
+
+	return ret;
 }
 
 QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
@@ -101,15 +131,15 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 		case TYPE_CHAR: {     //avoid big strings in table
 			int i;
 			for(i=0; ((char*)buffer)[i] && i<count; i++) ;
-            return QVariant::fromValue(currentLocale->toUnicode(QByteArray::fromRawData((char*)buffer, i)));
+			return QVariant::fromValue(toUnicode((char*)buffer, i));
 			break;
 		}
 
 		case TYPE_VARCHAR_STR:
 			if(((char*)buffer)[count-1] == '\0')  //On ne met pas de 0 final dans le QString
-                return QVariant::fromValue(currentLocale->toUnicode(QByteArray::fromRawData((char*)buffer, count-1)));
+				return QVariant::fromValue(toUnicode((char*)buffer, count-1));
 			else
-                return QVariant::fromValue(currentLocale->toUnicode(QByteArray::fromRawData((char*)buffer, count)));
+				return QVariant::fromValue(toUnicode((char*)buffer, count));
 			break;
 
 		case TYPE_INT8:
@@ -162,9 +192,14 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 		row->setCurrentRow(db->getRowAt(index.row()));
 		int realColumnIndex = columnBinding.at(index.column());
 
+		QByteArray converted;
+
+		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR || row->getType(realColumnIndex) == TYPE_CHAR)
+			converted = fromUnicode(value.toString());
+
 		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR) {
 			row->freeValue(realColumnIndex);
-			row->initData(realColumnIndex, currentLocale->fromUnicode(value.toString()).length()+1);
+			row->initData(realColumnIndex, converted.size()+1);
 		}
 		void *buffer = row->getValuePtr(realColumnIndex);
 		bool result = false;
@@ -197,7 +232,7 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 
 			case TYPE_CHAR:
 				result = true;
-				qstrncpy((char*)buffer, currentLocale->fromUnicode(value.toString()).constData(), row->getDataCount(realColumnIndex)+1);
+				qstrncpy((char*)buffer, converted.constData(), row->getDataCount(realColumnIndex)+1);
 				break;
 
 			case TYPE_FLOAT32:
@@ -210,7 +245,7 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 
 			case TYPE_VARCHAR_STR:
 				result = true;
-				qstrncpy((char*)buffer, currentLocale->fromUnicode(value.toString()).constData(), row->getDataCount(realColumnIndex)+1);
+				qstrncpy((char*)buffer, converted.constData(), row->getDataCount(realColumnIndex)+1);
 				break;
 		}
 

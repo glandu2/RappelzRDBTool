@@ -7,6 +7,7 @@
 #include <string.h>
 #include <math.h>
 #include <locale.h>
+#include "ICharsetConverter.h"
 
 void printOdbcStatus(SQLSMALLINT type, HSTMT hstmt) {
 	SQLCHAR     buffer[SQL_MAX_MESSAGE_LENGTH + 1];
@@ -58,6 +59,7 @@ SQLSource::SQLSource(SQLLanguage *language) {
 	sqlLanguage = language;
 	outputFile = 0;
 	fileOutputMode = false;
+	utf16To8bits = 0;
 	setlocale(LC_ALL, "C");
 }
 
@@ -83,6 +85,28 @@ int SQLSource::open(const char* source, eOpenMode openMode,  const char* locatio
 		SQLRETURN result;
 
 		fileOutputMode = false;
+
+		if(options) {
+			const char *p = strstr(options, "charset=");
+			if(p) {
+                char targetCharset[32] = {0};
+				p += 8;
+				const char *end = strchr(p, ';');
+				if(!end || end - p > 31) {
+					strncpy(targetCharset, p, 31);
+				} else {
+					strncpy(targetCharset, p, end - p);
+				}
+				targetCharset[31] = 0;
+
+				fprintf(stderr, "Using target charset \"%s\"\n", targetCharset);
+				utf16To8bits = createCharsetConverter(targetCharset);
+			}
+		}
+		if(utf16To8bits == 0)
+			utf16To8bits = createCharsetConverter("");
+		if(utf16To8bits == 0)
+			utf16To8bits = createCharsetConverter("CP1252");
 
 		result = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &henv);
 		if(!SQL_SUCCEEDED(result)) return ENOSYS;
@@ -138,6 +162,9 @@ void SQLSource::close() {
 		henv = 0;
 	}
 
+	if(utf16To8bits)
+		delete utf16To8bits;
+	utf16To8bits = 0;
 	if(tableName) free(tableName);
 	tableName = 0;
 }
@@ -160,7 +187,11 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 	prepareReadQuery();
 
 	printf("Quering: \"%s\"\n", query);
-	if(!SQL_SUCCEEDED(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS))) {
+	if(!SQL_SUCCEEDED(SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS))) {
+		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
+		return ENOEXEC;
+	}
+	if(!SQL_SUCCEEDED(SQLExecute(hstmt))) {
 		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
 		return ENOEXEC;
 	}
@@ -439,10 +470,9 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE)) continue;
 		columnIndex++;	//do not count ignored columns
 
-		if(row->getType(curCol) == TYPE_VARCHAR_STR) {
-			SQLGetData(hstmt, columnIndex, SQL_C_CHAR, &dummy, 0, &dataSize);
-			row->initData(curCol, dataSize+1);	//dataSize+1 as some odbc implementation does not count the ending '\0'
-		} else row->initData(curCol);
+		//Special handling for varchar
+		if(row->getType(curCol) != TYPE_VARCHAR_STR)
+			row->initData(curCol);
 
 		buffer = row->getValuePtr(curCol);
 
@@ -507,11 +537,38 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 			case TYPE_VARCHAR_SIZE:
 				break;
 
-			case TYPE_VARCHAR_STR:
-				SQLGetData(hstmt, columnIndex, SQL_C_CHAR, buffer, row->getDataCount(curCol), &isDataNull);
-				if(isDataNull == SQL_NULL_DATA)
-					*static_cast<char*>(buffer) = 0;
+			case TYPE_VARCHAR_STR: {
+				char *unicodeBuffer;
+				int inSize = 0;
+
+				SQLGetData(hstmt, columnIndex, SQL_C_WCHAR, &dummy, 0, &dataSize);
+				inSize = dataSize+2;
+				unicodeBuffer = new char[inSize];
+
+				SQLGetData(hstmt, columnIndex, SQL_C_WCHAR, unicodeBuffer, inSize, &isDataNull);
+
+
+				if(isDataNull == SQL_NULL_DATA) {
+					row->initData(curCol, 1);
+					*static_cast<char*>(row->getValuePtr(curCol)) = 0;
+				} else {
+					ICharsetConverter::ConvertedString in, out;
+					in.data = unicodeBuffer;
+					in.size = inSize;
+					utf16To8bits->convertFromUtf16(in, &out);
+
+					if(out.data[out.size-1] == 0)
+						row->initData(curCol, out.size);
+					else
+						row->initData(curCol, out.size+1);
+					char *outBuffer = static_cast<char*>(row->getValuePtr(curCol));
+					memcpy(outBuffer, out.data, out.size);
+					free(out.data);
+				}
+
+				delete[] unicodeBuffer;
 				break;
+			}
 		}
 	}
 	return 0;

@@ -2,11 +2,12 @@
 #include "ui_DatabaseView.h"
 #include "DatabaseTableModel.h"
 #include "../Base/IDatabase.h"
+#include "../Base/ICharsetConverter.h"
+#include "Settings.h"
 
 #include <QMessageBox>
 #include <QFileInfo>
 #include <QDate>
-#include <QTextCodec>
 
 bool sortStringCaseInsensitive( QByteArray a, QByteArray b ) {
 	return qstricmp(a.constData(), b.constData()) < 0;
@@ -21,7 +22,15 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 	lastPercentage = -1;
 	db = NULL;
 
-	databaseModel = new DatabaseTableModel(this);
+	const struct CharsetInfo * codepageList = availableCharsets();
+	QString defaultCodec = Settings::getSettings()->value("charset", "CP1252").toString();
+	for(int i = 0; codepageList[i].name; i++) {
+		ui->localeCombo->insertItem(i, QString::fromAscii(codepageList[i].description), QString::fromAscii(codepageList[i].name));
+		if(QString::fromAscii(codepageList[i].name) == defaultCodec)
+			ui->localeCombo->setCurrentIndex(i);
+	}
+
+	databaseModel = new DatabaseTableModel(ui->localeCombo->itemData(ui->localeCombo->currentIndex()).toByteArray(), this);
 	statusBarLabel = new QLabel(this);
 	statusBarLabel->hide();
 	setStatus(TS_NoDbDescLoaded);
@@ -42,19 +51,7 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 
 	connect(&searchNotFoundStyleTimer, SIGNAL(timeout()), this, SLOT(onSearchResetStyle()));
 
-	QList<QByteArray> codecList = QTextCodec::availableCodecs();
-	QByteArray localeCodecName = QTextCodec::codecForLocale()->name();
-	int codecsInserted = 0;
-
-	qSort(codecList.begin(), codecList.end(), &sortStringCaseInsensitive);
-	foreach(QByteArray codec, codecList) {
-		ui->localeCombo->insertItem(codecsInserted, QString::fromAscii(codec));
-		if(codec == localeCodecName)
-			ui->localeCombo->setCurrentIndex(codecsInserted);
-		codecsInserted++;
-	}
-
-	connect(ui->localeCombo, SIGNAL(currentIndexChanged(QString)), databaseModel, SLOT(onChangeLocale(QString)));
+	connect(ui->localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onChangeLocale(int)));
 
 	connect(ui->searchButton, SIGNAL(clicked()), this, SLOT(onSearch()));
 	connect(ui->searchTextEdit, SIGNAL(returnPressed()), this, SLOT(onSearch()));
@@ -67,9 +64,10 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 
 DatabaseView::~DatabaseView()
 {
+	Settings::getSettings()->setValue("charset", ui->localeCombo->itemData(ui->localeCombo->currentIndex()));
 	delete ui;
 	if(db)
-		delete db;
+		db->destroy();
 }
 
 void DatabaseView::setDbDescButtonChecked(bool checked) {
@@ -91,7 +89,7 @@ bool DatabaseView::loadCloseDbDescriptionFile(bool isLoad) {
 			return false;
 		}
 
-		delete db;
+		db->destroy();
 		db = NULL;
 		setStatus(TS_NoDbDescLoaded);
 	}
@@ -153,12 +151,13 @@ void DatabaseView::progressBarUpdate(int itemProceeded, int totalItem) {
 	}
 }
 
-int DatabaseView::loadDb(eDataSourceType type, QString filename, QString location, QString username, QString password) {
+int DatabaseView::loadDb(eDataSourceType type, QString filename, QString location, QString username, QString password, QByteArray options) {
 	int result;
 	QByteArray locationStr;
 	QByteArray usernameStr;
 	QByteArray passwordStr;
 
+	options += QByteArray("charset=") + ui->localeCombo->itemData(ui->localeCombo->currentIndex()).toByteArray() + ";";
 
 	ui->progressBar->setValue(0);
 	if(db->getRowCount() > 0) {
@@ -188,7 +187,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 
 	setStatus(TS_LoadingDB);
 
-	result = db->readData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr);
+	result = db->readData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr, options.constData());
 	savedData = true;
 
 	if(result != 0) {
@@ -218,7 +217,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 	return result;
 }
 
-int DatabaseView::saveDb(eDataSourceType type, QString filename, QString location, QString username, QString password) {
+int DatabaseView::saveDb(eDataSourceType type, QString filename, QString location, QString username, QString password, QByteArray options) {
 	int result;
 	QByteArray locationStr;
 	QByteArray usernameStr;
@@ -239,7 +238,7 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 		passwordStr = password.toLocal8Bit();
 
 
-	result = db->writeData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr.constData(), usernameStr.constData(), passwordStr.constData());
+	result = db->writeData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr.constData(), usernameStr.constData(), passwordStr.constData(), options.constData());
 
 	setStatus(TS_DbLoaded);
 
@@ -308,6 +307,10 @@ void DatabaseView::onSearch() {
 
 void DatabaseView::onSearchResetStyle() {
 	ui->searchTextEdit->setStyleSheet("");
+}
+
+void DatabaseView::onChangeLocale(int newIndex) {
+	databaseModel->changeLocale(ui->localeCombo->itemData(newIndex).toByteArray());
 }
 
 void DatabaseView::onModifyDb(QModelIndex, QModelIndex) {

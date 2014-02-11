@@ -14,8 +14,8 @@ class IDatabase : public IObject
 	public:
 		virtual const FieldOrder * DLLCALLCONV getFieldOrder(eDataSourceType type) = 0;
 
-		virtual int DLLCALLCONV readData(eDataSourceType type, const char* source = 0, void (DLLCALLCONV *progressCallBack)(void*, int, int) = 0, void *arg = 0, const char* location = 0, const char* user = 0, const char* password = 0) = 0;
-		virtual int DLLCALLCONV writeData(eDataSourceType type, const char* source = 0, void (DLLCALLCONV *progressCallBack)(void*, int, int) = 0, void *arg = 0, const char* location = 0, const char* user = 0, const char* password = 0) = 0;
+		virtual int DLLCALLCONV readData(eDataSourceType type, const char* source = 0, void (DLLCALLCONV *progressCallBack)(void*, int, int) = 0, void *arg = 0, const char* location = 0, const char* user = 0, const char* password = 0, const char* options = 0) = 0;
+		virtual int DLLCALLCONV writeData(eDataSourceType type, const char* source = 0, void (DLLCALLCONV *progressCallBack)(void*, int, int) = 0, void *arg = 0, const char* location = 0, const char* user = 0, const char* password = 0, const char* options = 0) = 0;
 
 		virtual void DLLCALLCONV close(void (DLLCALLCONV *progressCallBack)(void*, int, int), void *arg = 0) = 0;
 

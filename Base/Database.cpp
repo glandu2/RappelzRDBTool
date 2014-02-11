@@ -113,7 +113,7 @@ void Database::getDataSourceInfo(eDataSourceType type, IDataSource **ds, FieldOr
 
 /*********************************************************************/
 
-int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCONV *progressCallBack)(void*, int, int), void *arg, const char* location, const char* user, const char* password) {
+int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCONV *progressCallBack)(void*, int, int), void *arg, const char* location, const char* user, const char* password, const char* options) {
 	IDataSource *ds;
 	int result;
 	FieldOrder *order;
@@ -126,7 +126,7 @@ int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCO
 
 	rowManipulator->setFieldOrder(order);
 
-	result = ds->open(source, IDataSource::OM_Read, location, user, password);
+	result = ds->open(source, IDataSource::OM_Read, location, user, password, options);
 	if(result) return result;
 
 	result = ds->prepare(rowManipulator);
@@ -167,7 +167,7 @@ int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCO
 }
 
 
-int Database::writeData(eDataSourceType type, const char* source, void (DLLCALLCONV *progressCallBack)(void*, int, int), void *arg, const char* location, const char* user, const char* password) {
+int Database::writeData(eDataSourceType type, const char* source, void (DLLCALLCONV *progressCallBack)(void*, int, int), void *arg, const char* location, const char* user, const char* password, const char* options) {
 	IDataSource *ds;
 	int result;
 	FieldOrder *order;
@@ -181,7 +181,7 @@ int Database::writeData(eDataSourceType type, const char* source, void (DLLCALLC
 
 	rowManipulator->setFieldOrder(order);
 
-	result = ds->open(source, IDataSource::OM_Write, location, user, password);
+	result = ds->open(source, IDataSource::OM_Write, location, user, password, options);
 	if(result) return result;
 
 	result = ds->prepare(rowManipulator, recordNumber);

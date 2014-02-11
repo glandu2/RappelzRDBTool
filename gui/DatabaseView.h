@@ -51,10 +51,11 @@ class DatabaseView : public QWidget
 
 	public slots:
 		bool loadCloseDbDescriptionFile(bool isLoad);
-		int loadDb(eDataSourceType type, QString filename, QString location = QString(), QString username = QString(), QString password = QString());
-		int saveDb(eDataSourceType type, QString filename, QString location = QString(), QString username = QString(), QString password = QString());
+		int loadDb(eDataSourceType type, QString filename, QString location = QString(), QString username = QString(), QString password = QString(), QByteArray options = QByteArray());
+		int saveDb(eDataSourceType type, QString filename, QString location = QString(), QString username = QString(), QString password = QString(), QByteArray options = QByteArray());
 		bool closeDb(bool force = false);
 		void onSearch();
+		void onChangeLocale(int newIndex);
 
 	protected slots:
 		void onModifyDb(QModelIndex, QModelIndex);

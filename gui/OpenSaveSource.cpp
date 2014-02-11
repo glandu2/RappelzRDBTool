@@ -3,20 +3,20 @@
 #include <QInputDialog>
 #include <QCoreApplication>
 #include <QString>
+#include "Settings.h"
 
-OpenSaveSource::OpenSaveSource(QSettings *settings)
+OpenSaveSource::OpenSaveSource()
 {
-	options = settings;
 	autoDetectSourceType = true;
 
 #ifdef __linux__
-	defaultDirDLL = PersistentData(options, "RecentDirLinux/DatabaseDescription");
-	defaultDirSourceOpen = PersistentData(options, "RecentDirLinux/SourceOpen");
-	defaultDirSourceSave = PersistentData(options, "RecentDirLinux/SourceSave");
+	defaultDirDLL = PersistentData(Settings::getSettings(), "RecentDirLinux/DatabaseDescription");
+	defaultDirSourceOpen = PersistentData(Settings::getSettings(), "RecentDirLinux/SourceOpen");
+	defaultDirSourceSave = PersistentData(Settings::getSettings(), "RecentDirLinux/SourceSave");
 #else
-	defaultDirDLL = PersistentData(options, "RecentDirWindows/DatabaseDescription");
-	defaultDirSourceOpen = PersistentData(options, "RecentDirWindows/SourceOpen");
-	defaultDirSourceSave = PersistentData(options, "RecentDirWindows/SourceSave");
+	defaultDirDLL = PersistentData(Settings::getSettings(), "RecentDirWindows/DatabaseDescription");
+	defaultDirSourceOpen = PersistentData(Settings::getSettings(), "RecentDirWindows/SourceOpen");
+	defaultDirSourceSave = PersistentData(Settings::getSettings(), "RecentDirWindows/SourceSave");
 #endif
 }
 

@@ -10,6 +10,8 @@
 #include <sqlext.h>
 #include <stdio.h>
 
+class ICharsetConverter;
+
 namespace RappelzRDBBase {
 
 class SQLLanguage;
@@ -57,6 +59,7 @@ class SQLSource : public IDataSource
 		char *endOfHeader;
 
 		bool endOfRecordSet;
+		ICharsetConverter* utf16To8bits;
 };
 
 } //namespace

@@ -8,14 +8,12 @@ namespace Ui {
 class SqlConfigDialog;
 }
 
-class QSettings;
-
 class SqlConfigDialog : public QDialog
 {
 		Q_OBJECT
 		
 	public:
-		explicit SqlConfigDialog(QSettings *settings);
+		explicit SqlConfigDialog();
 		~SqlConfigDialog();
 
 		eDataSourceType getServerType();
@@ -28,7 +26,6 @@ class SqlConfigDialog : public QDialog
 		
 	private:
 		Ui::SqlConfigDialog *ui;
-		QSettings *settings;
 };
 
 #endif // SQLCONFIGDIALOG_H

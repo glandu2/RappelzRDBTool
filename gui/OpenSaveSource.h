@@ -5,18 +5,15 @@
 #include "../Base/DataType.h"
 #include "PersistentData.h"
 
-class QSettings;
-
 class OpenSaveSource : public QObject
 {
 	public:
-		OpenSaveSource(QSettings *settings);
+		OpenSaveSource();
 		void setSourceType(eDataSourceType type);
 		void setAutoDetectSourceType();
 		bool getSource(bool save, QString defaultName, QString *sourceName, eDataSourceType *sourceType);
 
 	private:
-		QSettings *options;
 		bool autoDetectSourceType;
 		eDataSourceType source;
 

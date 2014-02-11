@@ -70,7 +70,6 @@ class Maingui : public QMainWindow
 	private:
 		DatabaseDescriptionListModel *dbDescriptionModel;
 		QList<DatabaseView*> databaseViews;
-		QSettings *options;
 
 		Ui::MainWindow *ui;
 		SqlConfigDialog *sqlConfigDialog;

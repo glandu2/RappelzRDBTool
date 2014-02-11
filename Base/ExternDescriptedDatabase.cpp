@@ -18,23 +18,23 @@ ExternDescriptedDatabase::ExternDescriptedDatabase()
 {}
 
 int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
-    int dummy;
-    if(!systemError) systemError = &dummy;
+	int dummy;
+	if(!systemError) systemError = &dummy;
 	*systemError = 0;
 
 #ifdef __unix__
 	libHinst = (unsigned long long)dlopen(databaseName, RTLD_NOW);
-    if(!libHinst) {
+	if(!libHinst) {
 		*systemError = errno;
-		fprintf(stderr, "Unable to load Database description DLL, last error: %s", dlerror());
-        return ENOENT;
+		fprintf(stderr, "Unable to load Database description DLL, last error: %s\n", dlerror());
+		return ENOENT;
 	}
 #else
 	libHinst = (unsigned long long)LoadLibrary(databaseName);
-    if(!libHinst) {
-        *systemError = GetLastError();
-		fprintf(stderr, "Unable to load Database description DLL, last error: 0x%08x", *systemError);
-        return ENOENT;
+	if(!libHinst) {
+		*systemError = GetLastError();
+		fprintf(stderr, "Unable to load Database description DLL, last error: 0x%08x\n", *systemError);
+		return ENOENT;
 	}
 #endif
 
@@ -63,23 +63,23 @@ int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
 #else
 		FreeLibrary((HINSTANCE)libHinst);
 #endif
-		fputs("Not a database description DLL", stderr);
-        return EINVAL;
+		fputs("Not a database description DLL\n", stderr);
+		return EINVAL;
 	}
 
-    filename = databaseName;
+	filename = databaseName;
 
 	return 0;
 }
 
 ExternDescriptedDatabase::~ExternDescriptedDatabase() {
-    if(libHinst) {
-    #ifdef __unix__
-        dlclose((void*)libHinst);
-    #else
-        FreeLibrary((HINSTANCE)libHinst);
-    #endif
-    }
+	if(libHinst) {
+#ifdef __unix__
+		dlclose((void*)libHinst);
+#else
+		FreeLibrary((HINSTANCE)libHinst);
+#endif
+	}
 }
 
 void ExternDescriptedDatabase::registerDBStructure(FieldDescriptor **dfm, int *size) {

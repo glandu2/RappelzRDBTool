@@ -1,6 +1,7 @@
 #include "DatabaseDescriptionListModel.h"
 #include "../Base/IDatabaseDescription.h"
 #include "NameToHash.h"
+#include "Settings.h"
 
 #include <QSettings>
 #include <QDir>
@@ -10,9 +11,8 @@ bool compareDbDescriptionNameLessThan(IDatabaseDescription* a, IDatabaseDescript
 	return strcmp(a->getFilename(), b->getFilename()) < 0;
 }
 
-DatabaseDescriptionListModel::DatabaseDescriptionListModel(QSettings *settings, QObject *parent) :
-	QAbstractTableModel(parent),
-	options(settings)
+DatabaseDescriptionListModel::DatabaseDescriptionListModel(QObject *parent) :
+	QAbstractTableModel(parent)
 {
 	int i = 0;
 	QString value;
@@ -23,12 +23,12 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QSettings *settings, 
 	optionGroupName = "DbStructsWindows";
 #endif
 
-	while((value = options->value((optionGroupName + "/filepath/%1").arg(i)).toString()).isNull() == false) {
+	while((value = Settings::getSettings()->value((optionGroupName + "/filepath/%1").arg(i)).toString()).isNull() == false) {
 		IDatabaseDescription* dbDesc = createExternDescriptedDatabase();
 		if(dbDesc->open(value.toLocal8Bit().constData(), 0) == 0) {
 			dbDescriptions.append(dbDesc);
 		} else {
-			delete dbDesc;
+			dbDesc->destroy();
 		}
 		i++;
 	}
@@ -47,7 +47,7 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QSettings *settings, 
 			if(dbDesc->open(fileInfo.absoluteFilePath().toLocal8Bit().constData(), 0) == 0) {
 				append(dbDesc);
 			} else {
-				delete dbDesc;
+				dbDesc->destroy();
 			}
 		}
 	}
@@ -58,9 +58,9 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QSettings *settings, 
 }
 
 DatabaseDescriptionListModel::~DatabaseDescriptionListModel() {
-	options->remove(optionGroupName + "/filepath");
+	Settings::getSettings()->remove(optionGroupName + "/filepath");
 	for(int i = 0; i < dbDescriptions.size(); i++)
-		options->setValue((optionGroupName + "/filepath/%1").arg(i), QString::fromLocal8Bit(dbDescriptions.at(i)->getFilename()));
+		Settings::getSettings()->setValue((optionGroupName + "/filepath/%1").arg(i), QString::fromLocal8Bit(dbDescriptions.at(i)->getFilename()));
 }
 
 void DatabaseDescriptionListModel::append(IDatabaseDescription* value) {

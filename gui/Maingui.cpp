@@ -11,6 +11,7 @@
 #include "TabBarEventFilter.h"
 #include "DatabaseDescManageDialog.h"
 #include "NameToHash.h"
+#include "Settings.h"
 
 #include <QMessageBox>
 #include <QStringList>
@@ -24,15 +25,14 @@ Maingui::Maingui(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	options = new QSettings(QApplication::applicationDirPath() + "/RappelzRDBToolQt.ini", QSettings::IniFormat);
 
 	tabEventFilter = new TabBarEventFilter(ui->databaseTab, this);
 
-	sqlConfigDialog = new SqlConfigDialog(options);
-	dbDescriptionModel = new DatabaseDescriptionListModel(options);
+	sqlConfigDialog = new SqlConfigDialog();
+	dbDescriptionModel = new DatabaseDescriptionListModel();
 	dbDescriptionManageDialog = new DatabaseDescManageDialog(dbDescriptionModel, this);
 
-	ui->actionUse_hashed_files->setChecked(options->value("useHashedFilename").toBool());
+	ui->actionUse_hashed_files->setChecked(Settings::getSettings()->value("useHashedFilename").toBool());
 
 	currentStatusBarLabel = 0;
 
@@ -68,10 +68,9 @@ Maingui::Maingui(QWidget *parent) :
 
 Maingui::~Maingui()
 {
-	options->setValue("useHashedFilename", ui->actionUse_hashed_files->isChecked());
+	Settings::getSettings()->setValue("useHashedFilename", ui->actionUse_hashed_files->isChecked());
 	delete dbDescriptionModel;
 	delete sqlConfigDialog;
-	delete options;
 	delete ui;
 }
 
@@ -227,7 +226,7 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType, bool hashedFilename
 			break;
 	}
 
-	openSaveSource = new OpenSaveSource(options);
+	openSaveSource = new OpenSaveSource();
 
 	if(autoDetectType)
 		openSaveSource->setAutoDetectSourceType();

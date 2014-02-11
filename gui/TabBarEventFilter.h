@@ -20,7 +20,6 @@ class TabBarEventFilter : public QObject
 	private:
 		QTabBar *watchedTabBar;
 		QTabWidget *watchedTabWidget;
-		
 };
 
 #endif // TABBAREVENTFILTER_H

@@ -1,16 +1,15 @@
 #include "SqlConfigDialog.h"
 #include "ui_SqlConfigDialog.h"
 
-#include <QSettings>
+#include "Settings.h"
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-SqlConfigDialog::SqlConfigDialog(QSettings *settings) :
+SqlConfigDialog::SqlConfigDialog() :
 	QDialog(0),
-	ui(new Ui::SqlConfigDialog),
-	settings(settings)
+	ui(new Ui::SqlConfigDialog)
 {
 	ui->setupUi(this);
 #ifdef WIN32
@@ -20,25 +19,25 @@ SqlConfigDialog::SqlConfigDialog(QSettings *settings) :
 	ui->configureOdbcButton->deleteLater();
 #endif
 
-	ui->serverTypeCombo->setCurrentIndex(settings->value("SqlConfig/serverType").toInt());
-	ui->serverNameEdit->setText(settings->value("SqlConfig/serverName").toString());
+	ui->serverTypeCombo->setCurrentIndex(Settings::getSettings()->value("SqlConfig/serverType").toInt());
+	ui->serverNameEdit->setText(Settings::getSettings()->value("SqlConfig/serverName").toString());
 
-	ui->usernameEdit->setText(settings->value("SqlConfig/username").toString());
-	ui->passwordSaveCheck->setChecked(settings->value("SqlConfig/savePassword", false).toBool());
+	ui->usernameEdit->setText(Settings::getSettings()->value("SqlConfig/username").toString());
+	ui->passwordSaveCheck->setChecked(Settings::getSettings()->value("SqlConfig/savePassword", false).toBool());
 	if(ui->passwordSaveCheck->isChecked())
-		ui->passwordEdit->setText(settings->value("SqlConfig/password").toString());
+		ui->passwordEdit->setText(Settings::getSettings()->value("SqlConfig/password").toString());
 }
 
 SqlConfigDialog::~SqlConfigDialog()
 {
-	settings->setValue("SqlConfig/serverType", ui->serverTypeCombo->currentIndex());
-	settings->setValue("SqlConfig/serverName", ui->serverNameEdit->text());
-	settings->setValue("SqlConfig/username", ui->usernameEdit->text());
-	settings->setValue("SqlConfig/savePassword", ui->passwordSaveCheck->isChecked());
+	Settings::getSettings()->setValue("SqlConfig/serverType", ui->serverTypeCombo->currentIndex());
+	Settings::getSettings()->setValue("SqlConfig/serverName", ui->serverNameEdit->text());
+	Settings::getSettings()->setValue("SqlConfig/username", ui->usernameEdit->text());
+	Settings::getSettings()->setValue("SqlConfig/savePassword", ui->passwordSaveCheck->isChecked());
 
 	if(ui->passwordSaveCheck->isChecked())
-		settings->setValue("SqlConfig/password", ui->passwordEdit->text());
-	else settings->remove("SqlConfig/password");
+		Settings::getSettings()->setValue("SqlConfig/password", ui->passwordEdit->text());
+	else Settings::getSettings()->remove("SqlConfig/password");
 	delete ui;
 }
 

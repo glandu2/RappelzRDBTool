@@ -6,13 +6,13 @@
 
 class IDatabase;
 class IRowManipulator;
-class QTextCodec;
+class ICharsetConverter;
 
 class DatabaseTableModel : public QAbstractTableModel
 {
 		Q_OBJECT
 	public:
-		explicit DatabaseTableModel(QObject *parent = 0);
+		explicit DatabaseTableModel(QByteArray charset, QObject *parent = 0);
 
 		void bindToDatabase(IDatabase *db);
 		void unbindDatabase();
@@ -26,14 +26,16 @@ class DatabaseTableModel : public QAbstractTableModel
 
 		virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
-	public slots:
-		void onChangeLocale(QString newLocale);
+		QString toUnicode(const char* data, int size) const;
+		QByteArray fromUnicode(QString data) const;
+
+		void changeLocale(QByteArray newLocale);
 
 	private:
 		IDatabase *db;
 		IRowManipulator *row;
 		QVector<int> columnBinding;
-		QTextCodec *currentLocale;
+		ICharsetConverter *currentLocale;
 		
 };
 
