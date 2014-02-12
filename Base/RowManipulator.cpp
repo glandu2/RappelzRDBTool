@@ -227,6 +227,9 @@ void RowManipulator::freeValue(int colPos) {
 
 //ordered
 void *RowManipulator::getValuePtr(int colPos) {
+	if(colPos < 0)
+		return 0;
+
 	colPos = getColumnOriginalIndex(colPos);
 
 	const unsigned int dataCount = GET_VAR_LNGTH(columnsType->fieldsInfo[colPos].dataSize);

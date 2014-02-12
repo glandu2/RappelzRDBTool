@@ -82,9 +82,9 @@ static FieldDescriptor df[] =
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv10"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv11"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv12"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv13"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE , "nv13"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv14"},
-	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "item_use_flag2"},
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "item_use_flag2"},
 	 {1, TYPE_INT32, "material"},
 	 {1, TYPE_INT32, "summon_id"},
 	 {1, TYPE_INT32, "throw_range"},
@@ -160,7 +160,7 @@ static FieldDescriptor df[] =
 	 {256, TYPE_CHAR, "model_17"},
 	 {256, TYPE_CHAR, "texture_filename"},
 	 {256, TYPE_CHAR, "drop_type"},
-	 {3, TYPE_CHAR | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unkCatValue"},	//always "Cat"
+	 {3, TYPE_CHAR | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "unkCatValue"},	//always "Cat"
 	 {1, TYPE_INT32, "icon_id"},
 	 {256, TYPE_CHAR, "icon_file_name"},
 	 {512, TYPE_CHAR, "script_text"},

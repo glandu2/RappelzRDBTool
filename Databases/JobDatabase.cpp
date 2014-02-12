@@ -20,7 +20,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT16, "available_job_1"},
 	 {1, TYPE_INT16, "available_job_2"},
 	 {1, TYPE_INT16, "available_job_3"},
-	 {1, TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknown_value"},
+	 {1, TYPE_INT16 | TYPE_SQLIGNORE, "unknown_value"},
 	 {1, TYPE_INT32, "icon_id"},
 	 {256, TYPE_CHAR, "icon_file_name"}};
 
@@ -32,8 +32,8 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	if(mode == DCT_Write && dst == DF_RDB) {
-		*static_cast<short*>(row->getValuePtr("unknown_value")) = 162;
+	if(mode == DCT_Read && dst == DF_SQL) {
+		*static_cast<short*>(row->getValuePtr("unknown_value")) = 163;
 	}
 }
 

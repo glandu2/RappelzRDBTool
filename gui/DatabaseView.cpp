@@ -196,7 +196,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 		ui->progressBar->reset();
 		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't load the database file: %1").arg(strerror(result)));
 	} else {
-		loadedDatabaseName = QFileInfo(filename).fileName();
+		loadedDatabaseName = filename;
 		setWindowTitle(loadedDatabaseName);
 
 		databaseModel->bindToDatabase(db);
@@ -247,7 +247,7 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't save the database file: %1").arg(strerror(result)));
 	} else {
 		savedData = true;
-		loadedDatabaseName = QFileInfo(filename).fileName();
+		loadedDatabaseName = filename;
 		setWindowTitle(loadedDatabaseName);
 	}
 	ui->databaseTable->setEnabled(true);
@@ -315,7 +315,7 @@ void DatabaseView::onChangeLocale(int newIndex) {
 
 void DatabaseView::onModifyDb(QModelIndex, QModelIndex) {
 	savedData = false;
-	setWindowTitle(loadedDatabaseName + "*");
+	setWindowTitle(loadedDatabaseName);
 }
 
 void DatabaseView::setStatus(eToolStatus newStatus) {
@@ -342,6 +342,11 @@ void DatabaseView::setStatus(eToolStatus newStatus) {
 }
 
 void DatabaseView::setWindowTitle(const QString &title) {
-	QWidget::setWindowTitle(title);
+	QString shortTitle = QFileInfo(title).fileName();
+	if(savedData == false)
+		QWidget::setWindowTitle(shortTitle + "*");
+	else
+		QWidget::setWindowTitle(shortTitle);
+
 	emit titleChanged(this);
 }

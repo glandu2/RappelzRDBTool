@@ -29,7 +29,10 @@ int CharsetConverter::toUtf16(const char** inBuf, int* inSize, char** outBuf, in
 	char* outPtr = *outBuf;
 
 	iconv(ic_toUtf16,NULL,NULL,NULL,NULL);
-	while(iconv(ic_toUtf16, &inPtr, &sInSize, &outPtr, &sOutSize) == -1 && errno == EILSEQ || (sInSize > 0 && sOutSize > 1)) {
+	while(iconv(ic_toUtf16, &inPtr, &sInSize, &outPtr, &sOutSize) == -1 && sInSize > 0 && sOutSize > 1) {
+		if(errno == EINVAL || errno == E2BIG)
+			break;
+
 		inPtr ++;
 		sInSize --;
 
@@ -46,7 +49,14 @@ int CharsetConverter::toUtf16(const char** inBuf, int* inSize, char** outBuf, in
 	*outBuf = outPtr;
 	*outSize = (int)sOutSize;
 
-	return 0;
+	if(sInSize == 0)
+		return 0;
+	else {
+		if(errno == EINVAL || errno == E2BIG)
+			return -errno;
+		else
+			return -EINVAL;
+	}
 }
 
 int CharsetConverter::fromUtf16(const char** inBuf, int* inSize, char** outBuf, int* outSize) {
@@ -54,9 +64,13 @@ int CharsetConverter::fromUtf16(const char** inBuf, int* inSize, char** outBuf, 
 	size_t sOutSize = *outSize;
 	const char* inPtr = *inBuf;
 	char* outPtr = *outBuf;
+	size_t result;
 
 	iconv(ic_fromUtf16,NULL,NULL,NULL,NULL);
-	while(iconv(ic_fromUtf16, &inPtr, &sInSize, &outPtr, &sOutSize) == -1 && errno == EILSEQ || sInSize > 1 && sOutSize > 0) {
+	while((result = iconv(ic_fromUtf16, &inPtr, &sInSize, &outPtr, &sOutSize)) == -1 && sInSize > 1 && sOutSize > 0) {
+		if(errno == EINVAL || errno == E2BIG)
+			break;
+
 		inPtr += 2;
 		sInSize -= 2;
 
@@ -71,5 +85,12 @@ int CharsetConverter::fromUtf16(const char** inBuf, int* inSize, char** outBuf, 
 	*outBuf = outPtr;
 	*outSize = (int)sOutSize;
 
-	return 0;
+	if(sInSize == 0)
+		return 0;
+	else {
+		if(errno == EINVAL || errno == E2BIG)
+			return -errno;
+		else
+			return -EINVAL;
+	}
 }

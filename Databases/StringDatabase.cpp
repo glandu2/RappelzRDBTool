@@ -15,10 +15,10 @@ static FieldDescriptor df[] =
 	 {MAKEINDEXEDVAR(1, 4096), TYPE_VARCHAR_STR, "value"},
 	 {1, TYPE_INT32 | TYPE_FLAG_KEY, "code"},
 	 {1, TYPE_INT32, "group_id"},
-	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknownValue0"},
-	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknownValue1"},
-	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknownValue2"},
-	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknownValue3"}};
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "unknownValue0"},
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "unknownValue1"},
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "unknownValue2"},
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "unknownValue3"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
@@ -50,7 +50,7 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 	static int unknownValue2Idx;
 	static int unknownValue3Idx;
 
-	if(mode == DCT_Write && dst == DF_RDB) {
+	if(mode == DCT_Read && (dst == DF_SQL || dst == DF_CSV)) {
 		if(initialized == false) {
 			unknownValue0Idx = row->getColumnIndex("unknownValue0");
 			unknownValue1Idx = row->getColumnIndex("unknownValue1");

@@ -61,9 +61,14 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "local_flag"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
-void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
+EDATABASEDLL void DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
+}
+
+#pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
+EDATABASEDLL const char* DLLCALLCONV getDefaultFileName() {
+	return "db_creature";
 }
 
 #ifdef __cplusplus

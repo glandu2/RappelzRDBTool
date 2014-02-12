@@ -79,6 +79,11 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"effect_id\0";
 }
 
+#pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultFileName() {
+	return "db_setitemeffectresource";
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -202,8 +202,6 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 		endOfRecordSet = true;
 	} else endOfRecordSet = false;
 
-	setRowNumber(0);
-
 	return 0;
 }
 
@@ -283,7 +281,6 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 
 int SQLSource::readRow() {
 	prepareReadRowQuery(hstmt);
-	setRowNumber(getRowNumber()+1);
 
 	if(!SQL_SUCCEEDED(SQLFetch(hstmt)))
 		endOfRecordSet = true;
@@ -511,7 +508,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 					else {
 						float decimalValue;
 						sscanf(decimalTemp, "%f", &decimalValue);
-						*static_cast<int*>(buffer) = (int)(decimalValue*pow((float)10, row->getMaxDataCount(curCol))+0.5);
+						*static_cast<int*>(buffer) = (int)(decimalValue*pow((float)10, row->getDataIndex(curCol))+0.5);
 					}
 				}
 				break;
@@ -539,22 +536,35 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 
 			case TYPE_VARCHAR_STR: {
 				char *unicodeBuffer;
-				int inSize = 0;
+				int bufferSize;
+				int bytesRead = 0;
 
-				SQLGetData(hstmt, columnIndex, SQL_C_WCHAR, &dummy, 0, &dataSize);
-				inSize = dataSize+2;
-				unicodeBuffer = new char[inSize];
+				SQLGetData(hstmt, columnIndex, SQL_C_BINARY, &dummy, 0, &dataSize);
+				if(dataSize % 2 == 0)
+					bufferSize = dataSize+2;
+				else
+					bufferSize = dataSize+1;
+				unicodeBuffer = (char*)malloc(bufferSize);
 
-				SQLGetData(hstmt, columnIndex, SQL_C_WCHAR, unicodeBuffer, inSize, &isDataNull);
+				int ret;
+				while((ret = SQLGetData(hstmt, columnIndex, SQL_C_WCHAR, unicodeBuffer + bytesRead, bufferSize - bytesRead, &isDataNull)) == SQL_SUCCESS_WITH_INFO) {
+					if(isDataNull == SQL_NULL_DATA)
+						break;
 
+					bytesRead = bufferSize-2; //dont keep null terminator
+					bufferSize *= 2;
+					unicodeBuffer = (char*) realloc(unicodeBuffer, bufferSize);
+				}
 
 				if(isDataNull == SQL_NULL_DATA) {
 					row->initData(curCol, 1);
 					*static_cast<char*>(row->getValuePtr(curCol)) = 0;
 				} else {
+					bytesRead += isDataNull;
+
 					ICharsetConverter::ConvertedString in, out;
 					in.data = unicodeBuffer;
-					in.size = inSize;
+					in.size = bytesRead;
 					utf16To8bits->convertFromUtf16(in, &out);
 
 					if(out.data[out.size-1] == 0)
@@ -566,7 +576,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 					free(out.data);
 				}
 
-				delete[] unicodeBuffer;
+				free(unicodeBuffer);
 				break;
 			}
 		}

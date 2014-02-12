@@ -42,6 +42,11 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultFileName() {
+	return "db_itemeffectresource";
+}
+
 #ifdef __cplusplus
 }
 #endif

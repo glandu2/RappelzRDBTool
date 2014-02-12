@@ -5,8 +5,8 @@
 #include "Settings.h"
 
 //Unicode mess:
-//Combo box in sql table dialog to choose to which codepage convert data from SQL
-//Combo box for locale to choose the codepage of files (and store string always as 8 bits wide strings)
+//Dialog to hash names
+//Open files on command line
 
 int main(int argc, char *argv[])
 {

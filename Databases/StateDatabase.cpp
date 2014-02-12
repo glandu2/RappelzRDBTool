@@ -78,11 +78,11 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	if(mode == DCT_Write && dst == DF_RDB) {
+	if(mode == DCT_Read && dst == DF_SQL) {
 		*static_cast<char*>(row->getValuePtr("unknown0")) = 0;
 		*static_cast<char*>(row->getValuePtr("unknown1")) = 0;
 		*static_cast<short*>(row->getValuePtr("unknown2")) = 163;
-		*static_cast<int*>(row->getValuePtr("unknown3")) = 15662196;
+		*static_cast<int*>(row->getValuePtr("unknown3")) = 0xFFFC74;
 	}
 }
 
@@ -144,6 +144,11 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"special_output_fx_delay\0"
 			"state_fx_id\0"
 			"state_fx_pos_id\0";
+}
+
+#pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultFileName() {
+	return "db_tenacity";
 }
 
 #ifdef __cplusplus

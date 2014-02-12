@@ -51,12 +51,16 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 	QStringList filterList;
 	QString filter;
 	QString selectedFilter;
-	if(autoDetectSourceType)
-		filterList << "All files(*.*)";
 	if(source == DST_RDB || autoDetectSourceType)
-		filterList << "Client Database(*.rdb " + defaultName + ")";
+#ifdef _WIN32
+		filterList << "Client Database *.rdb;" + defaultName;
+#else
+		filterList << "Client Database (*.rdb " + defaultName + ")";
+#endif
 	if(source == DST_CSV || autoDetectSourceType)
-		filterList << "Tabulation separated table(*.csv *.tsv *.txt)";
+		filterList << "Tabulation separated table (*.csv *.tsv *.txt)";
+	if(autoDetectSourceType)
+		filterList << "All files (*.*)";
 
 	selectedFilter = filterList.first();
 	filter = filterList.join(";;");

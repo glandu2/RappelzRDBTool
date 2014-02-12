@@ -10,11 +10,11 @@ extern "C" {
 
 static FieldDescriptor df[] =
 	{{1, TYPE_INT32, "id"},
-	    {1, TYPE_INT32, "texture_change_time"},
-	    {1, TYPE_INT32, "a"},
-	    {1, TYPE_INT32, "r"},
-	    {1, TYPE_INT32, "g"},
-	    {1, TYPE_INT32, "b"},
+	 {1, TYPE_INT32, "texture_change_time"},
+	 {1, TYPE_INT32, "a"},
+	 {1, TYPE_INT32, "r"},
+	 {1, TYPE_INT32, "g"},
+	 {1, TYPE_INT32, "b"},
 	 {256, TYPE_CHAR, "texture_name_1"},
 	 {256, TYPE_CHAR, "texture_name_2"},
 	 {256, TYPE_CHAR, "texture_name_3"},
@@ -45,7 +45,7 @@ static FieldDescriptor df[] =
 	 {256, TYPE_CHAR, "texture_name_28"},
 	 {256, TYPE_CHAR, "texture_name_29"},
 	 {256, TYPE_CHAR, "texture_name_30"},
-	    {30, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nulValues"}};
+	 {30, TYPE_INT32 | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "nulValues"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {

@@ -101,6 +101,7 @@ void Maingui::onAddTab() {
 
 	ui->databaseTab->setUpdatesEnabled(false);
 	index = ui->databaseTab->addTab(tabView, tabView->windowTitle());
+	ui->databaseTab->setTabToolTip(index, tabView->getLoadedDatabaseName());
 	ui->databaseTab->setUpdatesEnabled(true);
 
 	databaseViews.insert(index, tabView);
@@ -141,6 +142,7 @@ void Maingui::onViewTitleChanged(DatabaseView* view) {
 	for(i = 0; i < databaseViews.size(); i++) {
 		if(databaseViews.at(i) == view) {
 			ui->databaseTab->setTabText(i, view->windowTitle());
+			ui->databaseTab->setTabToolTip(i, view->getLoadedDatabaseName());
 			break;
 		}
 	}

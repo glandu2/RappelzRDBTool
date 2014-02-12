@@ -91,6 +91,11 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"bone_effect_15\0";
 }
 
+#pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultFileName() {
+	return "db_modeleffectresource";
+}
+
 #ifdef __cplusplus
 }
 #endif

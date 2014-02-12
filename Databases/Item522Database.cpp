@@ -19,8 +19,8 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "type"},
 	 {1, TYPE_INT32, "group"},
 	 {1, TYPE_INT32, "class"},
-	 {1, TYPE_INT32 | TYPE_RDBIGNORE, "set_id"},
-	 {1, TYPE_INT32 | TYPE_RDBIGNORE, "set_part_flag"},
+	 {1, TYPE_INT32, "set_id"},
+	 {1, TYPE_INT32, "set_part_flag"},
 	 {1, TYPE_INT32, "rank"},
 	 {1, TYPE_INT32, "level"},
 	 {1, TYPE_INT32, "enhance"},
@@ -33,7 +33,7 @@ static FieldDescriptor df[] =
 	 {MAKEINDEXEDVAR(2, 1), TYPE_DECIMAL, "range"},
 	 {1, TYPE_FLOAT32, "weight"},
 	 {1, TYPE_INT32, "price"},
-	 {1, TYPE_INT32 | TYPE_RDBIGNORE, "huntaholic_point"},
+	 {1, TYPE_INT32, "huntaholic_point"},
 	 {1, TYPE_INT32, "endurance"},
 	 {1, TYPE_INT32, "wear_type"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv0"},
@@ -161,7 +161,7 @@ static FieldDescriptor df[] =
 	 {256, TYPE_CHAR, "model_16"},
 	 {256, TYPE_CHAR, "model_17"},
 	 {256, TYPE_CHAR, "drop_type"},
-	 {3, TYPE_CHAR | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unkCatValue"},	//always "Cat"
+	 {3, TYPE_CHAR | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "unkCatValue"},	//always "Cat"
 	 {1, TYPE_INT32, "icon_id"},
 	 {256, TYPE_CHAR, "icon_file_name"},
 	 {512, TYPE_CHAR, "script_text"},
@@ -312,9 +312,9 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Write && dst == DF_RDB) {
 		char *catValue = static_cast<char*>(row->getValuePtr("unkCatValue"));
-		catValue[0] = 'f';
-		catValue[1] = 'o';
-		catValue[2] = '=';
+		catValue[0] = 'y';
+		catValue[1] = ' ';
+		catValue[2] = 'I';
 		*static_cast<char*>(row->getValuePtr("unknown3")) = 0;
 		*static_cast<short*>(row->getValuePtr("unknown4")) = 0;
 
@@ -324,10 +324,6 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 			sprintf(nvValues, "nv%d", i);
 			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
 		}
-	} else if(mode == DCT_Read && dst == DF_RDB) {
-		*static_cast<int*>(row->getValuePtr("huntaholic_point")) = 0;
-		*static_cast<int*>(row->getValuePtr("set_id")) = 0;
-		*static_cast<int*>(row->getValuePtr("set_part_flag")) = 0;
 	}
 }
 

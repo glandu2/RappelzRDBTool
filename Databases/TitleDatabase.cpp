@@ -40,22 +40,20 @@ static FieldDescriptor df[] =
 	 {1, TYPE_FLOAT32, "stat_8"},
 	 {1, TYPE_INT32, "effect_1"},
 	 {1, TYPE_INT32, "effect_2"},
-	 {1, TYPE_INT8, "unknownValue0"},
-	 {1, TYPE_INT32, "unknownValue1"},
-	 {1, TYPE_INT32, "unknownValue2"}};
+	 {1, TYPE_INT8 | TYPE_SQLIGNORE, "unknownValue0"},
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE, "unknownValue1"},
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE, "unknownValue2"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
-/*
-#pragma comment(linker, "/EXPORT:convertData=_convertData@16")
-void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	if(mode == DCT_Write && dst == DF_RDB) {
-		*static_cast<short*>(row->getValuePtr("unknown_value")) = 162;
-	}
-}*/
+
+#pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultFileName() {
+	return "db_titleresource";
+}
 
 #ifdef __cplusplus
 }

@@ -3,6 +3,7 @@
 
 #include "IObject.h"
 #include <stdlib.h>
+#include <errno.h>
 
 class ICharsetConverter;
 
@@ -49,11 +50,15 @@ public:
 		while(inRemainingBytes > 0) {
 			int result = toUtf16(&inPtr, &inRemainingBytes, &outPtr, &outRemainingBytes);
 			if(result < 0) {
-				int outDone = out.size - outRemainingBytes;
-				out.size *= 2;
-				out.data = (char*)realloc(out.data, out.size);
-				outPtr = out.data + outDone;
-				outRemainingBytes = out.size - outDone;
+				if(result == -E2BIG) {
+					int outDone = out.size - outRemainingBytes;
+					out.size *= 2;
+					out.data = (char*)realloc(out.data, out.size);
+					outPtr = out.data + outDone;
+					outRemainingBytes = out.size - outDone;
+				} else {
+					break;
+				}
 			}
 		}
 
@@ -72,14 +77,18 @@ public:
 		char* outPtr = out.data;
 		int inRemainingBytes = in.size, outRemainingBytes = out.size;
 
-		while(inRemainingBytes > 0) {
+		while(inRemainingBytes > 1) {
 			int result = fromUtf16(&inPtr, &inRemainingBytes, &outPtr, &outRemainingBytes);
 			if(result < 0) {
-				int outDone = out.size - outRemainingBytes;
-				out.size *= 2;
-				out.data = (char*)realloc(out.data, out.size);
-				outPtr = out.data + outDone;
-				outRemainingBytes = out.size - outDone;
+				if(result == -E2BIG) {
+					int outDone = out.size - outRemainingBytes;
+					out.size *= 2;
+					out.data = (char*)realloc(out.data, out.size);
+					outPtr = out.data + outDone;
+					outRemainingBytes = out.size - outDone;
+				} else {
+					break;
+				}
 			}
 		}
 

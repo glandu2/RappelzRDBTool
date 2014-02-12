@@ -35,7 +35,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT8 | TYPE_SQLIGNORE, "sound_option0"},
 	 {1, TYPE_INT8 | TYPE_SQLIGNORE, "sound_option1"},
 	 {1, TYPE_INT8 | TYPE_SQLIGNORE, "sound_option2"},
-	 {3, TYPE_CHAR | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "kagValue"}};
+	 {3, TYPE_CHAR | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "kagValue"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {

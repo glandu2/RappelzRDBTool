@@ -122,6 +122,13 @@ const char* ExternDescriptedDatabase::getDefaultFileName() {
 	size_t endPos = filename.find("Database.");
 	if(endPos == std::string::npos)
 		endPos = filename.find_last_of('.');
+	if(endPos == std::string::npos)
+		endPos = filename.size();
+
+	//Discard version number
+	while(endPos > 0 && isdigit(filename.at(endPos-1)))
+		endPos--;
+
 	size_t beginPos = filename.find_last_of("/\\");
 
 	if(beginPos == std::string::npos || beginPos > endPos)
@@ -145,6 +152,13 @@ const char* ExternDescriptedDatabase::getDefaultTableName() {
 	size_t endPos = filename.find("Database.");
 	if(endPos == std::string::npos)
 		endPos = filename.find_last_of('.');
+	if(endPos == std::string::npos)
+		endPos = filename.size();
+
+	//Discard version number
+	while(endPos > 0 && isdigit(filename.at(endPos-1)))
+		endPos--;
+
 	size_t beginPos = filename.find_last_of("/\\");
 
 	if(beginPos == std::string::npos || beginPos > endPos)

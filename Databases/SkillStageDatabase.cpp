@@ -16,10 +16,10 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT8, "has_target"},
 	 {1, TYPE_INT8, "corpse_target"},
 	 {1, TYPE_INT8, "is_toggle"},
-	 {1, TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknown0"},
+	 {1, TYPE_INT16 | TYPE_SQLIGNORE, "unknown0"},
 	 {1, TYPE_FLOAT32, "casting_time"},
 	 {1, TYPE_INT16, "is_creature_skill"},
-	 {1, TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknown1"},
+	 {1, TYPE_INT16 | TYPE_SQLIGNORE, "unknown1"},
 	 {1, TYPE_INT32, "stage_type_id"},
 	 {1, TYPE_INT32, "casting_type_id"},
 	 {1, TYPE_INT32, "casting_start_motion_id"},
@@ -64,8 +64,8 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	if(mode == DCT_Write && dst == DF_RDB) {
-		*static_cast<short*>(row->getValuePtr("unknown0")) = 162;
+	if(mode == DCT_Read && dst == DF_SQL) {
+		*static_cast<short*>(row->getValuePtr("unknown0")) = 163;
 		*static_cast<short*>(row->getValuePtr("unknown1")) = 0;
 	}
 }

@@ -22,7 +22,7 @@ namespace RappelzRDBBase {
 
 FieldOrder Database::getFieldOrderFromColumnName(DataDescriptor *dataDescription, const char *columns) {
 	FieldOrder fo;
-	int i, count;
+	int i;
 	const char *p;
 
 	if(!columns) {
@@ -30,18 +30,35 @@ FieldOrder Database::getFieldOrderFromColumnName(DataDescriptor *dataDescription
 		fo.order = (int*) malloc(fo.size * sizeof(int));
 		for(i = 0;i < fo.size ;i++) fo.order[i] = i;
 	} else {
-		fo.order = (int*) malloc(dataDescription->numFields * sizeof(int));
-		for(count=0, p=columns; *p; p += strlen(p) + 1) {
-			for(i = 0; i < dataDescription->numFields; i++) {
-				if(!strcmp(p, dataDescription->fieldsInfo[i].columnName)) {
-					fo.order[count] = i;
-					count++;
+		fo.size = dataDescription->numFields;
+		fo.order = (int*) malloc(fo.size * sizeof(int));
+
+		std::vector<int> remainingIndex;
+		remainingIndex.reserve(fo.size);
+
+		for(i = 0; i < fo.size; i++)
+			remainingIndex.push_back(i);
+
+		int inOrder = 0;
+		for(p=columns; *p; p += strlen(p) + 1) {
+			for(i = 0; i < remainingIndex.size(); i++) {
+				if(!strcmp(p, dataDescription->fieldsInfo[remainingIndex[i]].columnName)) {
+					fo.order[inOrder] = remainingIndex[i];
+					inOrder++;
+					remainingIndex.erase(remainingIndex.begin() + i);
 					break;
 				}
 			}
 		}
 
-		fo.size = count;
+		for(i = 0; i < remainingIndex.size(); i++) {
+			if((dataDescription->fieldsInfo[remainingIndex[i]].dataType & TYPE_TYPEMASK) != TYPE_VARCHAR_SIZE) {
+				fo.order[inOrder] = remainingIndex[i];
+				inOrder++;
+			}
+		}
+
+		fo.size = inOrder;
 	}
 
 	return fo;
