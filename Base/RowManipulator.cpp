@@ -45,6 +45,8 @@ void RowManipulator::initRow(bool initializedFields) {
 			const unsigned int index = getDataIndex(i);
 			if(this->indexedSizePtrs.size() <= index) this->indexedSizePtrs.resize(index+1, 0);
 			this->indexedSizePtrs[index] = (int*)getValuePtr(i);
+			if(initializedFields == false)
+				*this->indexedSizePtrs[index] = 0;
 		}
 		this->initializedFields[i] = initializedFields;
 	}

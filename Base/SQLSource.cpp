@@ -89,7 +89,7 @@ int SQLSource::open(const char* source, eOpenMode openMode,  const char* locatio
 		if(options) {
 			const char *p = strstr(options, "charset=");
 			if(p) {
-                char targetCharset[32] = {0};
+				char targetCharset[32] = {0};
 				p += 8;
 				const char *end = strchr(p, ';');
 				if(!end || end - p > 31) {
@@ -501,17 +501,17 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 				break;
 
 			case TYPE_DECIMAL:
-				{
-					char decimalTemp[14];
-					SQLGetData(hstmt, columnIndex, SQL_C_CHAR, decimalTemp, 13, &isDataNull);
-					if(isDataNull == SQL_NULL_DATA) *static_cast<int*>(buffer) = 0;
-					else {
-						float decimalValue;
-						sscanf(decimalTemp, "%f", &decimalValue);
-						*static_cast<int*>(buffer) = (int)(decimalValue*pow((float)10, row->getDataIndex(curCol))+0.5);
-					}
+			{
+				char decimalTemp[14];
+				SQLGetData(hstmt, columnIndex, SQL_C_CHAR, decimalTemp, 13, &isDataNull);
+				if(isDataNull == SQL_NULL_DATA) *static_cast<int*>(buffer) = 0;
+				else {
+					float decimalValue;
+					sscanf(decimalTemp, "%f", &decimalValue);
+					*static_cast<int*>(buffer) = (int)(decimalValue*pow((float)10, row->getDataIndex(curCol))+0.5);
 				}
 				break;
+			}
 
 			case TYPE_INT64:
 				SQLGetData(hstmt, columnIndex, SQL_C_DEFAULT, buffer, sizeof(long long int), &isDataNull);	//using SQL_C_DEFAULT as SQL_C_SBIGINT has some problem with some odbc implementation
@@ -555,12 +555,13 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 					bufferSize *= 2;
 					unicodeBuffer = (char*) realloc(unicodeBuffer, bufferSize);
 				}
+				if(ret == SQL_SUCCESS)
+					bytesRead += isDataNull;
 
-				if(isDataNull == SQL_NULL_DATA) {
+				if(isDataNull == SQL_NULL_DATA || bytesRead == 0) {
 					row->initData(curCol, 1);
 					*static_cast<char*>(row->getValuePtr(curCol)) = 0;
 				} else {
-					bytesRead += isDataNull;
 
 					ICharsetConverter::ConvertedString in, out;
 					in.data = unicodeBuffer;

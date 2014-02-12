@@ -40,6 +40,14 @@ public:
 	//return number of significant bytes in converted buffer
 	inline int convertToUtf16(ConvertedString in, ConvertedString *converted) {
 		ConvertedString out;
+
+		if(in.size == 0) {
+			out.size = 2;
+			out.data = (char*)calloc(1, out.size);
+			*converted = out;
+			return out.size;
+		}
+
 		out.size = in.size * 2;
 		out.data = (char*) malloc(out.size);
 
@@ -70,6 +78,14 @@ public:
 	//return number of significant bytes in converted buffer
 	inline int convertFromUtf16(ConvertedString in, ConvertedString *converted) {
 		ConvertedString out;
+
+		if(in.size == 0) {
+			out.size = 1;
+			out.data = (char*)calloc(1, out.size);
+			*converted = out;
+			return out.size;
+		}
+
 		out.size = in.size;
 		out.data = (char*) malloc(out.size);
 
