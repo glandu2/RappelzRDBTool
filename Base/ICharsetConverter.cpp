@@ -13,16 +13,16 @@ ICharsetConverter * DLLCALLCONV createCharsetConverter(const char* charset) {
 #pragma comment(linker, "/EXPORT:availableCharsets=_availableCharsets@0")
 const CharsetInfo * DLLCALLCONV availableCharsets() {
 	static const CharsetInfo charsets[] = {
-        {"CP1252", "Western Europe"},
-        {"CP1256", "Arabic"},
-        {"CP1251", "Cyrillic"},
-        {"CP949", "Korean"},
-        {"CP1250", "Central Europe"},
-        {"CP1254", "Turkish"},
+		{"CP1252", "Western Europe"},
+		{"CP1256", "Arabic"},
+		{"CP1251", "Cyrillic"},
+		{"CP949", "Korean"},
+		{"CP1250", "Central Europe"},
+		{"CP1254", "Turkish"},
 		{"CP932", "Japanese"},
-        {"CP936", "Chinese simplified"},
+		{"CP936", "Chinese simplified"},
 		{"CP950", "Chinese traditional"},
-        {"CP874", "Thai"},
+		{"CP874", "Thai"},
 		{0, 0}
 	};
 
