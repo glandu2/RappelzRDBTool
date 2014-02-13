@@ -76,9 +76,11 @@ void decryptPhase2(char *hash, int size, int decodeSeed) {
  * \sa convertNameToHash
  */
 int convertHashToName(const char *hash, char *name) {
+    int hashSize;
+
 	if(!hash || !name) return EINVAL;
 
-	int hashSize = strlen(hash);
+    hashSize = strlen(hash);
 	if(hashSize > 2) {
 		int reducedHashSize = hashSize - 2;
 		char *reducedHash = (char*) alloca(reducedHashSize);  //no null terminator inside

@@ -4,6 +4,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <errno.h>
+#include <malloc.h>
 
 #include "NameToHash.h"
 
