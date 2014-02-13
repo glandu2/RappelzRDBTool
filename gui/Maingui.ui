@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>756</width>
-    <height>504</height>
+    <width>754</width>
+    <height>502</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>756</width>
+     <width>754</width>
      <height>21</height>
     </rect>
    </property>
@@ -84,6 +84,7 @@
     </property>
     <addaction name="actionSQL_Options"/>
     <addaction name="actionUse_hashed_files"/>
+    <addaction name="actionShow_Hide_Hash_Converter"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuOptions"/>
@@ -253,6 +254,11 @@
    </property>
    <property name="toolTip">
     <string>Use the hashed name when opening / saving RDB file as the default file name</string>
+   </property>
+  </action>
+  <action name="actionShow_Hide_Hash_Converter">
+   <property name="text">
+    <string>Show/Hide Hash Converter</string>
    </property>
   </action>
  </widget>

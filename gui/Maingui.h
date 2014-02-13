@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QModelIndex>
 #include "PersistentData.h"
+#include "HashConverterDialog.h"
 
 class IDatabase;
 class IRowManipulator;
@@ -53,6 +54,7 @@ class Maingui : public QMainWindow
 
 		void onSQLOptions();
 		void onDbDescManage();
+		void onToggleHashConverterDialog();
 
 		void onAbout();
 
@@ -77,6 +79,8 @@ class Maingui : public QMainWindow
 
 		TabBarEventFilter *tabEventFilter;
 		QLabel *currentStatusBarLabel;
+
+		HashConverterDialog hashConverter;
 };
 
 #endif // MAINGUI_H

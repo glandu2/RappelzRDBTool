@@ -26,7 +26,8 @@ FORMS += \
     Maingui.ui \
     SqlConfigDialog.ui \
     DatabaseView.ui \
-    DatabaseDescManageDialog.ui
+    DatabaseDescManageDialog.ui \
+    HashConverterDialog.ui
 
 SOURCES += \
     main.cpp \
@@ -40,7 +41,9 @@ SOURCES += \
     TabBarEventFilter.cpp \
     DatabaseDescManageDialog.cpp \
     NameToHash.c \
-    Settings.cpp
+    Settings.cpp \
+    HashConverterDialog.cpp \
+    HashToName.c
 
 HEADERS += \
     Maingui.h \
@@ -60,5 +63,7 @@ HEADERS += \
     TabBarEventFilter.h \
     DatabaseDescManageDialog.h \
     NameToHash.h \
-    Settings.h
+    Settings.h \
+    HashConverterDialog.h \
+    HashToName.h
 

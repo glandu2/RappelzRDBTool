@@ -21,7 +21,8 @@
 
 Maingui::Maingui(QWidget *parent) :
 	QMainWindow(parent),
-	ui(new Ui::MainWindow)
+	ui(new Ui::MainWindow),
+	hashConverter(this)
 {
 	ui->setupUi(this);
 
@@ -54,6 +55,7 @@ Maingui::Maingui(QWidget *parent) :
 	connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
 
 	connect(ui->actionSQL_Options, SIGNAL(triggered()), this, SLOT(onSQLOptions()));
+	connect(ui->actionShow_Hide_Hash_Converter, SIGNAL(triggered()), this, SLOT(onToggleHashConverterDialog()));
 
 	connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(onAbout()));
 	connect(ui->actionAbout_Qt, SIGNAL(triggered()), QApplication::instance(), SLOT(aboutQt()));
@@ -311,6 +313,13 @@ void Maingui::onSQLOptions() {
 
 void Maingui::onDbDescManage() {
 	dbDescriptionManageDialog->exec();
+}
+
+void Maingui::onToggleHashConverterDialog() {
+	if(hashConverter.isHidden())
+		hashConverter.show();
+	else
+		hashConverter.hide();
 }
 
 void Maingui::onAbout() {

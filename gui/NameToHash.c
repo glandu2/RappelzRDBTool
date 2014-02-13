@@ -16,10 +16,10 @@ static char encryptTablePhase2[0x80] =
 	 0x7E, 0x44, 0x27, 0x43, 0x21, 0x4A, 0x49, 0x64, 0x42, 0x55, 0x60, 0x71, 0x66, 0x70, 0x48, 0x51, 0x33, 0x4C, 0x6E, 0x6F, 0x5A, 0x69, 0X72, 0x73, 0x75, 0x3B, 0x7A, 0x63, 0x00, 0x54, 0x35, 0x00};
 
 
-void prepareHash(char *hash) {
+void prepareHash(char *hash, int size) {
 	char val1, val2;
-	int medianPt13 = floor(0.33*strlen(hash));
-	int medianPt23 = floor(0.66*strlen(hash));
+	int medianPt13 = floor(0.33*size);
+	int medianPt23 = floor(0.66*size);
 
 	val1 = hash[medianPt23];
 	val2 = hash[medianPt13];
@@ -31,12 +31,12 @@ void prepareHash(char *hash) {
 	hash[1] = val2;
 }
 
-void encryptNameToHash(char *name, unsigned int encodeSeed) {
+void encryptNameToHash(char *name, int size, unsigned int encodeSeed) {
 	unsigned int i, j;
 	unsigned char computeVar;
 	unsigned int computeLoop = encodeSeed;
 
-	for(i=0; name[i]; i++) {
+	for(i=0; i < size; i++) {
 		computeVar = name[i];
 
 		for(j=0; j < computeLoop; j++)
@@ -80,19 +80,20 @@ char computeFirstChar(char *reducedHash) {
  * \sa convertHashToName
  */
 int convertNameToHash(const char *name, char *hash, int encodeSeed) {
-	char reducedHash[260];
+	int nameSize = strlen(name);
+	char *reducedHash = alloca(nameSize);
 	
 	if(!name || !hash) return EINVAL;
 
 	if(encodeSeed == LEGACY_SEED) encodeSeed = computeLegacySeed(name);
 	if(encodeSeed < 0) return EINVAL;
 
-	strcpy(reducedHash, name);
-	encryptNameToHash(reducedHash, (unsigned int) encodeSeed);
-	prepareHash(reducedHash);
-	strcpy(hash+1, reducedHash);
-	hash[strlen(name)+1] = encryptLastCharTable[encodeSeed];
-	hash[strlen(name)+2] = 0;
+	memcpy(reducedHash, name, nameSize);
+	encryptNameToHash(reducedHash, nameSize, (unsigned int) encodeSeed);
+	prepareHash(reducedHash, nameSize);
+	memcpy(hash+1, reducedHash, nameSize);
+	hash[nameSize+1] = encryptLastCharTable[encodeSeed];
+	hash[nameSize+2] = 0;
 
 	hash[0] = computeFirstChar(reducedHash);
 	
