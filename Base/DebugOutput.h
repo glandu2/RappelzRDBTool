@@ -8,12 +8,12 @@
 #define debugoutput(format, ...) \
 { \
 	char buffer[512]; \
-	sprintf(buffer, format "\n", #__VA_ARGS__); \
+	sprintf(buffer, format "\r\n", ## __VA_ARGS__); \
 	OutputDebugString(buffer); \
 }
 #else
 #include <stdio.h>
-#define debugoutput(format, ...) fprintf(stderr, format, #__VA_ARGS__)
+#define debugoutput(format, ...) fprintf(stderr, format "\n", ## __VA_ARGS__)
 #endif
 
 #endif // DEBUGOUTPUT_H
