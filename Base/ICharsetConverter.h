@@ -42,8 +42,8 @@ public:
 		ConvertedString out;
 
 		if(in.size == 0) {
-			out.size = 2;
-			out.data = (char*)calloc(1, out.size);
+			out.size = 0;
+			out.data = (char*)calloc(1, 2);
 			*converted = out;
 			return out.size;
 		}
@@ -80,8 +80,8 @@ public:
 		ConvertedString out;
 
 		if(in.size == 0) {
-			out.size = 1;
-			out.data = (char*)calloc(1, out.size);
+			out.size = 0;
+			out.data = (char*)calloc(1, 1);
 			*converted = out;
 			return out.size;
 		}

@@ -568,7 +568,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 					in.size = bytesRead;
 					utf16To8bits->convertFromUtf16(in, &out);
 
-					if(out.data[out.size-1] == 0)
+					if(out.size > 0 && out.data[out.size-1] == 0)
 						row->initData(curCol, out.size);
 					else
 						row->initData(curCol, out.size+1);

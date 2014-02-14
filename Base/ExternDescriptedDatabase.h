@@ -27,6 +27,10 @@ class ExternDescriptedDatabase : public CImplement<IDatabaseDescription>
 		virtual const char* getDefaultFileName();
 		virtual const char* getDefaultTableName();
 
+	protected:
+		void* getProcAddress(const char* name, int argumentsBytes);
+		static void* nativeGetProcAddress(unsigned long long handle, const char* name);
+
 	private:
 		unsigned long long libHinst;
 

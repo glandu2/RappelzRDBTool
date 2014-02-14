@@ -6,6 +6,8 @@
 #include <errno.h>
 #include <vector>
 
+#include "DebugOutput.h"
+
 namespace RappelzRDBBase {
 
 //linear
@@ -229,8 +231,10 @@ void RowManipulator::freeValue(int colPos) {
 
 //ordered
 void *RowManipulator::getValuePtr(int colPos) {
-	if(colPos < 0)
+	if(colPos < 0 || colPos >= getColumnCount()) {
+		debugoutput("Invalid column index: %d. Only has %d cols (index begin at 0 for first)", colPos, getColumnCount());
 		return 0;
+	}
 
 	colPos = getColumnOriginalIndex(colPos);
 
@@ -309,6 +313,8 @@ int RowManipulator::getColumnIndex(const char* columnName) {
 		if(!strcmp(getColumnName(i), columnName))
 			return i;
 	}
+
+	debugoutput("Column named \"%s\" not found", columnName);
 	return -1;
 }
 

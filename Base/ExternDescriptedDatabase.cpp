@@ -39,23 +39,13 @@ int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
 #endif
 
 
-#ifdef __unix__
-	DLLregisterDBStructure = (DLLREGISTERSTRUCTPROC) dlsym((void*)libHinst, "registerDBStructure");
-	DLLgetSQLColumnOrder = (DLLSQLORDERPROC) dlsym((void*)libHinst, "getSQLColumnOrder");
-	DLLgetCSVColumnOrder = (DLLCSVORDERPROC) dlsym((void*)libHinst, "getCSVColumnOrder");
-	DLLconvertData = (DLLCONVERTDATAPROC) dlsym((void*)libHinst, "convertData");
-	DLLgetSpecialCaseID = (DLLISSPECIALPROC) dlsym((void*)libHinst, "getSpecialCaseID");
-	DLLgetDefaultFileName = (DLLDEFAULTFILENAMEPROC) dlsym((void*)libHinst, "getDefaultFileName");
-	DLLgetDefaultTableName = (DLLDEFAULTTABLENAMEPROC) dlsym((void*)libHinst, "getDefaultTableName");
-#else
-	DLLregisterDBStructure = (DLLREGISTERSTRUCTPROC) GetProcAddress((HINSTANCE)libHinst, "registerDBStructure");
-	DLLgetSQLColumnOrder = (DLLSQLORDERPROC) GetProcAddress((HINSTANCE)libHinst, "getSQLColumnOrder");
-	DLLgetCSVColumnOrder = (DLLCSVORDERPROC) GetProcAddress((HINSTANCE)libHinst, "getCSVColumnOrder");
-	DLLconvertData = (DLLCONVERTDATAPROC) GetProcAddress((HINSTANCE)libHinst, "convertData");
-	DLLgetSpecialCaseID = (DLLISSPECIALPROC) GetProcAddress((HINSTANCE)libHinst, "getSpecialCaseID");
-	DLLgetDefaultFileName = (DLLDEFAULTFILENAMEPROC) GetProcAddress((HINSTANCE)libHinst, "getDefaultFileName");
-	DLLgetDefaultTableName = (DLLDEFAULTTABLENAMEPROC) GetProcAddress((HINSTANCE)libHinst, "getDefaultTableName");
-#endif
+	DLLregisterDBStructure = (DLLREGISTERSTRUCTPROC) getProcAddress("registerDBStructure", 8);
+	DLLgetSQLColumnOrder = (DLLSQLORDERPROC) getProcAddress("getSQLColumnOrder", 0);
+	DLLgetCSVColumnOrder = (DLLCSVORDERPROC) getProcAddress("getCSVColumnOrder", 0);
+	DLLconvertData = (DLLCONVERTDATAPROC) getProcAddress("convertData", 16);
+	DLLgetSpecialCaseID = (DLLISSPECIALPROC) getProcAddress("getSpecialCaseID", 0);
+	DLLgetDefaultFileName = (DLLDEFAULTFILENAMEPROC) getProcAddress("getDefaultFileName", 0);
+	DLLgetDefaultTableName = (DLLDEFAULTTABLENAMEPROC) getProcAddress("getDefaultTableName", 0);
 
 	if(DLLregisterDBStructure == 0) {
 #ifdef __unix__
@@ -169,6 +159,32 @@ const char* ExternDescriptedDatabase::getDefaultTableName() {
 	fallbackDefaultTableName = filename.substr(beginPos, endPos - beginPos) + "Resource";
 
 	return fallbackDefaultTableName.c_str();
+}
+
+void* ExternDescriptedDatabase::getProcAddress(const char* name, int argumentsBytes) {
+	void* procAddress;
+
+	procAddress = nativeGetProcAddress(libHinst, name);
+	if(procAddress) return procAddress;
+
+	char* buffer = (char*)alloca(strlen(name) + 10);
+
+	sprintf(buffer, "%s@%d", name, argumentsBytes);
+	procAddress = nativeGetProcAddress(libHinst, buffer);
+	if(procAddress) return procAddress;
+
+	sprintf(buffer, "_%s@%d", name, argumentsBytes);
+	procAddress = nativeGetProcAddress(libHinst, buffer);
+
+	return procAddress;
+}
+
+void* ExternDescriptedDatabase::nativeGetProcAddress(unsigned long long handle, const char* name) {
+#ifdef __unix__
+	return dlsym((void*)handle, name);
+#else
+	return GetProcAddress((HINSTANCE)handle, name);
+#endif
 }
 
 } //namespace
