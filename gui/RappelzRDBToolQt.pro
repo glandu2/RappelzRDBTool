@@ -1,6 +1,10 @@
 # -------------------------------------------------
 # Project created by QtCreator 2012-07-12T12:36:12
 # -------------------------------------------------
+
+QT += core gui
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
 TARGET = RappelzRDBToolQt
 TEMPLATE = app
 DEFINES += BUILDING_CLIENT _CRT_SECURE_NO_WARNINGS

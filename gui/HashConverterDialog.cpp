@@ -18,7 +18,7 @@ HashConverterDialog::~HashConverterDialog()
 }
 
 void HashConverterDialog::updateName() {
-	QByteArray hash = ui->hashEdit->text().toAscii();
+	QByteArray hash = ui->hashEdit->text().toLatin1();
 	QByteArray name;
 
 	if(hash.size() >= 2) {
@@ -31,7 +31,7 @@ void HashConverterDialog::updateName() {
 }
 
 void HashConverterDialog::updateHash() {
-	QByteArray name = ui->nameEdit->text().toAscii();
+	QByteArray name = ui->nameEdit->text().toLatin1();
 	QByteArray hash;
 
 	hash.resize(name.size()+3);

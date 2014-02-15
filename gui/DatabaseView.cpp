@@ -25,8 +25,8 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 	const struct CharsetInfo * codepageList = availableCharsets();
 	QString defaultCodec = Settings::getSettings()->value("charset", "CP1252").toString();
 	for(int i = 0; codepageList[i].name; i++) {
-		ui->localeCombo->insertItem(i, QString::fromAscii(codepageList[i].description), QString::fromAscii(codepageList[i].name));
-		if(QString::fromAscii(codepageList[i].name) == defaultCodec)
+		ui->localeCombo->insertItem(i, QString::fromLatin1(codepageList[i].description), QString::fromLatin1(codepageList[i].name));
+		if(QString::fromLatin1(codepageList[i].name) == defaultCodec)
 			ui->localeCombo->setCurrentIndex(i);
 	}
 
