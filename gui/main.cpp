@@ -1,4 +1,5 @@
-#include <QtGui/QApplication>
+#include <QApplication>
+
 #include <QMessageBox>
 #include <QTextStream>
 #include "Maingui.h"
