@@ -248,7 +248,7 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 			p += strlen(p);
 		}
 
-		sprintf(p, "\"%s\" ", row->getColumnName(curCol));
+		sprintf(p, "%s ", row->getColumnName(curCol));
 		p += strlen(p);
 
 		sqlLanguage->getTypeName(p, row->getType(curCol), row->getMaxDataCount(curCol), row->getDataIndex(curCol));
@@ -331,7 +331,7 @@ int SQLSource::prepareReadQuery() {
 			strcpy(p, ", ");
 			p += strlen(p);
 		}
-		sprintf(p, "\"%s\"", row->getColumnName(i));
+		sprintf(p, "%s", row->getColumnName(i));
 		p += strlen(p);
 	}
 	sprintf(p, " FROM %s;", tableName);
@@ -357,12 +357,12 @@ int SQLSource::prepareWriteQuery() {
 			strcpy(ptr, ",");
 			ptr += strlen(ptr);
 		}
-		strcpy(ptr, "\"");
-		ptr++;
+//		strcpy(ptr, "\"");
+//		ptr++;
 		strcpy(ptr, row->getColumnName(curCol));
 		ptr += strlen(ptr);
-		strcpy(ptr, "\"");
-		ptr++;
+//		strcpy(ptr, "\"");
+//		ptr++;
 	}
 	strcpy(ptr, ") VALUES (");
 	ptr += strlen(ptr);
