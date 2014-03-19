@@ -5,6 +5,7 @@ bin*/
 obj*/
 project-*/
 internal*
+deploy/
 
 *.ilk
 *.exe
