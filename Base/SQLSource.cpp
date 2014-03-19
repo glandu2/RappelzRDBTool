@@ -9,7 +9,7 @@
 #include <locale.h>
 #include "ICharsetConverter.h"
 
-void printOdbcStatus(SQLSMALLINT type, HSTMT hstmt) {
+static void printOdbcStatus(SQLSMALLINT type, HSTMT hstmt) {
 	SQLCHAR     buffer[SQL_MAX_MESSAGE_LENGTH + 1];
 	SQLCHAR     sqlstate[SQL_SQLSTATE_SIZE + 1];
 	SQLINTEGER  sqlcode;
@@ -25,40 +25,12 @@ void printOdbcStatus(SQLSMALLINT type, HSTMT hstmt) {
 
 namespace RappelzRDBBase {
 
-char *SQLSource::strreplace(const char *input, char c, const char *rep) {
-	int occurences;
-	char *replacedStr;
-	const char *p;
-	char *rp;
-
-	for(p = input, occurences = 0; *p; p++) {
-		if(*p == c)
-			occurences++;
-	}
-
-	replacedStr = (char*) malloc(p - input + occurences*(strlen(rep)-1) + 1);
-	for(p = input, rp = replacedStr; *p; p++) {
-		if(*p == c) {
-			strcpy(rp, rep);
-			rp += strlen(rep);
-		} else {
-			*rp = *p;
-			rp++;
-		}
-	}
-	*rp = 0;
-
-	return replacedStr;
-}
-
 SQLSource::SQLSource(SQLLanguage *language) {
 	henv = 0;
 	hdbc = 0;
 	hstmt = 0;
 	tableName = 0;
 	sqlLanguage = language;
-	outputFile = 0;
-	fileOutputMode = false;
 	utf16To8bits = 0;
 	setlocale(LC_ALL, "C");
 }
@@ -69,74 +41,75 @@ SQLSource::~SQLSource() {
 	delete sqlLanguage;
 }
 
+int SQLSource::checkSqlResult(int result) {
+	if(!SQL_SUCCEEDED(result) && result != SQL_NO_DATA && result != SQL_NEED_DATA) {
+		fprintf(stderr, "SQL Error %d\n", result);
+		fprintf(stderr, "SQL Query: %s\n", query);
+		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
+		printOdbcStatus(SQL_HANDLE_DBC, hdbc);
+		printOdbcStatus(SQL_HANDLE_ENV, henv);
+		commitTransaction = false;
+		return EILSEQ;
+	}
+
+    return 0;
+}
+
 int SQLSource::open(const char* source, eOpenMode openMode,  const char* location, const char* user, const char* password, const char* options) {
 	IDataSource::open(source, openMode, location, user, password);
 
+	SQLRETURN result;
 
-	if(options && strstr(options, "output-file")) {
-		if(openMode != OM_Write)	//only write sql file supported
-			return ENOSYS;
-
-		fileOutputMode = true;
-		outputFile = fopen(source, "w");
-		if(!outputFile)
-			return errno;
-	} else {						//directly send instructions to database via odbc
-		SQLRETURN result;
-
-		fileOutputMode = false;
-
-		if(options) {
-			const char *p = strstr(options, "charset=");
-			if(p) {
-				char targetCharset[32] = {0};
-				p += 8;
-				const char *end = strchr(p, ';');
-				if(!end || end - p > 31) {
-					strncpy(targetCharset, p, 31);
-				} else {
-					strncpy(targetCharset, p, end - p);
-				}
-				targetCharset[31] = 0;
-
-				fprintf(stderr, "Using target charset \"%s\"\n", targetCharset);
-				utf16To8bits = createCharsetConverter(targetCharset);
+	if(options) {
+		const char *p = strstr(options, "charset=");
+		if(p) {
+			char targetCharset[32] = {0};
+			p += 8;
+			const char *end = strchr(p, ';');
+			if(!end || end - p > 31) {
+				strncpy(targetCharset, p, 31);
+			} else {
+				strncpy(targetCharset, p, end - p);
 			}
+			targetCharset[31] = 0;
+
+			fprintf(stderr, "Using target charset \"%s\"\n", targetCharset);
+			utf16To8bits = createCharsetConverter(targetCharset);
 		}
-		if(utf16To8bits == 0)
-			utf16To8bits = createCharsetConverter("");
-		if(utf16To8bits == 0)
-			utf16To8bits = createCharsetConverter("CP1252");
-
-		result = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &henv);
-		if(!SQL_SUCCEEDED(result)) return ENOSYS;
-
-		result = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, SQL_IS_INTEGER);
-		if(!SQL_SUCCEEDED(result)) {
-			SQLFreeHandle(SQL_HANDLE_ENV, henv);
-			henv = 0;
-			return ENOSYS;
-		}
-
-		SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
-		result = SQLConnect(hdbc, (UCHAR*)location, SQL_NTS, (UCHAR*)user, SQL_NTS, (UCHAR*)password, SQL_NTS);
-		if(!SQL_SUCCEEDED(result)) {
-			printOdbcStatus(SQL_HANDLE_DBC, hdbc);
-			printf("%d\n", result);
-			SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
-			SQLFreeHandle(SQL_HANDLE_ENV, henv);
-			hdbc = 0;
-			henv = 0;
-			return ENOENT;
-		}
-
-		SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-
-		if(openMode == OM_Write) {
-			SQLSetConnectAttr(hdbc, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF, SQL_IS_UINTEGER);
-			commitTransaction = true;
-		} else SQLSetConnectAttr(hdbc, SQL_ATTR_TXN_ISOLATION, (SQLPOINTER)SQL_TXN_SERIALIZABLE, SQL_IS_UINTEGER);	//consitent results with select count(*) and select *
 	}
+	if(utf16To8bits == 0)
+		utf16To8bits = createCharsetConverter("");
+	if(utf16To8bits == 0)
+		utf16To8bits = createCharsetConverter("CP1252");
+
+	result = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &henv);
+	if(!SQL_SUCCEEDED(result)) return ENOSYS;
+
+	result = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, SQL_IS_INTEGER);
+	if(!SQL_SUCCEEDED(result)) {
+		SQLFreeHandle(SQL_HANDLE_ENV, henv);
+		henv = 0;
+		return ENOSYS;
+	}
+
+	SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
+	result = SQLConnect(hdbc, (UCHAR*)location, SQL_NTS, (UCHAR*)user, SQL_NTS, (UCHAR*)password, SQL_NTS);
+	if(!SQL_SUCCEEDED(result)) {
+		printOdbcStatus(SQL_HANDLE_DBC, hdbc);
+		printf("%d\n", result);
+		SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
+		SQLFreeHandle(SQL_HANDLE_ENV, henv);
+		hdbc = 0;
+		henv = 0;
+		return ENOENT;
+	}
+
+	SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+
+	if(openMode == OM_Write) {
+		SQLSetConnectAttr(hdbc, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF, SQL_IS_UINTEGER);
+		commitTransaction = true;
+	} else SQLSetConnectAttr(hdbc, SQL_ATTR_TXN_ISOLATION, (SQLPOINTER)SQL_TXN_SERIALIZABLE, SQL_IS_UINTEGER);	//consitent results with select count(*) and select *
 
 	tableName = strdup(source);
 
@@ -144,23 +117,18 @@ int SQLSource::open(const char* source, eOpenMode openMode,  const char* locatio
 }
 
 void SQLSource::close() {
-	if(fileOutputMode) {
-		if(outputFile) fclose(outputFile);
-		outputFile = 0;
-	} else {
-		if(getOpenMode() == OM_Write && hdbc) {
-			if(commitTransaction)
-				SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
-			else SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
-		}
-
-		if(hstmt) SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-		if(hdbc) SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
-		if(henv) SQLFreeHandle(SQL_HANDLE_ENV, henv);
-		hstmt = 0;
-		hdbc = 0;
-		henv = 0;
+	if(getOpenMode() == OM_Write && hdbc) {
+		if(commitTransaction)
+			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
+		else SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 	}
+
+	if(hstmt) SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+	if(hdbc) SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
+	if(henv) SQLFreeHandle(SQL_HANDLE_ENV, henv);
+	hstmt = 0;
+	hdbc = 0;
+	henv = 0;
 
 	if(utf16To8bits)
 		delete utf16To8bits;
@@ -175,10 +143,9 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 	//retreive row count
 	sprintf(query, "SELECT COUNT(*) FROM %s;", tableName);
 	SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-	if(!SQL_SUCCEEDED(SQLFetch(hstmt))) {
-		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
+	if(checkSqlResult(SQLFetch(hstmt)))
 		return EINVAL;
-	}
+
 	SQLGetData(hstmt, 1, SQL_C_LONG, &rowCount, sizeof(int), NULL);
 	setRowNumber(rowCount);
 
@@ -187,14 +154,11 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 	prepareReadQuery();
 
 	printf("Quering: \"%s\"\n", query);
-	if(!SQL_SUCCEEDED(SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS))) {
-		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
+	if(checkSqlResult(SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS)))
 		return ENOEXEC;
-	}
-	if(!SQL_SUCCEEDED(SQLExecute(hstmt))) {
-		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
+
+	if(checkSqlResult(SQLExecute(hstmt)))
 		return ENOEXEC;
-	}
 
 
 	//rows are pre-fetched
@@ -206,22 +170,14 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 }
 
 int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
-	char *ptr = query;
-	bool isFirstColumn = true;
-
 	sprintf(query, "DROP TABLE %s;", tableName);
-	if(fileOutputMode) {
-		fputs(query, outputFile);
-	} else {
-		SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-		SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
-	}
+	SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+	SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
 
 	if(createSQLTable(hstmt, tableName))
 		return EACCES;
 
-	if(!fileOutputMode)
-		SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
+	SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
 
 	prepareWriteQuery();
 
@@ -264,19 +220,11 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 	}
 	strcpy(p, ");");
 
-	if(fileOutputMode) {
-		fputs(query, outputFile);
-		return ferror(outputFile) == 0;
-	} else {
-		int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-		if(!SQL_SUCCEEDED(result) && result != SQL_NO_DATA) {
-			fprintf(stderr, "SQL Query: %s\n", query);
-			printOdbcStatus(SQL_HANDLE_STMT, hstmt);
-			commitTransaction = false;
-			return EILSEQ;
-		}
-		return 0;
-	}
+	int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+	if(checkSqlResult(result))
+		return EILSEQ;
+
+	return 0;
 }
 
 int SQLSource::readRow() {
@@ -292,166 +240,218 @@ int SQLSource::readRow() {
 int SQLSource::writeRow() {
 	int result;
 
-	result = prepareWriteRowQuery();
+	result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+	if(checkSqlResult(result))
+		return EILSEQ;
+
+	result = completeWriteRowQuery();
 	if(result != 0) {
 		commitTransaction = false;
 		return result;
 	}
 
-	if(fileOutputMode) {
-		fputs(query, outputFile);
-	} else {
-		int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-		if(!SQL_SUCCEEDED(result) && result != SQL_NO_DATA) {
-			fprintf(stderr, "SQL Query: %s\n", query);
-			printOdbcStatus(SQL_HANDLE_STMT, hstmt);
-			commitTransaction = false;
-			return EILSEQ;
-		}
-	}
-
 	return 0;
 }
 
-int SQLSource::prepareReadQuery() {
-	char *p = query;
+char* SQLSource::appendColumnNames(char *p) {
 	bool isFirstColumn = true;
 	int i;
 	IRowManipulator *row = getRowManipulator();
 
-	strcpy(p, "SELECT ");
-	p += strlen(p);
-
 	for(i=0; i<row->getColumnCount(); i++) {
-		if(GET_FLAGBIT(row->getIgnoreType(i), TYPE_SQLIGNORE)) continue;
+		if(GET_FLAGBIT(row->getIgnoreType(i), TYPE_SQLIGNORE))
+			continue;
 
-		if(isFirstColumn)
+		if(isFirstColumn) {
 			isFirstColumn = false;
-		else {
+		} else {
 			strcpy(p, ", ");
 			p += strlen(p);
 		}
-		sprintf(p, "\"%s\"", row->getColumnName(i));
-		p += strlen(p);
+		p += sprintf(p, "\"%s\"", row->getColumnName(i));
 	}
+
+	return p;
+}
+
+int SQLSource::prepareReadQuery() {
+	char *p = query;
+
+	strcpy(p, "SELECT ");
+	p += strlen(p);
+
+	p = appendColumnNames(p);
+
 	sprintf(p, " FROM %s;", tableName);
 
 	return 0;
 }
 
 int SQLSource::prepareWriteQuery() {
-	char *ptr = query;
-	int curCol;
+	static SQLLEN dataAtExecution = SQL_DATA_AT_EXEC;
+	char *p = query;
+	int i, curCol;
 	bool isFirstColumn = true;
 	IRowManipulator *row = getRowManipulator();
 
-	sprintf(ptr, "INSERT INTO %s (", tableName);
-	ptr += strlen(ptr);
+	p += sprintf(p, "INSERT INTO %s (", tableName);
 
-	for(curCol=0; curCol<row->getColumnCount(); curCol++) {
-		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE)) continue;
+	p = appendColumnNames(p);
 
-		if(isFirstColumn)
+	strcpy(p, ") VALUES (");
+	p += strlen(p);
+
+	for(i=1, curCol=0; curCol<row->getColumnCount(); curCol++) {
+		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE) || row->getType(curCol) == TYPE_VARCHAR_SIZE)
+			continue;
+
+		if(isFirstColumn) {
 			isFirstColumn = false;
-		else {
-			strcpy(ptr, ",");
-			ptr += strlen(ptr);
+		} else {
+			strcpy(p, ", ");
+			p += 2;
 		}
-		strcpy(ptr, "\"");
-		ptr++;
-		strcpy(ptr, row->getColumnName(curCol));
-		ptr += strlen(ptr);
-		strcpy(ptr, "\"");
-		ptr++;
-	}
-	strcpy(ptr, ") VALUES (");
-	ptr += strlen(ptr);
+		strcpy(p, "?");
+		p++;
 
-	endOfHeader = ptr;
+		SQLSMALLINT columnType = SQL_C_DEFAULT, dbType = SQL_UNKNOWN_TYPE, precision = 0;
+		SQLULEN columnSize = 1;
+		SQLLEN bufferSize = 0;
+
+		switch(row->getType(curCol)) {
+			case TYPE_BIT:
+				columnType = SQL_C_DEFAULT;
+				dbType = SQL_BIT;
+				bufferSize = 1;
+				break;
+
+			case TYPE_CHAR:
+				columnType = SQL_C_CHAR;
+				dbType = SQL_VARCHAR;
+				columnSize = row->getMaxDataCount(curCol);
+				bufferSize = 1;
+				break;
+
+			case TYPE_INT8:
+				columnType = SQL_C_TINYINT;
+				dbType = SQL_TINYINT;
+				columnSize = 1;
+				bufferSize = 1;
+				break;
+
+			case TYPE_INT16:
+				columnType = SQL_C_SHORT;
+				dbType = SQL_SMALLINT;
+				bufferSize = 2;
+				break;
+
+			case TYPE_INT32:
+				columnType = SQL_C_LONG;
+				dbType = SQL_INTEGER;
+				bufferSize = 4;
+				break;
+
+			case TYPE_DECIMAL:
+				columnType = SQL_C_DOUBLE;
+				dbType = SQL_DECIMAL;
+				columnSize = 10;
+				precision = row->getDataIndex(curCol);
+				break;
+
+			case TYPE_INT64:
+				columnType = SQL_C_SBIGINT;
+				dbType = SQL_BIGINT;
+				bufferSize = 8;
+				break;
+
+			case TYPE_FLOAT32:
+				columnType = SQL_C_FLOAT;
+				dbType = SQL_REAL;
+				break;
+
+			case TYPE_FLOAT64:
+				columnType = SQL_C_DOUBLE;
+				dbType = SQL_DOUBLE;
+				break;
+
+			case TYPE_VARCHAR_SIZE:
+				break;
+
+			case TYPE_VARCHAR_STR:
+				columnType = SQL_C_CHAR;
+				dbType = SQL_VARCHAR;
+				columnSize = row->getMaxDataCount(curCol);
+				break;
+		}
+		int result = SQLBindParameter(hstmt, i, SQL_PARAM_INPUT, columnType, dbType, columnSize, precision, reinterpret_cast<SQLPOINTER>(curCol), bufferSize, &dataAtExecution);
+		if(checkSqlResult(result))
+			return EILSEQ;
+		i++;
+	}
+
+	strcpy(p, ");");
+	p += strlen(p);
+
 	return 0;
 }
 
-int SQLSource::prepareWriteRowQuery() {
-	bool isFirstColumn = true;
-	char *ptr = endOfHeader;
+int SQLSource::completeWriteRowQuery() {
 	IRowManipulator *row = getRowManipulator();
 	void *buffer;
 	int curCol, count;
+	SQLRETURN result;
 
-	for(curCol=0; curCol<row->getColumnCount(); curCol++) {
-		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE)) continue;
-
-		if(isFirstColumn)
-			isFirstColumn = false;
-		else {
-			strcpy(ptr, ",");
-			ptr += strlen(ptr);
-		}
-
+	while((result = SQLParamData(hstmt, (SQLPOINTER*)&curCol)) == SQL_NEED_DATA) {
 		count = row->getDataCount(curCol);
 		buffer = row->getValuePtr(curCol);
 
 		switch(row->getType(curCol)) {
 			case TYPE_BIT:
 			case TYPE_INT8:
-				sprintf(ptr, "\'%d\'", *static_cast<char*>(buffer));
-				ptr += strlen(ptr);
+				SQLPutData(hstmt, buffer, 1);
 				break;
 
 			case TYPE_INT16:
-				sprintf(ptr, "\'%d\'", *static_cast<short*>(buffer));
-				ptr += strlen(ptr);
+				SQLPutData(hstmt, buffer, 2);
 				break;
 
 			case TYPE_INT32:
-				sprintf(ptr, "\'%d\'", *static_cast<int*>(buffer));
-				ptr += strlen(ptr);
+				SQLPutData(hstmt, buffer, 4);
 				break;
 
 			case TYPE_INT64:
-				sprintf(ptr, "\'%I64d\'", *static_cast<long long int*>(buffer));
-				ptr += strlen(ptr);
+				SQLPutData(hstmt, buffer, 8);
 				break;
 
 			case TYPE_CHAR: {
-				char *sqlEscapedStr = strreplace(static_cast<char*>(buffer), '\'', "\'\'");
-				sprintf(ptr, "\'%.*s\'", strlen(sqlEscapedStr), sqlEscapedStr);
-				ptr += strlen(ptr);
-				free(sqlEscapedStr);
+				SQLPutData(hstmt, buffer, strlen((char*)buffer));
 				break;
 			}
 
 			case TYPE_FLOAT32:
-				sprintf(ptr, "\'%f\'", *static_cast<float*>(buffer));
-				ptr += strlen(ptr);
+				SQLPutData(hstmt, buffer, 4);
 				break;
 
 			case TYPE_FLOAT64:
-				sprintf(ptr, "\'%lf\'", *static_cast<double*>(buffer));
-				ptr += strlen(ptr);
+				SQLPutData(hstmt, buffer, 8);
 				break;
 
 			case TYPE_VARCHAR_STR: {
-				char *sqlEscapedStr = strreplace(static_cast<char*>(buffer), '\'', "\'\'");
-				sprintf(ptr, "\'%.*s\'", strlen(sqlEscapedStr), sqlEscapedStr);
-				ptr += strlen(ptr);
-				free(sqlEscapedStr);
+				SQLPutData(hstmt, buffer, strlen((char*)buffer));
 				break;
 			}
 
 			case TYPE_DECIMAL: {
-				register int initialVal, intVal, decimalVal, tenPow;
-				tenPow = static_cast<int>(pow((float)10, row->getDataIndex(curCol))+0.5);
+				double initialVal, val, tenPow;
+				tenPow = pow(10.0, row->getDataIndex(curCol));
 				initialVal = *static_cast<int*>(buffer);
-				intVal = static_cast<int>(fabs((float)static_cast<int>(initialVal / tenPow))+0.5);
-				decimalVal = static_cast<int>(fabs((float)static_cast<int>(initialVal % tenPow))+0.5);
-				sprintf(ptr, "\'%c%d.%0*d\'", (initialVal < 0)? '-' : ' ', intVal, row->getDataIndex(curCol), decimalVal);
-				ptr += strlen(ptr);
+				val = initialVal / tenPow;
+				SQLPutData(hstmt, &val, 8);
 				break;
 			}
 		}
 	}
-	strcpy(ptr, ");");
+
 
 	return 0;
 }

@@ -39,11 +39,13 @@ class SQLSource : public IDataSource
 
 	protected:
 		int createSQLTable(SQLHSTMT hstmt, const char *table);
-		int prepareWriteRowQuery();
+		int completeWriteRowQuery();
 		int prepareReadRowQuery(SQLHSTMT hstmt);
 		int prepareReadQuery();
 		int prepareWriteQuery();
 		char *strreplace(const char *input, char c, const char *rep);
+		char *appendColumnNames(char *p);
+		int checkSqlResult(int result);
 
 		SQLHENV henv;
 		SQLHDBC hdbc;
@@ -51,12 +53,9 @@ class SQLSource : public IDataSource
 		bool commitTransaction;
 
 	private:
-		FILE *outputFile;
-		bool fileOutputMode;
 		char *tableName;
 		SQLLanguage *sqlLanguage;
 		char query[256*1024];
-		char *endOfHeader;
 
 		bool endOfRecordSet;
 		ICharsetConverter* utf16To8bits;

@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	Settings::setSettings(&options);
 
 	a.setApplicationName("RappelzRDBTool by Glandu");
-	a.setApplicationVersion("2.0");
+	a.setApplicationVersion("2.3.4");
 
 	Maingui mainGui;
 
