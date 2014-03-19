@@ -59,6 +59,8 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 #endif
 	if(source == DST_CSV || autoDetectSourceType)
 		filterList << "Tabulation separated table (*.csv *.tsv *.txt)";
+	if(save && (source == DST_SQLFile || autoDetectSourceType))
+		filterList << "SQL Script (*.sql)";
 	if(autoDetectSourceType)
 		filterList << "All files (*.*)";
 
@@ -85,6 +87,8 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 			*sourceType = DST_RDB;
 		else if((useExtension && filename.endsWith(".csv", Qt::CaseInsensitive)) || selectedFilter.contains("*.csv"))
 			*sourceType = DST_CSV;
+		else if(save && ((useExtension && filename.endsWith(".sql", Qt::CaseInsensitive)) || selectedFilter.contains("*.sql")))
+			*sourceType = DST_SQLFile;
 		else *sourceType = DST_CSV;
 	}
 

@@ -9,6 +9,7 @@
 #include "SQLSource.h"
 #include "SQLPostgres.h"
 #include "SQLServer.h"
+#include "SQLFileSource.h"
 
 #include "RowManipulator.h"
 
@@ -91,6 +92,7 @@ const FieldOrder *Database::getFieldOrder(eDataSourceType type) {
 		case DST_CSV: return &csvOrder;
 		case DST_SQLPostgres: return &sqlOrder;
 		case DST_SQLServer: return &sqlOrder;
+		case DST_SQLFile: return &sqlOrder;
 	}
 
 	return NULL;
@@ -112,6 +114,12 @@ void Database::getDataSourceInfo(eDataSourceType type, IDataSource **ds, FieldOr
 			if(ds) *ds = new CSVSource;
 			if(associatedOrder) *associatedOrder = &csvOrder;
 			if(associatedFormat) *associatedFormat = DF_CSV;
+			break;
+
+		case DST_SQLFile:
+			if(ds) *ds = new SQLFileSource(new SQLServer);
+			if(associatedOrder) *associatedOrder = &sqlOrder;
+			if(associatedFormat) *associatedFormat = DF_SQL;
 			break;
 
 		case DST_SQLPostgres:

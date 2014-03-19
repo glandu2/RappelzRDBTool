@@ -194,7 +194,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 		closeDb();
 		setStatus(TS_NoDbLoaded);
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't load the database file: %1").arg(strerror(result)));
+		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't load the database file: %1(%2)").arg(strerror(result)).arg(result));
 	} else {
 		loadedDatabaseName = filename;
 		setWindowTitle(loadedDatabaseName);
@@ -244,7 +244,7 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 
 	if(result != 0) {
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't save the database file: %1").arg(strerror(result)));
+		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't save the database file: %1(%2)").arg(strerror(result)).arg(result));
 	} else {
 		savedData = true;
 		loadedDatabaseName = filename;

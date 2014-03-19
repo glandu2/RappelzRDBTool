@@ -2,12 +2,6 @@
 #define SQLFileSource_H
 
 #include "IDataSource.h"
-#ifdef __unix__
-#  include <sql.h>
-#else
-#  include <windows.h>
-#endif
-#include <sqlext.h>
 #include <stdio.h>
 
 class ICharsetConverter;
@@ -38,28 +32,19 @@ class SQLFileSource : public IDataSource
 		virtual bool hasNext();
 
 	protected:
-		int createSQLTable(SQLHSTMT hstmt, const char *table);
+		int createSQLTable();
 		int prepareWriteRowQuery();
-		int prepareReadRowQuery(SQLHSTMT hstmt);
+		int prepareReadRowQuery();
 		int prepareReadQuery();
 		int prepareWriteQuery();
 		char *strreplace(const char *input, char c, const char *rep);
 
-		SQLHENV henv;
-		SQLHDBC hdbc;
-		SQLHSTMT hstmt;
-		bool commitTransaction;
-
 	private:
 		FILE *outputFile;
-		bool fileOutputMode;
 		char *tableName;
 		SQLLanguage *sqlLanguage;
 		char query[256*1024];
 		char *endOfHeader;
-
-		bool endOfRecordSet;
-		ICharsetConverter* utf16To8bits;
 };
 
 } //namespace

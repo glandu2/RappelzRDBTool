@@ -46,11 +46,12 @@ Maingui::Maingui(QWidget *parent) :
 	connect(ui->actionLoadFromFile, SIGNAL(triggered()), this, SLOT(onLoadFile()));
 	connect(ui->actionLoad_from_RDB, SIGNAL(triggered()), this, SLOT(onLoadRDB()));
 	connect(ui->actionLoad_from_CSV, SIGNAL(triggered()), this, SLOT(onLoadCSV()));
-	connect(ui->actionLoad_from_SQL, SIGNAL(triggered()), this, SLOT(onLoadSQL()));
+	connect(ui->actionLoad_from_SQLDatabase, SIGNAL(triggered()), this, SLOT(onLoadSQLDatabase()));
 	connect(ui->actionSaveToFile, SIGNAL(triggered()), this, SLOT(onSaveFile()));
 	connect(ui->actionSave_to_RDB, SIGNAL(triggered()), this, SLOT(onSaveRDB()));
 	connect(ui->actionSave_to_CSV, SIGNAL(triggered()), this, SLOT(onSaveCSV()));
-	connect(ui->actionSave_to_SQL, SIGNAL(triggered()), this, SLOT(onSaveSQL()));
+	connect(ui->actionSave_to_SQL_file, SIGNAL(triggered()), this, SLOT(onSaveSQL()));
+	connect(ui->actionSave_to_SQLDatabase, SIGNAL(triggered()), this, SLOT(onSaveSQLDatabase()));
 	connect(ui->actionClose_Database, SIGNAL(triggered()), this, SLOT(onCloseDb()));
 	connect(ui->actionQuit, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -180,7 +181,7 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType, bool hashedFilename
 	//Load the current select db structure if not already done
 	onLoadDbStructDLL();
 
-	if(srcType == ST_Sql && sqlConfigDialog->getServerName().isEmpty()) {
+	if(srcType == ST_SqlDatabase && sqlConfigDialog->getServerName().isEmpty()) {
 		sqlConfigDialog->exec();
 		if(sqlConfigDialog->getServerName().isEmpty())
 			return;
@@ -222,6 +223,11 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType, bool hashedFilename
 			break;
 
 		case ST_Sql:
+			sourceType = DST_SQLFile;
+			defaultSourceName = QByteArray("Arcadia.dbo.") + currentView->getDefaultTableName();
+			break;
+
+		case ST_SqlDatabase:
 			sourceType = sqlConfigDialog->getServerType();
 			if(sourceType == DST_SQLServer)
 				defaultSourceName = QByteArray("Arcadia.dbo.") + currentView->getDefaultTableName();
@@ -286,8 +292,8 @@ void Maingui::onLoadCSV() {
 	loadSaveDbFile(false, ST_Csv, ui->actionUse_hashed_files->isChecked());
 }
 
-void Maingui::onLoadSQL() {
-	loadSaveDbFile(false, ST_Sql, ui->actionUse_hashed_files->isChecked());
+void Maingui::onLoadSQLDatabase() {
+	loadSaveDbFile(false, ST_SqlDatabase, ui->actionUse_hashed_files->isChecked());
 }
 
 
@@ -305,6 +311,10 @@ void Maingui::onSaveCSV() {
 
 void Maingui::onSaveSQL() {
 	loadSaveDbFile(true, ST_Sql, ui->actionUse_hashed_files->isChecked());
+}
+
+void Maingui::onSaveSQLDatabase() {
+	loadSaveDbFile(true, ST_SqlDatabase, ui->actionUse_hashed_files->isChecked());
 }
 
 void Maingui::onSQLOptions() {

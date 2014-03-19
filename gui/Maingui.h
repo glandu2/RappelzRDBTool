@@ -31,7 +31,8 @@ class Maingui : public QMainWindow
 			ST_None,
 			ST_Rdb,
 			ST_Csv,
-			ST_Sql
+			ST_Sql,
+			ST_SqlDatabase
 		};
 
 		explicit Maingui(QWidget *parent = 0);
@@ -43,12 +44,13 @@ class Maingui : public QMainWindow
 		void onLoadFile();
 		void onLoadRDB();
 		void onLoadCSV();
-		void onLoadSQL();
+		void onLoadSQLDatabase();
 
 		void onSaveFile();
 		void onSaveRDB();
 		void onSaveCSV();
 		void onSaveSQL();
+		void onSaveSQLDatabase();
 
 		void onCloseDb();
 
