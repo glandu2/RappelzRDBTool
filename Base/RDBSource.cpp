@@ -122,6 +122,7 @@ int RDBSource::readRow() {
 				}
 				break;
 
+			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
 			case TYPE_CHAR:
 			case TYPE_INT8:
@@ -211,6 +212,7 @@ int RDBSource::writeRow() {
 				}
 				break;
 
+			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
 			case TYPE_CHAR:
 			case TYPE_INT8:

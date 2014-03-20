@@ -74,6 +74,7 @@ int SQLFileSource::open(const char* source, eOpenMode openMode,  const char* loc
 
 	tableName = (char*)malloc(ext - p + 1);
 	memcpy(tableName, p, ext - p);
+	tableName[ext - p] = '\0';
 
 	return 0;
 }
@@ -228,6 +229,7 @@ int SQLFileSource::writeRow() {
 				ptr += strlen(ptr);
 				break;
 
+			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR: {
 				char *sqlEscapedStr = strreplace(static_cast<char*>(buffer), '\'', "\'\'");
 				sprintf(ptr, "\'%.*s\'", strlen(sqlEscapedStr), sqlEscapedStr);

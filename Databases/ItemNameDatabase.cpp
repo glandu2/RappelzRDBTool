@@ -10,7 +10,7 @@ extern "C" {
 static FieldDescriptor df[] =
 	{{1, TYPE_INT32 | TYPE_FLAG_KEY, "id"},
 	 {MAKEINDEXEDVAR(0, 1), TYPE_VARCHAR_SIZE | TYPE_SQLIGNORE | TYPE_CSVIGNORE, ""},
-	 {MAKEINDEXEDVAR(0, 4096), TYPE_VARCHAR_STR, "value"}};
+	 {MAKEINDEXEDVAR(0, 3999), TYPE_NVARCHAR_STR, "value"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {

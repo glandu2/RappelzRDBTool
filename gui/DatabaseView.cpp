@@ -159,6 +159,8 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 
 	options += QByteArray("charset=") + ui->localeCombo->itemData(ui->localeCombo->currentIndex()).toByteArray() + ";";
 
+	setStatus(TS_LoadingDB);
+
 	ui->progressBar->setValue(0);
 	if(db->getRowCount() > 0) {
 		ui->progressBar->setMaximum(200);
@@ -183,9 +185,6 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 
 	if(!password.isEmpty())
 		passwordStr = password.toLocal8Bit();
-
-
-	setStatus(TS_LoadingDB);
 
 	result = db->readData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr, options.constData());
 	savedData = true;
@@ -222,6 +221,8 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 	QByteArray locationStr;
 	QByteArray usernameStr;
 	QByteArray passwordStr;
+
+	options += QByteArray("charset=") + ui->localeCombo->itemData(ui->localeCombo->currentIndex()).toByteArray() + ";";
 
 	setStatus(TS_SavingDB);
 

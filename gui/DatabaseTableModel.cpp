@@ -135,6 +135,7 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 			break;
 		}
 
+		case TYPE_NVARCHAR_STR:
 		case TYPE_VARCHAR_STR:
 			if(((char*)buffer)[count-1] == '\0')  //On ne met pas de 0 final dans le QString
 				return QVariant::fromValue(toUnicode((char*)buffer, count-1));
@@ -194,10 +195,10 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 
 		QByteArray converted;
 
-		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR || row->getType(realColumnIndex) == TYPE_CHAR)
+		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR || row->getType(realColumnIndex) == TYPE_NVARCHAR_STR || row->getType(realColumnIndex) == TYPE_CHAR)
 			converted = fromUnicode(value.toString());
 
-		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR) {
+		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR || row->getType(realColumnIndex) == TYPE_NVARCHAR_STR) {
 			row->freeValue(realColumnIndex);
 			row->initData(realColumnIndex, converted.size()+1);
 		}
@@ -243,6 +244,7 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 				*(double*)buffer = value.toDouble(&result);
 				break;
 
+			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
 				result = true;
 				qstrncpy((char*)buffer, converted.constData(), row->getDataCount(realColumnIndex)+1);

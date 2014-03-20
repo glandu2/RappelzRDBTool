@@ -179,6 +179,7 @@ int CSVSource::readRow() {
 				sscanf(readptr, "%lf", (double*)buffer);
 				break;
 
+			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
 				strcpy((char*)buffer, readptr);
 				break;

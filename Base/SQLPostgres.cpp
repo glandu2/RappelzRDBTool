@@ -39,6 +39,7 @@ void SQLPostgres::getTypeName(char *buffer, int type, int count, int index) {
 			break;
 
 		case TYPE_CHAR:
+		case TYPE_NVARCHAR_STR:
 		case TYPE_VARCHAR_STR:
 			sprintf(buffer, "varchar(%d)", count);
 			break;

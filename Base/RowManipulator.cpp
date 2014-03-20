@@ -84,6 +84,7 @@ int RowManipulator::initData(int colPos, unsigned int dataCount) {
 				result = row[getColumnOriginalIndex(colPos)] = malloc((dataCount+7)/8);
 			break;
 
+		case TYPE_NVARCHAR_STR:
 		case TYPE_VARCHAR_STR:
 		case TYPE_CHAR:
 			if((maxDataCount+1) > (sizeof(void*)/sizeof(char))) {
@@ -183,6 +184,7 @@ void RowManipulator::freeValue(int colPos) {
 				free(row[colPos]);
 			break;
 
+		case TYPE_NVARCHAR_STR:
 		case TYPE_VARCHAR_STR:
 		case TYPE_INT8:
 		case TYPE_CHAR:
@@ -246,6 +248,7 @@ void *RowManipulator::getValuePtr(int colPos) {
 				return row[colPos];
 			return &row[colPos];
 
+		case TYPE_NVARCHAR_STR:
 		case TYPE_VARCHAR_STR:
 		case TYPE_INT8:
 		case TYPE_CHAR:
@@ -293,7 +296,7 @@ void *RowManipulator::getValuePtr(int colPos) {
 
 //ordered
 int RowManipulator::getDataCount(int colPos) {
-	if(getType(colPos) == TYPE_VARCHAR_STR && *this->indexedSizePtrs[getDataIndex(colPos)])
+	if((getType(colPos) == TYPE_VARCHAR_STR || getType(colPos) == TYPE_NVARCHAR_STR) && *this->indexedSizePtrs[getDataIndex(colPos)])
 		return *this->indexedSizePtrs[getDataIndex(colPos)];
 	return getMaxDataCount(colPos);
 }
@@ -301,7 +304,7 @@ int RowManipulator::getDataCount(int colPos) {
 //ordered
 //If the value was already allocated, freeing and reinit is needed after that
 void RowManipulator::setDataCount(int colPos, int dataCount) {
-	if(getType(colPos) == TYPE_VARCHAR_STR)
+	if(getType(colPos) == TYPE_VARCHAR_STR || getType(colPos) == TYPE_NVARCHAR_STR)
 		*this->indexedSizePtrs[getDataIndex(colPos)] = dataCount;
 }
 

@@ -12,6 +12,7 @@
 #define TYPE_VARCHAR_SIZE	0x0000000C
 #define TYPE_VARCHAR_STR	0x0000000D
 #define TYPE_DECIMAL	0x0000000E			//dataSize = number of fractionnal digits,  here it would be 2: 567323.54
+#define TYPE_NVARCHAR_STR	0x0000000F
 
 #define TYPE_RDBIGNORE	0x00000100
 #define TYPE_SQLIGNORE	0x00000200

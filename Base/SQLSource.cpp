@@ -240,7 +240,11 @@ int SQLSource::readRow() {
 int SQLSource::writeRow() {
 	int result;
 
-	result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+	result = SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS);
+	if(checkSqlResult(result))
+		return EILSEQ;
+
+	result = SQLExecute(hstmt);
 	if(checkSqlResult(result))
 		return EILSEQ;
 
@@ -326,8 +330,8 @@ int SQLSource::prepareWriteQuery() {
 				break;
 
 			case TYPE_CHAR:
-				columnType = SQL_C_CHAR;
-				dbType = SQL_VARCHAR;
+				columnType = SQL_C_WCHAR;
+				dbType = SQL_WVARCHAR;
 				columnSize = row->getMaxDataCount(curCol);
 				bufferSize = 1;
 				break;
@@ -377,9 +381,10 @@ int SQLSource::prepareWriteQuery() {
 			case TYPE_VARCHAR_SIZE:
 				break;
 
+			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
-				columnType = SQL_C_CHAR;
-				dbType = SQL_VARCHAR;
+				columnType = SQL_C_WCHAR;
+				dbType = SQL_WVARCHAR;
 				columnSize = row->getMaxDataCount(curCol);
 				break;
 		}
@@ -423,11 +428,6 @@ int SQLSource::completeWriteRowQuery() {
 				SQLPutData(hstmt, buffer, 8);
 				break;
 
-			case TYPE_CHAR: {
-				SQLPutData(hstmt, buffer, strlen((char*)buffer));
-				break;
-			}
-
 			case TYPE_FLOAT32:
 				SQLPutData(hstmt, buffer, 4);
 				break;
@@ -436,8 +436,16 @@ int SQLSource::completeWriteRowQuery() {
 				SQLPutData(hstmt, buffer, 8);
 				break;
 
+			case TYPE_CHAR:
+			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR: {
-				SQLPutData(hstmt, buffer, strlen((char*)buffer));
+				ICharsetConverter::ConvertedString in, out;
+				in.data = (char*)buffer;
+				in.size = strlen((char*)buffer);
+				utf16To8bits->convertToUtf16(in, &out);
+
+				SQLPutData(hstmt, out.data, out.size);
+				free(out.data);
 				break;
 			}
 
@@ -468,7 +476,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 		columnIndex++;	//do not count ignored columns
 
 		//Special handling for varchar
-		if(row->getType(curCol) != TYPE_VARCHAR_STR)
+		if(row->getType(curCol) != TYPE_VARCHAR_STR && row->getType(curCol) != TYPE_NVARCHAR_STR)
 			row->initData(curCol);
 
 		buffer = row->getValuePtr(curCol);
@@ -534,6 +542,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 			case TYPE_VARCHAR_SIZE:
 				break;
 
+			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR: {
 				char *unicodeBuffer;
 				int bufferSize;

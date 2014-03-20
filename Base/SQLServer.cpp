@@ -42,6 +42,10 @@ void SQLServer::getTypeName(char *buffer, int type, int count, int index) {
 		case TYPE_VARCHAR_STR:
 			sprintf(buffer, "varchar(%d)", count);
 			break;
+
+		case TYPE_NVARCHAR_STR:
+			sprintf(buffer, "nvarchar(%d)", count);
+			break;
 	}
 }
 
