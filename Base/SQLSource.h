@@ -45,7 +45,7 @@ class SQLSource : public IDataSource
 		int prepareWriteQuery();
 		char *strreplace(const char *input, char c, const char *rep);
 		char *appendColumnNames(char *p);
-		int checkSqlResult(int result);
+		int checkSqlResult(int result, const char *functionName);
 
 		SQLHENV henv;
 		SQLHDBC hdbc;

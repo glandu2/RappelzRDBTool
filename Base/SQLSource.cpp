@@ -41,9 +41,9 @@ SQLSource::~SQLSource() {
 	delete sqlLanguage;
 }
 
-int SQLSource::checkSqlResult(int result) {
+int SQLSource::checkSqlResult(int result, const char* functionName) {
 	if(!SQL_SUCCEEDED(result) && result != SQL_NO_DATA && result != SQL_NEED_DATA) {
-		fprintf(stderr, "SQL Error %d\n", result);
+		fprintf(stderr, "%s: SQL Error %d\n", functionName, result);
 		fprintf(stderr, "SQL Query: %s\n", query);
 		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
 		printOdbcStatus(SQL_HANDLE_DBC, hdbc);
@@ -143,7 +143,7 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 	//retreive row count
 	sprintf(query, "SELECT COUNT(*) FROM %s;", tableName);
 	SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-	if(checkSqlResult(SQLFetch(hstmt)))
+	if(checkSqlResult(SQLFetch(hstmt), "prepareRead.SQLFetch"))
 		return EINVAL;
 
 	SQLGetData(hstmt, 1, SQL_C_LONG, &rowCount, sizeof(int), NULL);
@@ -154,10 +154,10 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 	prepareReadQuery();
 
 	printf("Quering: \"%s\"\n", query);
-	if(checkSqlResult(SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS)))
+	if(checkSqlResult(SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS), "prepareRead.SQLPrepare"))
 		return ENOEXEC;
 
-	if(checkSqlResult(SQLExecute(hstmt)))
+	if(checkSqlResult(SQLExecute(hstmt), "prepareRead.SQLExecute"))
 		return ENOEXEC;
 
 
@@ -221,7 +221,7 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 	strcpy(p, ");");
 
 	int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-	if(checkSqlResult(result))
+	if(checkSqlResult(result, "createSQLTable.SQLExecDirect"))
 		return EILSEQ;
 
 	return 0;
@@ -241,11 +241,11 @@ int SQLSource::writeRow() {
 	int result;
 
 	result = SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS);
-	if(checkSqlResult(result))
+	if(checkSqlResult(result, "writeRow.SQLPrepare"))
 		return EILSEQ;
 
 	result = SQLExecute(hstmt);
-	if(checkSqlResult(result))
+	if(checkSqlResult(result, "writeRow.SQLExecute"))
 		return EILSEQ;
 
 	result = completeWriteRowQuery();
@@ -389,7 +389,7 @@ int SQLSource::prepareWriteQuery() {
 				break;
 		}
 		int result = SQLBindParameter(hstmt, i, SQL_PARAM_INPUT, columnType, dbType, columnSize, precision, reinterpret_cast<SQLPOINTER>(curCol), bufferSize, &dataAtExecution);
-		if(checkSqlResult(result))
+		if(checkSqlResult(result, "prepareWriteQuery.SQLBindParameter"))
 			return EILSEQ;
 		i++;
 	}
