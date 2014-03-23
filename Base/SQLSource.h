@@ -9,6 +9,7 @@
 #endif
 #include <sqlext.h>
 #include <stdio.h>
+#include <vector>
 
 class ICharsetConverter;
 
@@ -38,14 +39,26 @@ class SQLSource : public IDataSource
 		virtual bool hasNext();
 
 	protected:
+		struct ParameterInfo {
+			ParameterInfo(void *data = 0, SQLLEN dataSizeOrInd = 0) : data(data), dataSizeOrInd(dataSizeOrInd) {}
+			void* data;
+			SQLLEN dataSizeOrInd;
+		};
+
 		int createSQLTable(SQLHSTMT hstmt, const char *table);
-		int completeWriteRowQuery();
+		int prepareWriteRowQuery();
 		int prepareReadRowQuery(SQLHSTMT hstmt);
 		int prepareReadQuery();
 		int prepareWriteQuery();
 		char *strreplace(const char *input, char c, const char *rep);
 		char *appendColumnNames(char *p);
 		int checkSqlResult(int result, const char *functionName);
+
+		void clearBoundParameters(int newCount);
+		ParameterInfo* initParameter(int index, SQLLEN dataSizeOrInd);
+		void* getParameter(int index);
+		SQLLEN* getParameterSizeOrInd(int index);
+		void setParameterData(int index, void *data, SQLLEN size);
 
 		SQLHENV henv;
 		SQLHDBC hdbc;
@@ -56,6 +69,8 @@ class SQLSource : public IDataSource
 		char *tableName;
 		SQLLanguage *sqlLanguage;
 		char query[256*1024];
+
+		std::vector<ParameterInfo> boundBuffers;
 
 		bool endOfRecordSet;
 		ICharsetConverter* utf16To8bits;

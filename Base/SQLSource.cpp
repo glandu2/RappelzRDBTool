@@ -130,6 +130,8 @@ void SQLSource::close() {
 	hdbc = 0;
 	henv = 0;
 
+	clearBoundParameters(0);
+
 	if(utf16To8bits)
 		delete utf16To8bits;
 	utf16To8bits = 0;
@@ -170,6 +172,8 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 }
 
 int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
+	clearBoundParameters(row->getColumnCount());
+
 	sprintf(query, "DROP TABLE %s;", tableName);
 	SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
 	SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
@@ -181,11 +185,14 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 
 	prepareWriteQuery();
 
+	int result = SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS);
+	if(checkSqlResult(result, "writeRow.SQLExecute"))
+		return EILSEQ;
+
 	return 0;
 }
 
 int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
-	char query[8192];
 	char *p;
 	int isFirstColumn = 1, curCol;
 	IRowManipulator *row = getRowManipulator();
@@ -240,19 +247,11 @@ int SQLSource::readRow() {
 int SQLSource::writeRow() {
 	int result;
 
-	result = SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS);
-	if(checkSqlResult(result, "writeRow.SQLPrepare"))
-		return EILSEQ;
+	prepareWriteRowQuery();
 
 	result = SQLExecute(hstmt);
 	if(checkSqlResult(result, "writeRow.SQLExecute"))
 		return EILSEQ;
-
-	result = completeWriteRowQuery();
-	if(result != 0) {
-		commitTransaction = false;
-		return result;
-	}
 
 	return 0;
 }
@@ -292,7 +291,6 @@ int SQLSource::prepareReadQuery() {
 }
 
 int SQLSource::prepareWriteQuery() {
-	static SQLLEN dataAtExecution = SQL_DATA_AT_EXEC;
 	char *p = query;
 	int i, curCol;
 	bool isFirstColumn = true;
@@ -331,9 +329,9 @@ int SQLSource::prepareWriteQuery() {
 
 			case TYPE_CHAR:
 				columnType = SQL_C_WCHAR;
-				dbType = SQL_WVARCHAR;
+				dbType = SQL_WLONGVARCHAR;
 				columnSize = row->getMaxDataCount(curCol);
-				bufferSize = 1;
+				bufferSize = columnSize*4; //worst case: each UTF16 character is 4 bytes wide
 				break;
 
 			case TYPE_INT8:
@@ -360,6 +358,7 @@ int SQLSource::prepareWriteQuery() {
 				dbType = SQL_DECIMAL;
 				columnSize = 10;
 				precision = row->getDataIndex(curCol);
+				bufferSize = 8;
 				break;
 
 			case TYPE_INT64:
@@ -371,11 +370,13 @@ int SQLSource::prepareWriteQuery() {
 			case TYPE_FLOAT32:
 				columnType = SQL_C_FLOAT;
 				dbType = SQL_REAL;
+				bufferSize = 4;
 				break;
 
 			case TYPE_FLOAT64:
 				columnType = SQL_C_DOUBLE;
 				dbType = SQL_DOUBLE;
+				bufferSize = 8;
 				break;
 
 			case TYPE_VARCHAR_SIZE:
@@ -384,11 +385,13 @@ int SQLSource::prepareWriteQuery() {
 			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
 				columnType = SQL_C_WCHAR;
-				dbType = SQL_WVARCHAR;
+				dbType = SQL_WLONGVARCHAR;
 				columnSize = row->getMaxDataCount(curCol);
+				bufferSize = columnSize*4; //worst case: each UTF16 character is 4 bytes wide
 				break;
 		}
-		int result = SQLBindParameter(hstmt, i, SQL_PARAM_INPUT, columnType, dbType, columnSize, precision, reinterpret_cast<SQLPOINTER>(curCol), bufferSize, &dataAtExecution);
+		ParameterInfo* paramInfo = initParameter(curCol, bufferSize);
+		int result = SQLBindParameter(hstmt, i, SQL_PARAM_INPUT, columnType, dbType, columnSize, precision, paramInfo->data, 0, &paramInfo->dataSizeOrInd);
 		if(checkSqlResult(result, "prepareWriteQuery.SQLBindParameter"))
 			return EILSEQ;
 		i++;
@@ -400,40 +403,42 @@ int SQLSource::prepareWriteQuery() {
 	return 0;
 }
 
-int SQLSource::completeWriteRowQuery() {
+int SQLSource::prepareWriteRowQuery() {
 	IRowManipulator *row = getRowManipulator();
 	void *buffer;
 	int curCol, count;
-	SQLRETURN result;
 
-	while((result = SQLParamData(hstmt, (SQLPOINTER*)&curCol)) == SQL_NEED_DATA) {
+	for(curCol = 0; curCol < row->getColumnCount(); curCol++) {
+		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE) || row->getType(curCol) == TYPE_VARCHAR_SIZE)
+			continue;
+
 		count = row->getDataCount(curCol);
 		buffer = row->getValuePtr(curCol);
 
 		switch(row->getType(curCol)) {
 			case TYPE_BIT:
 			case TYPE_INT8:
-				SQLPutData(hstmt, buffer, 1);
+				setParameterData(curCol, buffer, 1);
 				break;
 
 			case TYPE_INT16:
-				SQLPutData(hstmt, buffer, 2);
+				setParameterData(curCol, buffer, 2);
 				break;
 
 			case TYPE_INT32:
-				SQLPutData(hstmt, buffer, 4);
+				setParameterData(curCol, buffer, 4);
 				break;
 
 			case TYPE_INT64:
-				SQLPutData(hstmt, buffer, 8);
+				setParameterData(curCol, buffer, 8);
 				break;
 
 			case TYPE_FLOAT32:
-				SQLPutData(hstmt, buffer, 4);
+				setParameterData(curCol, buffer, 4);
 				break;
 
 			case TYPE_FLOAT64:
-				SQLPutData(hstmt, buffer, 8);
+				setParameterData(curCol, buffer, 8);
 				break;
 
 			case TYPE_CHAR:
@@ -444,7 +449,7 @@ int SQLSource::completeWriteRowQuery() {
 				in.size = strlen((char*)buffer);
 				utf16To8bits->convertToUtf16(in, &out);
 
-				SQLPutData(hstmt, out.data, out.size);
+				setParameterData(curCol, out.data, out.size);
 				free(out.data);
 				break;
 			}
@@ -454,7 +459,7 @@ int SQLSource::completeWriteRowQuery() {
 				tenPow = pow(10.0, row->getDataIndex(curCol));
 				initialVal = *static_cast<int*>(buffer);
 				val = initialVal / tenPow;
-				SQLPutData(hstmt, &val, 8);
+				setParameterData(curCol, &val, 8);
 				break;
 			}
 		}
@@ -596,6 +601,48 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 
 bool SQLSource::hasNext() {
 	return !endOfRecordSet;
+}
+
+
+/***********************************/
+/*** Parameter binding functions ***/
+/***********************************/
+
+void SQLSource::clearBoundParameters(int newCount) {
+	if(hstmt)
+		SQLFreeStmt(hstmt, SQL_RESET_PARAMS);
+	for(int i = 0; i < boundBuffers.size(); i++) {
+		if(boundBuffers[i].data)
+			free(boundBuffers[i].data);
+		boundBuffers[i].data = 0;
+	}
+	boundBuffers.resize(newCount);
+}
+
+SQLSource::ParameterInfo* SQLSource::initParameter(int index, SQLLEN dataSizeOrInd) {
+	if(boundBuffers[index].data != 0)
+		free(boundBuffers[index].data);
+
+	if(dataSizeOrInd > 0) {
+		boundBuffers[index].data = malloc(dataSizeOrInd);
+		boundBuffers[index].dataSizeOrInd = 0;
+	} else
+		boundBuffers[index].dataSizeOrInd = dataSizeOrInd;
+
+	return &boundBuffers[index];
+}
+
+void* SQLSource::getParameter(int index) {
+	return boundBuffers[index].data;
+}
+
+SQLLEN* SQLSource::getParameterSizeOrInd(int index) {
+	return &boundBuffers[index].dataSizeOrInd;
+}
+
+void SQLSource::setParameterData(int index, void *data, SQLLEN size) {
+	memcpy(boundBuffers[index].data, data, size);
+	boundBuffers[index].dataSizeOrInd = size;
 }
 
 } //namespace
