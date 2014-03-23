@@ -329,7 +329,7 @@ int SQLSource::prepareWriteQuery() {
 
 			case TYPE_CHAR:
 				columnType = SQL_C_WCHAR;
-				dbType = SQL_WLONGVARCHAR;
+				dbType = SQL_WVARCHAR;
 				columnSize = row->getMaxDataCount(curCol);
 				bufferSize = columnSize*4; //worst case: each UTF16 character is 4 bytes wide
 				break;
@@ -385,7 +385,7 @@ int SQLSource::prepareWriteQuery() {
 			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
 				columnType = SQL_C_WCHAR;
-				dbType = SQL_WLONGVARCHAR;
+				dbType = SQL_WVARCHAR;
 				columnSize = row->getMaxDataCount(curCol);
 				bufferSize = columnSize*4; //worst case: each UTF16 character is 4 bytes wide
 				break;
