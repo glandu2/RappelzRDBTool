@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 static FieldDescriptor df[] =
-	{{1, TYPE_INT32 | TYPE_FLAG_KEY, "id"},
+	{{1, TYPE_INT32, "id"},
 	 {MAKEINDEXEDVAR(0, 1), TYPE_VARCHAR_SIZE | TYPE_SQLIGNORE | TYPE_CSVIGNORE, ""},
 	 {MAKEINDEXEDVAR(0, 3999), TYPE_NVARCHAR_STR, "value"}};
 

@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 static FieldDescriptor df[] =
-	{{ 1, TYPE_INT32 | TYPE_FLAG_KEY, "id" },
+	{{ 1, TYPE_INT32, "id" },
 	{ 1, TYPE_INT32, "name_id" },
 	{ 1, TYPE_INT32, "type" },
 	{ 1, TYPE_INT32, "group" },
