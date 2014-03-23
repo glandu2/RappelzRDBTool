@@ -60,11 +60,10 @@ int computeLegacySeed(const char *name) {
 	else return computeVar;
 }
 
-char computeFirstChar(char *reducedHash) {
+char computeFirstChar(char *reducedHash, unsigned int size) {
 	int i, computeVar;
 
-	//for(i = 0, computeVar = 0; i < strlen(reducedHash); i++)
-	for(i = 0, computeVar = 0; reducedHash[i]; i++)
+	for(i = 0, computeVar = 0; i < size; i++)
 		computeVar = reducedHash[i] + computeVar;
 
 	return encryptLastCharTable[computeVar % 0x54];
@@ -96,7 +95,7 @@ int convertNameToHash(const char *name, char *hash, int encodeSeed) {
 	hash[nameSize+1] = encryptLastCharTable[encodeSeed];
 	hash[nameSize+2] = 0;
 
-	hash[0] = computeFirstChar(reducedHash);
+	hash[0] = computeFirstChar(reducedHash, nameSize);
 	
 	return 0;
 }

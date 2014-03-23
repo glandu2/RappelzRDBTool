@@ -32,6 +32,7 @@ static FieldDescriptor df[] =
 	{ 1, TYPE_FLOAT32, "weight" },
 	{ 1, TYPE_INT32, "price" },
 	{ 1, TYPE_INT32, "huntaholic_point" },
+	{ 1, TYPE_INT32 | TYPE_RDBIGNORE, "arena_points" },
 	{ 1, TYPE_INT32, "ethereal_durability" },
 	{ 1, TYPE_INT32, "endurance" },
 	{ 1, TYPE_INT32, "wear_type" },
@@ -144,117 +145,188 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 	return  "id\0"
-		"name_id\0"
-		"tooltip_id\0"
-		"type\0"
-		"group\0"
-		"class\0"
-		"wear_type\0"
-		"set_id\0"
-		"set_part_flag\0"
-		"grade\0"
-		"rank\0"
-		"level\0"
-		"enhance\0"
-		"socket\0"
-		"status_flag\0"
-		"limit_deva\0"
-		"limit_asura\0"
-		"limit_gaia\0"
-		"job_depth\0"
-		"limit_fighter\0"
-		"limit_hunter\0"
-		"limit_magician\0"
-		"limit_summoner\0"
-		"use_min_level\0"
-		"use_max_level\0"
-		"target_min_level\0"
-		"target_max_level\0"
-		"range\0"
-		"weight\0"
-		"price\0"
-		"huntaholic_point\0"
-		"ethereal_durability\0"
-		"endurance\0"
-		"material\0"
-		"summon_id\0"
-		"item_use_flag\0"
-		"available_period\0"
-		"decrease_type\0"
-		"throw_range\0"
-		"base_type_0\0"
-		"base_var1_0\0"
-		"base_var2_0\0"
-		"base_type_1\0"
-		"base_var1_1\0"
-		"base_var2_1\0"
-		"base_type_2\0"
-		"base_var1_2\0"
-		"base_var2_2\0"
-		"base_type_3\0"
-		"base_var1_3\0"
-		"base_var2_3\0"
-		"opt_type_0\0"
-		"opt_var1_0\0"
-		"opt_var2_0\0"
-		"opt_type_1\0"
-		"opt_var1_1\0"
-		"opt_var2_1\0"
-		"opt_type_2\0"
-		"opt_var1_2\0"
-		"opt_var2_2\0"
-		"opt_type_3\0"
-		"opt_var1_3\0"
-		"opt_var2_3\0"
-		"effect_id\0"
-		"enhance_0_id\0"
-		"enhance_0_01\0"
-		"enhance_0_02\0"
-		"enhance_0_03\0"
-		"enhance_0_04\0"
-		"enhance_1_id\0"
-		"enhance_1_01\0"
-		"enhance_1_02\0"
-		"enhance_1_03\0"
-		"enhance_1_04\0"
-		"skill_id\0"
-		"state_id\0"
-		"state_level\0"
-		"state_time\0"
-		"cool_time\0"
-		"cool_time_group\0"
-		"model_type_dem\0"
-		"model_type_def\0"
-		"model_type_asm\0"
-		"model_type_asf\0"
-		"model_type_gam\0"
-		"model_type_gaf\0"
-		"deco_model_change\0"
-		"model_00\0"
-		"model_01\0"
-		"model_02\0"
-		"model_03\0"
-		"model_04\0"
-		"model_05\0"
-		"model_06\0"
-		"model_07\0"
-		"model_08\0"
-		"model_09\0"
-		"model_10\0"
-		"model_11\0"
-		"model_12\0"
-		"model_13\0"
-		"model_14\0"
-		"model_15\0"
-		"model_16\0"
-		"model_17\0"
-		"texture_filename\0"
-		"drop_type\0"
-		"icon_id\0"
-		"icon_file_name\0"
-		"script_text\0"
-		"unknownValue2\0";
+			"name_id\0"
+			"tooltip_id\0"
+			"type\0"
+			"group\0"
+			"class\0"
+			"wear_type\0"
+			"set_id\0"
+			"set_part_flag\0"
+			"grade\0"
+			"rank\0"
+			"level\0"
+			"enhance\0"
+			"socket\0"
+			"status_flag\0"
+			"limit_deva\0"
+			"limit_asura\0"
+			"limit_gaia\0"
+			"job_depth\0"
+			"limit_fighter\0"
+			"limit_hunter\0"
+			"limit_magician\0"
+			"limit_summoner\0"
+			"use_min_level\0"
+			"use_max_level\0"
+			"target_min_level\0"
+			"target_max_level\0"
+			"range\0"
+			"weight\0"
+			"price\0"
+			"huntaholic_point\0"
+			"arena_points\0"
+			"ethereal_durability\0"
+			"endurance\0"
+			"material\0"
+			"summon_id\0"
+			"item_use_flag\0"
+			"available_period\0"
+			"decrease_type\0"
+			"throw_range\0"
+			"base_type_0\0"
+			"base_var1_0\0"
+			"base_var2_0\0"
+			"base_type_1\0"
+			"base_var1_1\0"
+			"base_var2_1\0"
+			"base_type_2\0"
+			"base_var1_2\0"
+			"base_var2_2\0"
+			"base_type_3\0"
+			"base_var1_3\0"
+			"base_var2_3\0"
+			"opt_type_0\0"
+			"opt_var1_0\0"
+			"opt_var2_0\0"
+			"opt_type_1\0"
+			"opt_var1_1\0"
+			"opt_var2_1\0"
+			"opt_type_2\0"
+			"opt_var1_2\0"
+			"opt_var2_2\0"
+			"opt_type_3\0"
+			"opt_var1_3\0"
+			"opt_var2_3\0"
+			"effect_id\0"
+			"enhance_0_id\0"
+			"enhance_0_01\0"
+			"enhance_0_02\0"
+			"enhance_0_03\0"
+			"enhance_0_04\0"
+			"enhance_1_id\0"
+			"enhance_1_01\0"
+			"enhance_1_02\0"
+			"enhance_1_03\0"
+			"enhance_1_04\0"
+			"skill_id\0"
+			"state_id\0"
+			"state_level\0"
+			"state_time\0"
+			"cool_time\0"
+			"cool_time_group\0"
+			"model_type_dem\0"
+			"model_type_def\0"
+			"model_type_asm\0"
+			"model_type_asf\0"
+			"model_type_gam\0"
+			"model_type_gaf\0"
+			"deco_model_change\0"
+			"model_00\0"
+			"model_01\0"
+			"model_02\0"
+			"model_03\0"
+			"model_04\0"
+			"model_05\0"
+			"model_06\0"
+			"model_07\0"
+			"model_08\0"
+			"model_09\0"
+			"model_10\0"
+			"model_11\0"
+			"model_12\0"
+			"model_13\0"
+			"model_14\0"
+			"model_15\0"
+			"model_16\0"
+			"model_17\0"
+			"texture_filename\0"
+			"drop_type\0"
+			"icon_id\0"
+			"icon_file_name\0"
+			"script_text\0"
+			"unknownValue2\0";
 }
+
+typedef struct {
+	int id;
+	int arena_points;
+} ArenaPoints;
+
+//Data values by Ne0@NCarbon
+static ArenaPoints arenaPoints[] =
+//      id     arena_points
+	{{1100103, 20},
+	 {3800209, 80},
+	 {3800210, 80},
+	 {3800211, 80},
+	 {3800201, 90},
+	 {3800202, 90},
+	 {3800203, 110},
+	 {3800204, 110},
+	 {3800205, 110},
+	 {3800206, 110},
+	 {3800207, 110},
+	 {3800208, 110},
+	 {3800229, 6250},
+	 {3800241, 6250},
+	 {3800253, 6250},
+	 {693030 , 6817},
+	 {693031 , 6817},
+	 {693032 , 6817},
+	 {693033 , 6817},
+	 {693034 , 6817},
+	 {3800242, 8520},
+	 {3800230, 8520},
+	 {3800254, 8520},
+	 {3800240, 11360},
+	 {3800252, 11360},
+	 {3800228, 11360},
+	 {3800257, 18750},
+	 {3800245, 18750},
+	 {3800233, 18750},
+	 {3800255, 19310},
+	 {3800243, 19310},
+	 {3800231, 19310},
+	 {3800234, 25560},
+	 {3800258, 25560},
+	 {3800246, 25560},
+	 {3800256, 34080},
+	 {3800244, 34080},
+	 {3800232, 34080},
+	 {3800264, 56810},
+	 {3800259, 57940},
+	 {3800247, 57940},
+	 {3800235, 57940},
+	 {3800265, 78400},
+	 {3800261, 93730},
+	 {3800237, 93730},
+	 {3800249, 93730},
+	 {3800250, 127820},
+	 {3800238, 127820},
+	 {3800262, 127820},
+	 {3800248, 170420},
+	 {3800260, 170420},
+	 {3800236, 170420},
+	 {3800001, 227230},
+	 {3800002, 227230},
+	 {3800003, 227230},
+	 {3800004, 227230},
+	 {3800005, 227230},
+	 {3800239, 289720},
+	 {3800251, 289720},
+	 {3800263, 289720},
+	 {3800101, 1136160}};
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
@@ -273,6 +345,16 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
 		}
 		*static_cast<short*>(row->getValuePtr("nv9")) = 0;
+	} else if(mode == DCT_Read && dst == DF_RDB) {
+		int id = *static_cast<int*>(row->getValuePtr("id"));
+		int* arena_points_column = static_cast<int*>(row->getValuePtr("arena_points"));
+		int i;
+		for(i = 0; i < sizeof(arenaPoints) / sizeof(ArenaPoints); i++) {
+			if(arenaPoints[i].id == id) {
+				*arena_points_column = arenaPoints[i].arena_points;
+				break;
+			}
+		}
 	}
 }
 
