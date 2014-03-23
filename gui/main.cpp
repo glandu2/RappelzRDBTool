@@ -5,8 +5,6 @@
 #include "Maingui.h"
 #include "Settings.h"
 
-//Unicode mess:
-//Dialog to hash names
 //Open files on command line
 
 int main(int argc, char *argv[])
