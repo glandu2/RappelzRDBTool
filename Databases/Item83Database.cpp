@@ -349,6 +349,7 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		int id = *static_cast<int*>(row->getValuePtr("id"));
 		int* arena_points_column = static_cast<int*>(row->getValuePtr("arena_points"));
 		int i;
+		*arena_points_column = 0;
 		for(i = 0; i < sizeof(arenaPoints) / sizeof(ArenaPoints); i++) {
 			if(arenaPoints[i].id == id) {
 				*arena_points_column = arenaPoints[i].arena_points;
