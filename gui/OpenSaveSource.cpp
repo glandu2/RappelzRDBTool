@@ -8,6 +8,7 @@
 OpenSaveSource::OpenSaveSource()
 {
 	autoDetectSourceType = true;
+	source = DST_RDB;
 
 #ifdef __linux__
 	defaultDirDLL = PersistentData(Settings::getSettings(), "RecentDirLinux/DatabaseDescription");

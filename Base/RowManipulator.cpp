@@ -20,6 +20,8 @@ RowManipulator::RowManipulator(const DataDescriptor* columnsType, FieldOrder *or
 	this->columnsType = columnsType;
 	this->columnsTypeOrdered.fieldsInfo = 0;
 	this->columnsTypeOrdered.numFields = 0;
+	this->order = 0;
+
 	setFieldOrder(order);
 	this->initializedFields = new bool[columnsType->numFields];
 

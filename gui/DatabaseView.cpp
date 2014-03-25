@@ -19,8 +19,10 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 	dbDescriptionListModel(dbDescriptionListModel)
 {
 	ui->setupUi(this);
+	progressBarOffset = 0;
 	lastPercentage = -1;
 	db = NULL;
+	currentStatus = TS_NoDbDescLoaded;
 
 	const struct CharsetInfo * codepageList = availableCharsets();
 	QString defaultCodec = Settings::getSettings()->value("charset", "CP1252").toString();

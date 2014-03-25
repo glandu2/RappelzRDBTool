@@ -72,6 +72,7 @@ Database::Database(IDatabaseDescription *databaseDescription) {
 	this->rowManipulator = NULL;
 	this->dataList = new std::vector<void**>;
 	this->userData = 0;
+	this->date = 0;
 
 	this->databaseDescription->registerDBStructure(&this->dataDescription.fieldsInfo, &this->dataDescription.numFields);
 
@@ -160,29 +161,35 @@ int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCO
 	int rowProceed = 0;
 	date = ds->getDate();
 
-	dataList->reserve(ds->getRowNumber());
+	try {
+		if(ds->getRowNumber() > 500000000) //si plus de 500 millions de ligne, alors c'est trop douteux on considère que ce n'est pas un vrai RDB
+			return EINVAL;
+		dataList->reserve(ds->getRowNumber());
 
-	while(ds->hasNext()) {
-		result = rowManipulator->allocRow();
-		if(result) return result;
+		while(ds->hasNext()) {
+			result = rowManipulator->allocRow();
+			if(result) return result;
 
-		result = ds->processRow();
-		if(result != 0) {
-			rowManipulator->freeRow();
-			fprintf(stderr, "\nError while reading (%d), aborting\n", result);
-			break;
+			result = ds->processRow();
+			if(result != 0) {
+				rowManipulator->freeRow();
+				fprintf(stderr, "\nError while reading (%d), aborting\n", result);
+				break;
+			}
+			result = rowManipulator->completeRowInit();
+			if(result) return result;
+
+			databaseDescription->convertData(destFormat, DCT_Read, rowManipulator, rowProceed);
+
+			dataList->push_back(rowManipulator->getCurrentRow());
+
+			if(progressCallBack) progressCallBack(arg, rowProceed, ds->getRowNumber());
+			rowProceed++;
 		}
-		result = rowManipulator->completeRowInit();
-		if(result) return result;
-
-		databaseDescription->convertData(destFormat, DCT_Read, rowManipulator, rowProceed);
-
-		dataList->push_back(rowManipulator->getCurrentRow());
-
-		if(progressCallBack) progressCallBack(arg, rowProceed, ds->getRowNumber());
-		rowProceed++;
+		if(result == 0 && progressCallBack) progressCallBack(arg, ds->getRowNumber(), ds->getRowNumber());
+	} catch(...) {
+		return EINVAL;
 	}
-	if(result == 0 && progressCallBack) progressCallBack(arg, ds->getRowNumber(), ds->getRowNumber());
 
 	ds->close();
 
