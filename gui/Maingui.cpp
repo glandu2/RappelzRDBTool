@@ -224,7 +224,7 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType, bool hashedFilename
 
 		case ST_Sql:
 			sourceType = DST_SQLFile;
-			defaultSourceName = QByteArray("Arcadia.dbo.") + currentView->getDefaultTableName();
+			defaultSourceName = QByteArray("Arcadia.dbo.") + currentView->getDefaultTableName() + ".sql";
 			break;
 
 		case ST_SqlDatabase:

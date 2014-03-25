@@ -32,7 +32,6 @@ SQLSource::SQLSource(SQLLanguage *language) {
 	tableName = 0;
 	sqlLanguage = language;
 	utf16To8bits = 0;
-	setlocale(LC_ALL, "C");
 }
 
 SQLSource::~SQLSource() {

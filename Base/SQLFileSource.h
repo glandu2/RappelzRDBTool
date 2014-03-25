@@ -37,7 +37,7 @@ class SQLFileSource : public IDataSource
 		int prepareReadRowQuery();
 		int prepareReadQuery();
 		int prepareWriteQuery();
-		char *strreplace(const char *input, char c, const char *rep);
+		char *strreplace(char *input, char c, const char *rep);
 
 	private:
 		FILE *outputFile;

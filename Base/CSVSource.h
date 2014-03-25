@@ -5,12 +5,14 @@
 #include <stdio.h>
 #include <locale.h>
 
+#define CSVSOURCE_LINESIZE 8192
+
 namespace RappelzRDBBase {
 
 class CSVSource : public IDataSource
 {
 	public:
-		CSVSource() { eofState = ES_NotEOF; setlocale(LC_ALL, "C"); }
+		CSVSource() { eofState = ES_NotEOF; setlocale(LC_NUMERIC, "C"); }
 
 		virtual int open(const char* source, eOpenMode openMode,  const char* location = 0, const char* user = 0, const char* password = 0, const char* options = 0);
 		virtual void close();
@@ -31,7 +33,7 @@ class CSVSource : public IDataSource
 		} eofState;
 		FILE *csvFile;
 
-		char line[4096];
+		char line[CSVSOURCE_LINESIZE];
 		void *io_buffer;
 };
 

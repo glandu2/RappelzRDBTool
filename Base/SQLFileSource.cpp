@@ -11,7 +11,7 @@
 
 namespace RappelzRDBBase {
 
-char *SQLFileSource::strreplace(const char *input, char c, const char *rep) {
+char *SQLFileSource::strreplace(char *input, char c, const char *rep) {
 	int occurences;
 	char *replacedStr;
 	const char *p;
@@ -21,6 +21,9 @@ char *SQLFileSource::strreplace(const char *input, char c, const char *rep) {
 		if(*p == c)
 			occurences++;
 	}
+
+	if(occurences == 0)
+		return input;
 
 	replacedStr = (char*) malloc(p - input + occurences*(strlen(rep)-1) + 1);
 	for(p = input, rp = replacedStr; *p; p++) {
@@ -41,7 +44,6 @@ SQLFileSource::SQLFileSource(SQLLanguage *language) {
 	tableName = 0;
 	sqlLanguage = language;
 	outputFile = 0;
-	setlocale(LC_ALL, "C");
 }
 
 SQLFileSource::~SQLFileSource() {
@@ -192,62 +194,49 @@ int SQLFileSource::writeRow() {
 		switch(row->getType(curCol)) {
 			case TYPE_BIT:
 			case TYPE_INT8:
-				sprintf(ptr, "\'%d\'", *static_cast<char*>(buffer));
-				ptr += strlen(ptr);
+				ptr += sprintf(ptr, "\'%d\'", *static_cast<char*>(buffer));
 				break;
 
 			case TYPE_INT16:
-				sprintf(ptr, "\'%d\'", *static_cast<short*>(buffer));
-				ptr += strlen(ptr);
+				ptr += sprintf(ptr, "\'%d\'", *static_cast<short*>(buffer));
 				break;
 
 			case TYPE_INT32:
-				sprintf(ptr, "\'%d\'", *static_cast<int*>(buffer));
-				ptr += strlen(ptr);
+				ptr += sprintf(ptr, "\'%d\'", *static_cast<int*>(buffer));
 				break;
 
 			case TYPE_INT64:
-				sprintf(ptr, "\'%I64d\'", *static_cast<long long int*>(buffer));
-				ptr += strlen(ptr);
+				ptr += sprintf(ptr, "\'%I64d\'", *static_cast<long long int*>(buffer));
 				break;
 
 			case TYPE_CHAR: {
 				char *sqlEscapedStr = strreplace(static_cast<char*>(buffer), '\'', "\'\'");
-				sprintf(ptr, "\'%.*s\'", strlen(sqlEscapedStr), sqlEscapedStr);
-				ptr += strlen(ptr);
-				free(sqlEscapedStr);
+				ptr += sprintf(ptr, "\'%.*s\'", strlen(sqlEscapedStr), sqlEscapedStr);
+				if(sqlEscapedStr != buffer)
+					free(sqlEscapedStr);
 				break;
 			}
 
 			case TYPE_FLOAT32:
-				sprintf(ptr, "\'%f\'", *static_cast<float*>(buffer));
-				ptr += strlen(ptr);
+				ptr += sprintf(ptr, "\'%e\'", *static_cast<float*>(buffer));
 				break;
 
 			case TYPE_FLOAT64:
-				sprintf(ptr, "\'%lf\'", *static_cast<double*>(buffer));
-				ptr += strlen(ptr);
+				ptr += sprintf(ptr, "\'%le\'", *static_cast<double*>(buffer));
 				break;
 
 			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR: {
 				char *sqlEscapedStr = strreplace(static_cast<char*>(buffer), '\'', "\'\'");
-				sprintf(ptr, "\'%.*s\'", strlen(sqlEscapedStr), sqlEscapedStr);
-				ptr += strlen(ptr);
-				free(sqlEscapedStr);
+				ptr += sprintf(ptr, "\'%.*s\'", strlen(sqlEscapedStr), sqlEscapedStr);
+				if(sqlEscapedStr != buffer)
+					free(sqlEscapedStr);
 				break;
 			}
 
-			case TYPE_DECIMAL: {
-				register int initialVal, intVal, decimalVal, tenPow;
-				tenPow = static_cast<int>(pow((float)10, row->getDataIndex(curCol))+0.5);
-				initialVal = *static_cast<int*>(buffer);
-				intVal = static_cast<int>(fabs((float)static_cast<int>(initialVal / tenPow))+0.5);
-				decimalVal = static_cast<int>(fabs((float)static_cast<int>(initialVal % tenPow))+0.5);
-				sprintf(ptr, "\'%c%d.%0*d\'", (initialVal < 0)? '-' : ' ', intVal, row->getDataIndex(curCol), decimalVal);
-				ptr += strlen(ptr);
+			case TYPE_DECIMAL:
+				ptr += sprintf(ptr, "\'%lf\'", (double)(*(int*)buffer)/pow(10.0, row->getDataIndex(curCol)));
 				break;
-			}
 		}
 	}
 	strcpy(ptr, ");\n");

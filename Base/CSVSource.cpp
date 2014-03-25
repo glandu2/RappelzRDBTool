@@ -109,8 +109,8 @@ int CSVSource::prepareWrite(IRowManipulator *row, unsigned int rowNumber) {
 }
 
 int CSVSource::prepareRead(IRowManipulator *row) {
-	fgets(line, 4096, csvFile);	//discard columns names
-	if(fgets(line, 4096, csvFile) == NULL) {	//preread lines
+	fgets(line, CSVSOURCE_LINESIZE, csvFile);	//discard columns names
+	if(fgets(line, CSVSOURCE_LINESIZE, csvFile) == NULL) {	//preread lines
 		eofState = ES_EOF;
 		return 0;
 	}
@@ -155,13 +155,12 @@ int CSVSource::readRow() {
 				*(int*)buffer = atoi(readptr);
 				break;
 
-			case TYPE_DECIMAL:
-				{
-					float decimalTemp;
-					sscanf(readptr, "%f", &decimalTemp);
-					*(int*)buffer = (int)(decimalTemp*pow((float)10, row->getDataIndex(curCol)) + 0.5);
-				}
+			case TYPE_DECIMAL: {
+				double decimalTemp;
+				sscanf(readptr, "%lf", &decimalTemp);
+				*(int*)buffer = (int)(decimalTemp*pow(10.0, row->getDataIndex(curCol)) + 0.5);
 				break;
+			}
 
 			case TYPE_INT64:
 				sscanf(readptr, "%I64d", (long long int*)buffer);
@@ -172,11 +171,11 @@ int CSVSource::readRow() {
 				break;
 
 			case TYPE_FLOAT32:
-				sscanf(readptr, "%f", (float*)buffer);
+				sscanf(readptr, "%e", (float*)buffer);
 				break;
 
 			case TYPE_FLOAT64:
-				sscanf(readptr, "%lf", (double*)buffer);
+				sscanf(readptr, "%le", (double*)buffer);
 				break;
 
 			case TYPE_NVARCHAR_STR:
@@ -190,7 +189,7 @@ int CSVSource::readRow() {
 	setRowNumber(getRowNumber()+1);
 
 	//read next line
-	if(fgets(line, 4096, csvFile) == NULL) {
+	if(fgets(line, CSVSOURCE_LINESIZE, csvFile) == NULL) {
 		eofState = ES_EOF;
 		return 0;
 	}
@@ -249,11 +248,11 @@ int CSVSource::writeRow() {
 				break;
 
 			case TYPE_FLOAT32:
-				fprintf(csvFile, "%f", *(float*)buffer);
+				fprintf(csvFile, "%e", *(float*)buffer);
 				break;
 
 			case TYPE_DECIMAL:
-				fprintf(csvFile, "%f", (*(int*)buffer)/pow((float)10, row->getDataIndex(curCol)));
+				fprintf(csvFile, "%lf", (double)(*(int*)buffer)/pow(10.0, row->getDataIndex(curCol)));
 				break;
 
 			case TYPE_INT32:
@@ -262,7 +261,7 @@ int CSVSource::writeRow() {
 				break;
 
 			case TYPE_FLOAT64:
-				fprintf(csvFile, "%lf", *(double*)buffer);
+				fprintf(csvFile, "%le", *(double*)buffer);
 				break;
 
 			case TYPE_INT64:

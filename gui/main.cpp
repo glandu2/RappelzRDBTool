@@ -2,6 +2,7 @@
 
 #include <QMessageBox>
 #include <QTextStream>
+#include <QLocale>
 #include "Maingui.h"
 #include "Settings.h"
 
@@ -10,6 +11,10 @@
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+
+	setlocale(LC_NUMERIC, "C");
+	QLocale::setDefault(QLocale::c());
+
 
 	QSettings options(QApplication::applicationDirPath() + "/RappelzRDBToolQt.ini", QSettings::IniFormat);
 	Settings::setSettings(&options);
