@@ -9,7 +9,7 @@ dir_guibin=$dir_deploy/RappelzRDBToolQt-$version
 rm -r $dir_deploy
 mkdir -p $dir_dbsrc $dir_dev $dir_guibin
 
-pushd gui && lrelease RappelzRDBToolQt.pro && popd
+pushd gui && lupdate RappelzRDBToolQt.pro && popd
 
 cp Databases/*.cpp $dir_dbsrc/
 cp Base/I*.h Base/DataType.h Base/ExportDLL.h Base/Guid.h Base/SpecialDatabaseRules.h bin/RpzRdbBase.lib $dir_dev/
