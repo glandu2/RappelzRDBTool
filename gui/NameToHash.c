@@ -82,7 +82,7 @@ char computeFirstChar(char *reducedHash, unsigned int size) {
 int convertNameToHash(const char *name, char *hash, int encodeSeed) {
 	unsigned int nameSize = strlen(name);
 	char *reducedHash = alloca(nameSize);
-	
+
 	if(!name || !hash) return EINVAL;
 
 	if(encodeSeed == LEGACY_SEED) encodeSeed = computeLegacySeed(name);
@@ -96,7 +96,7 @@ int convertNameToHash(const char *name, char *hash, int encodeSeed) {
 	hash[nameSize+2] = 0;
 
 	hash[0] = computeFirstChar(reducedHash, nameSize);
-	
+
 	return 0;
 }
 
