@@ -15,12 +15,8 @@ SqlConfigDialog::SqlConfigDialog() :
 	ui(new Ui::SqlConfigDialog)
 {
 	ui->setupUi(this);
-#ifdef WIN32
+
 	connect(ui->configureOdbcButton, SIGNAL(clicked()), this, SLOT(onConfigureOdbc()));
-#else
-	ui->verticalLayout->removeWidget(ui->configureOdbcButton);
-	ui->configureOdbcButton->deleteLater();
-#endif
 
 	ui->serverTypeCombo->setCurrentIndex(Settings::getSettings()->value("SqlConfig/serverType").toInt());
 	ui->serverNameEdit->setText(Settings::getSettings()->value("SqlConfig/serverName").toString());
