@@ -330,5 +330,5 @@ void Maingui::onToggleHashConverterDialog() {
 }
 
 void Maingui::onAbout() {
-	QMessageBox::information(this, QCoreApplication::applicationName(), QString("This tool can convert RDB files to CSV files and CSV to RDB. It was made by Glandu2 for epvp.\nVersion: %1").arg(QCoreApplication::applicationVersion()));
+	QMessageBox::information(this, QCoreApplication::applicationName(), QString("This tool can convert RDB files to CSV files and CSV to RDB. It was made by Glandu2 for epvp.\nVersion: %1\nUsing locale: %2").arg(QCoreApplication::applicationVersion()).arg(QLocale::system().name()));
 }

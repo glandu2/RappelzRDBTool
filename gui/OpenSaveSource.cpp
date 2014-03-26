@@ -41,8 +41,9 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 		QString message;
 
 		if(save)
-			message = "Enter full SQL target table (like Arcadia.dbo.StringResource)\nWarning: the table will be overwritten without prompt if it already exists !";
-		else message = "Enter full SQL target table (like Arcadia.dbo.StringResource)";
+			message = tr("Enter full SQL target table (like Arcadia.dbo.StringResource)\nWarning: the table will be overwritten without prompt if it already exists !", "Save to SQL database inputbox label");
+		else
+			message = tr("Enter full SQL target table (like Arcadia.dbo.StringResource)", "Load from SQL database inputbox label");
 
 		*sourceName = QInputDialog::getText(0, QCoreApplication::applicationName(), message, QLineEdit::Normal, defaultName, &ok);
 		*sourceType = source;
@@ -52,18 +53,24 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 	QStringList filterList;
 	QString filter;
 	QString selectedFilter;
-	if(source == DST_RDB || autoDetectSourceType)
+
+	QString allFiles = tr("All files (*)");
 #ifdef _WIN32
-		filterList << "Client Database *.rdb;" + defaultName;
+	QString rdbFiles = tr("Client Database *.rdb;%1").arg(defaultName);
 #else
-		filterList << "Client Database (*.rdb " + defaultName + ")";
+	QString rdbFiles = tr("Client Database (*.rdb %1)").arg(defaultName);
 #endif
-	if(source == DST_CSV || autoDetectSourceType)
-		filterList << "Tabulation separated table (*.csv *.tsv *.txt)";
-	if(save && (source == DST_SQLFile || autoDetectSourceType))
-		filterList << "SQL Script (*.sql)";
+	QString csvFiles = tr("Tabulation separated table (*.csv *.tsv *.txt)");
+	QString sqlFiles = tr("SQL Script (*.sql)");
+
 	if(autoDetectSourceType)
-		filterList << "All files (*.*)";
+		filterList << allFiles;
+	if(source == DST_RDB || autoDetectSourceType)
+		filterList << rdbFiles;
+	if(source == DST_CSV || autoDetectSourceType)
+		filterList << csvFiles;
+	if(save && (source == DST_SQLFile || autoDetectSourceType))
+		filterList << sqlFiles;
 
 	selectedFilter = filterList.first();
 	filter = filterList.join(";;");
@@ -79,18 +86,25 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 	}
 
 	if(autoDetectSourceType) {
-		bool useExtension = false;
 		QString filename = QFileInfo(*sourceName).fileName();
-		if(selectedFilter.contains("All files"))
-			useExtension = true;
-
-		if((useExtension && filename.endsWith(".rdb", Qt::CaseInsensitive)) || selectedFilter.contains("Client Database"))
+		if(selectedFilter.contains(allFiles)) {
+			if(filename.endsWith(".rdb", Qt::CaseInsensitive))
+				*sourceType = DST_RDB;
+			else if(filename.endsWith(".csv", Qt::CaseInsensitive) || filename.endsWith(".tsv", Qt::CaseInsensitive) || filename.endsWith(".txt", Qt::CaseInsensitive))
+				*sourceType = DST_CSV;
+			else if(save && filename.endsWith(".sql", Qt::CaseInsensitive))
+				*sourceType = DST_SQLFile;
+			else
+				*sourceType = DST_RDB; //default, case of hashed names
+		} else if(selectedFilter.contains(rdbFiles)) {
 			*sourceType = DST_RDB;
-		else if((useExtension && filename.endsWith(".csv", Qt::CaseInsensitive)) || selectedFilter.contains("*.csv"))
+		} else if(selectedFilter.contains(csvFiles)) {
 			*sourceType = DST_CSV;
-		else if(save && ((useExtension && filename.endsWith(".sql", Qt::CaseInsensitive)) || selectedFilter.contains("*.sql")))
+		} else if(save && selectedFilter.contains(sqlFiles)) {
 			*sourceType = DST_SQLFile;
-		else *sourceType = DST_CSV;
+		} else {
+			*sourceType = DST_CSV;
+		}
 	}
 
 	return !sourceName->isNull();

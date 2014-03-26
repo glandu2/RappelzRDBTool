@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QLocale>
+#include <QTranslator>
 #include "Maingui.h"
 #include "Settings.h"
 
@@ -19,14 +20,22 @@ int main(int argc, char *argv[])
 	QSettings options(QApplication::applicationDirPath() + "/RappelzRDBToolQt.ini", QSettings::IniFormat);
 	Settings::setSettings(&options);
 
+	QString translationFileName = Settings::getSettings()->value("translationFile", QString("RappelzRDBToolQt.%1.qm").arg(QLocale::system().name())).toString();
+	QTranslator translationFile;
+
+	if(translationFile.load(translationFileName))
+		Settings::getSettings()->setValue("translationFile", translationFileName);
+
+	a.installTranslator(&translationFile);
+
 	a.setApplicationName("RappelzRDBTool by Glandu");
-	a.setApplicationVersion("2.3.5");
+	a.setApplicationVersion("2.3.7");
 
 	Maingui mainGui;
 
 	mainGui.show();
 
-	printf("Quitting ... %d\n", a.exec());
+	a.exec();
 
 	return 0;
 }

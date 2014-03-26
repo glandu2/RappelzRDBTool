@@ -71,3 +71,4 @@ HEADERS += \
     HashConverterDialog.h \
     HashToName.h
 
+TRANSLATIONS = RappelzRDBToolQt_sample.ts

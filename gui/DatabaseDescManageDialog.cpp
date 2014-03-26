@@ -35,29 +35,32 @@ void DatabaseDescManageDialog::onAdd() {
 
 	for(int i = 0; i < fileToAdd.size(); i++) {
 		const QString& fileName = fileToAdd.at(i);
+		const QByteArray fileName8bits = fileName.toLocal8Bit();
 		int result, sysError;
 
 		IDatabaseDescription* dbDesc = createExternDescriptedDatabase();
 
-		result = dbDesc->open(fileName.toLocal8Bit().constData(), &sysError);
+		result = dbDesc->open(fileName8bits.constData(), &sysError);
 		if(result == 0) {
 			dbDescriptionModel->append(dbDesc);
 		} else {
 			dbDesc->destroy();
+
+			//Use fromLocal8Bit(toLocal8Bit()) to have the true used filename
 			switch(result) {
 				case ENOENT:
 					QMessageBox::warning(this, QCoreApplication::applicationName(),
-										 QString("Can\'t load %1, are you sure the file exist and has the same bits (32 or 64) as this gui ?\nAdditional error code: %2").arg(QString::fromLocal8Bit(fileName.toLocal8Bit().constData())).arg(sysError));
+										 tr("Can\'t load %1, are you sure the file exist and has the same bits (32 or 64) as this gui ?\nAdditional error code: %2").arg(QString::fromLocal8Bit(fileName8bits.constData())).arg(sysError));
 					break;
 
 				case EINVAL:
 					QMessageBox::warning(this, QCoreApplication::applicationName(),
-										 QString("Can\'t use %1, this is not a database description file").arg(QString::fromLocal8Bit(fileName.toLocal8Bit().constData())));
+										 tr("Can\'t use %1, this is not a database description file").arg(QString::fromLocal8Bit(fileName8bits.constData())));
 					break;
 
 				default:
 					QMessageBox::warning(this, QCoreApplication::applicationName(),
-										 QString("Unknown error while loading %1.\nAdditional error code: %2").arg(QString::fromLocal8Bit(fileName.toLocal8Bit().constData()), sysError));
+										 tr("Unknown error while loading %1.\nAdditional error code: %2").arg(QString::fromLocal8Bit(fileName8bits.constData()), sysError));
 					break;
 			}
 		}

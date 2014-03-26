@@ -7,6 +7,7 @@
 
 class OpenSaveSource : public QObject
 {
+	Q_OBJECT
 	public:
 		OpenSaveSource();
 		void setSourceType(eDataSourceType type);

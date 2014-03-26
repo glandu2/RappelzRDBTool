@@ -33,7 +33,7 @@
       <string>Load/Unload the selected database structure</string>
      </property>
      <property name="text">
-      <string>Loaded</string>
+      <string notr="true">Loaded</string>
      </property>
      <property name="checkable">
       <bool>true</bool>

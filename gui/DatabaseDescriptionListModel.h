@@ -8,6 +8,7 @@ class IDatabaseDescription;
 
 class DatabaseDescriptionListModel : public QAbstractTableModel
 {
+	Q_OBJECT
 	public:
 		DatabaseDescriptionListModel(QObject *parent = 0);
 		~DatabaseDescriptionListModel();

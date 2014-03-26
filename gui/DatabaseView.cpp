@@ -45,7 +45,7 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 	setDbDescButtonChecked(false);
 
 	savedData = true;
-	loadedDatabaseName = "<No database>";
+	loadedDatabaseName = tr("<No database>");
 	setWindowTitle(loadedDatabaseName);
 
 	searchNotFoundStyleTimer.setInterval(2000);
@@ -75,9 +75,9 @@ DatabaseView::~DatabaseView()
 void DatabaseView::setDbDescButtonChecked(bool checked) {
 	ui->dbLoadClose->setChecked(checked);
 	if(checked)
-		ui->dbLoadClose->setText("Loaded");
+		ui->dbLoadClose->setText(tr("Loaded", "Database description dll button label"));
 	else
-		ui->dbLoadClose->setText("Load");
+		ui->dbLoadClose->setText(tr("Load", "Database description dll button label"));
 }
 
 bool DatabaseView::loadCloseDbDescriptionFile(bool isLoad) {
@@ -98,7 +98,7 @@ bool DatabaseView::loadCloseDbDescriptionFile(bool isLoad) {
 
 	if(isLoad) {
 		if(ui->dbStructCombo->currentIndex() == -1) {
-			QMessageBox::warning(this, QCoreApplication::applicationName(), QString("You must add Database Description files first !"));
+			QMessageBox::warning(this, QCoreApplication::applicationName(), tr("You must add Database Description files first !"));
 			setDbDescButtonChecked(false);
 			return false;
 		}
@@ -195,7 +195,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 		closeDb();
 		setStatus(TS_NoDbLoaded);
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't load the database file: %1(%2)").arg(strerror(result)).arg(result));
+		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't load the database file: %1(%2)").arg(strerror(result)).arg(result));
 	} else {
 		loadedDatabaseName = filename;
 		setWindowTitle(loadedDatabaseName);
@@ -247,7 +247,7 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 
 	if(result != 0) {
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), QString("Couldn't save the database file: %1(%2)").arg(strerror(result)).arg(result));
+		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't save the database file: %1(%2)").arg(strerror(result)).arg(result));
 	} else {
 		savedData = true;
 		loadedDatabaseName = filename;
@@ -327,17 +327,17 @@ void DatabaseView::setStatus(eToolStatus newStatus) {
 	currentStatus = newStatus;
 
 	switch(currentStatus) {
-		case TS_NoDbDescLoaded: newMessage = "No Database Description Loaded";   break;
-		case TS_LoadingDbDesc:  newMessage = "Loading Database Description ..."; break;
-		case TS_NoDbLoaded:     newMessage = "No Database Loaded";               break;
-		case TS_LoadingDB:      newMessage = "Loading Database ...";             break;
-		case TS_DbLoaded:       newMessage = QString("Database loaded, %1 rows").arg(db ? db->getRowCount() : 0);                  break;
-		case TS_SavingDB:       newMessage = "Saving Database ...";              break;
-		case TS_ClosingDB:      newMessage = "Closing Database ...";             break;
+		case TS_NoDbDescLoaded: newMessage = tr("No Database Description Loaded");   break;
+		case TS_LoadingDbDesc:  newMessage = tr("Loading Database Description ..."); break;
+		case TS_NoDbLoaded:     newMessage = tr("No Database Loaded");               break;
+		case TS_LoadingDB:      newMessage = tr("Loading Database ...");             break;
+		case TS_DbLoaded:       newMessage = tr("Database loaded, %1 rows").arg(db ? db->getRowCount() : 0);                  break;
+		case TS_SavingDB:       newMessage = tr("Saving Database ...");              break;
+		case TS_ClosingDB:      newMessage = tr("Closing Database ...");             break;
 	}
 
 	if(db && db->getDate() && currentStatus == TS_DbLoaded) {
-		newMessage += QString(" | Creation date: %1").arg(QDateTime::fromTime_t(db->getDate()).toString("yyyy/MM/dd"));
+		newMessage += " | " + tr("Creation date: %1").arg(QDateTime::fromTime_t(db->getDate()).toString(tr("yyyy/MM/dd", "RDB Creation date format")));
 	}
 
 	if(!newMessage.isNull())
