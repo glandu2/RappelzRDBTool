@@ -61,7 +61,7 @@ int computeLegacySeed(const char *name) {
 }
 
 char computeFirstChar(char *reducedHash, unsigned int size) {
-	int i, computeVar;
+	unsigned int i, computeVar;
 
 	for(i = 0, computeVar = 0; i < size; i++)
 		computeVar = reducedHash[i] + computeVar;

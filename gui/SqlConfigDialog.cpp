@@ -2,6 +2,9 @@
 #include "ui_SqlConfigDialog.h"
 
 #include "Settings.h"
+#include <QDesktopServices>
+#include <QDir>
+#include <QUrl>
 
 #ifdef WIN32
 #include <windows.h>
@@ -44,6 +47,8 @@ SqlConfigDialog::~SqlConfigDialog()
 void SqlConfigDialog::onConfigureOdbc() {
 #ifdef WIN32
 	ShellExecute(0, L"runas", L"odbcad32.exe", 0, 0, SW_SHOWNORMAL);
+#elif defined(__unix__)
+	QDesktopServices::openUrl(QUrl(QDir::homePath() + "/.odbc.ini"));
 #endif
 }
 

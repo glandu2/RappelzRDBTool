@@ -47,7 +47,6 @@ void DatabaseTableModel::bindToDatabase(IDatabase *db) {
 
 	this->db = db;
 
-	//emit dataChanged(createIndex(0, 0), createIndex(rowCount()-1, columnCount()-1));
 	endResetModel();
 }
 

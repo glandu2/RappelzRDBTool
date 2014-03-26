@@ -82,14 +82,10 @@ void Maingui::onTabChanged(int index) {
 	if(!currentView)
 		return;
 
-	qDebug("Switched tab to %d", index);
-	qDebug("last status bar label was %p", currentStatusBarLabel);
-
 	if(currentStatusBarLabel)
 		ui->statusBar->removeWidget(currentStatusBarLabel);
 	currentStatusBarLabel = currentView->getStatusLabel();
 
-	qDebug("new status bar label is %p", currentStatusBarLabel);
 	if(currentStatusBarLabel) {
 		ui->statusBar->addWidget(currentStatusBarLabel);
 		currentStatusBarLabel->show();
@@ -166,10 +162,11 @@ void Maingui::onLoadDbStructDLL() {
 	currentView->loadCloseDbDescriptionFile(true);
 }
 
-void Maingui::loadSaveDbFile(bool save, eSourceType srcType, bool hashedFilename) {
+void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 	OpenSaveSource *openSaveSource;
 	bool ok;
 	bool autoDetectType;
+	bool hashedFilename = ui->actionUse_hashed_files->isChecked();
 	QString sourceName;
 	QByteArray defaultSourceName;
 	eDataSourceType sourceType;
@@ -281,40 +278,40 @@ void Maingui::closeEvent(QCloseEvent *event)
 }
 
 void Maingui::onLoadFile() {
-	loadSaveDbFile(false, ST_None, ui->actionUse_hashed_files->isChecked());
+	loadSaveDbFile(false, ST_None);
 }
 
 void Maingui::onLoadRDB() {
-	loadSaveDbFile(false, ST_Rdb, ui->actionUse_hashed_files->isChecked());
+	loadSaveDbFile(false, ST_Rdb);
 }
 
 void Maingui::onLoadCSV() {
-	loadSaveDbFile(false, ST_Csv, ui->actionUse_hashed_files->isChecked());
+	loadSaveDbFile(false, ST_Csv);
 }
 
 void Maingui::onLoadSQLDatabase() {
-	loadSaveDbFile(false, ST_SqlDatabase, ui->actionUse_hashed_files->isChecked());
+	loadSaveDbFile(false, ST_SqlDatabase);
 }
 
 
 void Maingui::onSaveFile() {
-	loadSaveDbFile(true, ST_None, ui->actionUse_hashed_files->isChecked());
+	loadSaveDbFile(true, ST_None);
 }
 
 void Maingui::onSaveRDB() {
-	loadSaveDbFile(true, ST_Rdb, ui->actionUse_hashed_files->isChecked());
+	loadSaveDbFile(true, ST_Rdb);
 }
 
 void Maingui::onSaveCSV() {
-	loadSaveDbFile(true, ST_Csv, ui->actionUse_hashed_files->isChecked());
+	loadSaveDbFile(true, ST_Csv);
 }
 
 void Maingui::onSaveSQL() {
-	loadSaveDbFile(true, ST_Sql, ui->actionUse_hashed_files->isChecked());
+	loadSaveDbFile(true, ST_Sql);
 }
 
 void Maingui::onSaveSQLDatabase() {
-	loadSaveDbFile(true, ST_SqlDatabase, ui->actionUse_hashed_files->isChecked());
+	loadSaveDbFile(true, ST_SqlDatabase);
 }
 
 void Maingui::onSQLOptions() {
