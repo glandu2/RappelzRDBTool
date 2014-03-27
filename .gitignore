@@ -13,7 +13,10 @@ deploy/
 *.o
 *.pdb
 *.user*
+RappelzRDBToolQt_sample.ts
+*.qm
 CMakeLists.txt.*
+.directory
 
 #############
 ## Windows detritus
