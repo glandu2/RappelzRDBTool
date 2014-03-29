@@ -133,7 +133,7 @@ QString FileDialog::getOpenFileName(QWidget *parent, const QString &caption, con
 	ofn.lpstrInitialDir = (LPCWSTR) initialDir.utf16();
 	ofn.lpstrTitle = (LPCWSTR) caption.utf16();
 
-	ofn.Flags = OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST | OFN_NONETWORKBUTTON;
+	ofn.Flags = OFN_NOCHANGEDIR | OFN_FILEMUSTEXIST | OFN_NONETWORKBUTTON | OFN_HIDEREADONLY;
 	if(options & QFileDialog::DontResolveSymlinks)
 		ofn.Flags |= OFN_NODEREFERENCELINKS;
 
