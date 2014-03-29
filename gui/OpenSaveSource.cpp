@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QString>
 #include "Settings.h"
+#include "FileDialog.h"
 
 OpenSaveSource::OpenSaveSource()
 {
@@ -55,11 +56,7 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 	QString selectedFilter;
 
 	QString allFiles = tr("All files (*)");
-#ifdef _WIN32
-	QString rdbFiles = tr("Client Database *.rdb;%1").arg(defaultName);
-#else
 	QString rdbFiles = tr("Client Database (*.rdb %1)").arg(defaultName);
-#endif
 	QString csvFiles = tr("Tabulation separated table (*.csv *.tsv *.txt)");
 	QString sqlFiles = tr("SQL Script (*.sql)");
 
@@ -76,11 +73,11 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 	filter = filterList.join(";;");
 
 	if(save) {
-		*sourceName = QFileDialog::getSaveFileName(0, tr("Choose Database Source"), defaultDirSourceSave.value(defaultDirSourceOpen.value()).toString() + "/" + defaultName, filter, &selectedFilter);
+		*sourceName = FileDialog::getSaveFileName(0, tr("Choose Database Source"), defaultDirSourceSave.value(defaultDirSourceOpen.value()).toString() + "/" + defaultName, filter, &selectedFilter);
 		if(!sourceName->isNull())
 			defaultDirSourceSave = QFileInfo(*sourceName).absolutePath();
 	} else {
-		*sourceName = QFileDialog::getOpenFileName(0, tr("Choose Database Source"), defaultDirSourceOpen.value().toString() + "/" + defaultName, filter, &selectedFilter);
+		*sourceName = FileDialog::getOpenFileName(0, tr("Choose Database Source"), defaultDirSourceOpen.value().toString() + "/" + defaultName, filter, &selectedFilter);
 		if(!sourceName->isNull())
 			defaultDirSourceOpen = QFileInfo(*sourceName).absolutePath();
 	}

@@ -20,7 +20,7 @@ CONFIG += debug_and_release debug_and_release_target
 DESTDIR = ../bin
 
 win32 {
-LIBS += ../bin/RpzRdbBase.lib Shell32.lib
+LIBS += ../bin/RpzRdbBase.lib Shell32.lib comdlg32.lib
 }
 unix {
 LIBS += ../bin/RpzRdbBase.so -Wl,-R,\'\$\$ORIGIN/\'
@@ -47,7 +47,8 @@ SOURCES += \
     NameToHash.c \
     Settings.cpp \
     HashConverterDialog.cpp \
-    HashToName.c
+    HashToName.c \
+    FileDialog.cpp
 
 HEADERS += \
     Maingui.h \
@@ -69,6 +70,7 @@ HEADERS += \
     NameToHash.h \
     Settings.h \
     HashConverterDialog.h \
-    HashToName.h
+    HashToName.h \
+    FileDialog.h
 
 TRANSLATIONS = RappelzRDBToolQt_sample.ts
