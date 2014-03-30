@@ -2,14 +2,24 @@
 #include "ui_HashConverterDialog.h"
 #include "NameToHash.h"
 #include "HashToName.h"
+#include <QFileDialog>
+#include "FileToRenameListModel.h"
 
 HashConverterDialog::HashConverterDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::HashConverterDialog)
 {
 	ui->setupUi(this);
+
+	fileListmodel = new FileToRenameListModel(this);
+	ui->filesToRenameTable->setModel(fileListmodel);
+
 	connect(ui->hashToNameButton, SIGNAL(clicked()), this, SLOT(updateName()));
 	connect(ui->nameToHashButton, SIGNAL(clicked()), this, SLOT(updateHash()));
+
+	connect(ui->addButton, SIGNAL(clicked()), this, SLOT(addFile()));
+	connect(ui->removeButton, SIGNAL(clicked()), this, SLOT(removeFile()));
+	connect(ui->renameButton, SIGNAL(clicked()), this, SLOT(renameFiles()));
 }
 
 HashConverterDialog::~HashConverterDialog()
@@ -39,4 +49,34 @@ void HashConverterDialog::updateHash() {
 	hash.resize(hash.size()-1);
 
 	ui->hashEdit->setText(hash);
+}
+
+void HashConverterDialog::addFile() {
+	QStringList fileToAdd = QFileDialog::getOpenFileNames(this, QCoreApplication::applicationName(), QString(), tr("RDB files (*.rdb);;All files (*)", "File dialogbox filter for hash renamer"));
+
+	for(int i = 0; i < fileToAdd.size(); i++) {
+		fileListmodel->append(fileToAdd.at(i));
+	}
+}
+
+void HashConverterDialog::removeFile() {
+	QModelIndexList indices = ui->filesToRenameTable->selectionModel()->selectedRows();
+	QModelIndex index;
+
+	foreach(index, indices) {
+		if(index.isValid())
+			fileListmodel->remove(index.row());
+	}
+}
+
+void HashConverterDialog::renameFiles() {
+	int count = fileListmodel->getCount();
+
+	for(int i = 0; i < count; i++) {
+		QFile file(fileListmodel->getSourceFilename(i));
+		if(file.exists()) {
+			QFile::remove(fileListmodel->getTargetFilename(i));
+			file.copy(fileListmodel->getTargetFilename(i));
+		}
+	}
 }

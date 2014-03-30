@@ -7,6 +7,8 @@ namespace Ui {
 class HashConverterDialog;
 }
 
+class FileToRenameListModel;
+
 class HashConverterDialog : public QDialog
 {
 	Q_OBJECT
@@ -19,8 +21,13 @@ public slots:
 	void updateName();
 	void updateHash();
 
+	void addFile();
+	void removeFile();
+	void renameFiles();
+
 private:
 	Ui::HashConverterDialog *ui;
+	FileToRenameListModel* fileListmodel;
 };
 
 #endif // HASHCONVERTERDIALOG_H

@@ -48,7 +48,8 @@ SOURCES += \
     Settings.cpp \
     HashConverterDialog.cpp \
     HashToName.c \
-    FileDialog.cpp
+    FileDialog.cpp \
+    FileToRenameListModel.cpp
 
 HEADERS += \
     Maingui.h \
@@ -71,6 +72,7 @@ HEADERS += \
     Settings.h \
     HashConverterDialog.h \
     HashToName.h \
-    FileDialog.h
+    FileDialog.h \
+    FileToRenameListModel.h
 
 TRANSLATIONS = RappelzRDBToolQt_sample.ts

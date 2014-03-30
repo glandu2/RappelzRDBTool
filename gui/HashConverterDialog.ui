@@ -6,69 +6,48 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>522</width>
-    <height>159</height>
+    <width>481</width>
+    <height>266</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string comment="Title of the dialogbox">Hash / Name converter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="4">
-    <widget class="QPushButton" name="closeButton">
+   <item row="2" column="0" colspan="2">
+    <widget class="QLabel" name="filesToRenameLabel">
      <property name="text">
-      <string comment="Button text">Close</string>
+      <string>Files to rename:</string>
+     </property>
+     <property name="buddy">
+      <cstring>filesToRenameTable</cstring>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="4">
-    <widget class="QLineEdit" name="hashEdit"/>
-   </item>
-   <item row="0" column="1" colspan="4">
-    <widget class="QLineEdit" name="nameEdit"/>
-   </item>
-   <item row="3" column="3">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="1">
-    <widget class="QPushButton" name="nameToHashButton">
-     <property name="text">
-      <string comment="Button text">Name &gt; Hash</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="hashLabel">
-     <property name="text">
-      <string comment="Label next to hash editfield">Hash:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
+   <item row="1" column="2">
     <widget class="QPushButton" name="hashToNameButton">
      <property name="text">
       <string comment="Button text">Hash &gt; Name</string>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="nameLabel">
-     <property name="text">
-      <string comment="Label next to name editfield">Name:</string>
+     <property name="autoDefault">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
-   <item row="2" column="4">
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="nameEdit"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="addButton">
+     <property name="text">
+      <string comment="Button to add files to rename list">Add</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -81,8 +60,116 @@
      </property>
     </spacer>
    </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="removeButton">
+     <property name="text">
+      <string comment="Button to remove files to rename list">Remove</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="nameToHashButton">
+     <property name="text">
+      <string comment="Button text">Name &gt; Hash</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="hashLabel">
+     <property name="text">
+      <string comment="Label next to hash editfield">Hash:</string>
+     </property>
+     <property name="buddy">
+      <cstring>hashEdit</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="nameLabel">
+     <property name="text">
+      <string comment="Label next to name editfield">Name:</string>
+     </property>
+     <property name="buddy">
+      <cstring>nameEdit</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="hashEdit"/>
+   </item>
+   <item row="5" column="2">
+    <widget class="QPushButton" name="renameButton">
+     <property name="text">
+      <string comment="Button to rename files in rename list">Rename files</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2">
+    <widget class="QPushButton" name="closeButton">
+     <property name="text">
+      <string comment="Button text">Close</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" rowspan="5" colspan="2">
+    <widget class="QTableView" name="filesToRenameTable">
+     <attribute name="horizontalHeaderHighlightSections">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderMinimumSectionSize">
+      <number>150</number>
+     </attribute>
+     <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>16</number>
+     </attribute>
+     <attribute name="verticalHeaderHighlightSections">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderMinimumSectionSize">
+      <number>16</number>
+     </attribute>
+     <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderStretchLastSection">
+      <bool>false</bool>
+     </attribute>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>nameEdit</tabstop>
+  <tabstop>nameToHashButton</tabstop>
+  <tabstop>hashEdit</tabstop>
+  <tabstop>hashToNameButton</tabstop>
+  <tabstop>filesToRenameTable</tabstop>
+  <tabstop>addButton</tabstop>
+  <tabstop>removeButton</tabstop>
+  <tabstop>renameButton</tabstop>
+  <tabstop>closeButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -92,12 +179,44 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>282</x>
-     <y>75</y>
+     <x>350</x>
+     <y>249</y>
     </hint>
     <hint type="destinationlabel">
      <x>16</x>
      <y>73</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>nameEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>nameToHashButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>239</x>
+     <y>17</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>345</x>
+     <y>18</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>hashEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>hashToNameButton</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>239</x>
+     <y>45</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>345</x>
+     <y>43</y>
     </hint>
    </hints>
   </connection>
