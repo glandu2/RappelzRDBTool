@@ -53,4 +53,6 @@ enum eDataSourceType { DST_RDB=1, DST_CSV=2, DST_SQLServer=3, DST_SQLPostgres=4,
 enum eDataFormat { DF_None=0, DF_RDB=1, DF_CSV=2, DF_SQL=3 };
 enum eDataConvertionType { DCT_Read=0, DCT_Write=1 };
 
+#define IS_DST_FILESOURCE(type) ((type) == DST_RDB || (type) == DST_CSV || (type) == DST_SQLFile)
+
 #endif // DATATYPE_H_INCLUDED

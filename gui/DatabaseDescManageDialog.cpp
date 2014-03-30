@@ -31,7 +31,7 @@ DatabaseDescManageDialog::~DatabaseDescManageDialog()
 
 
 void DatabaseDescManageDialog::onAdd() {
-	QStringList fileToAdd = QFileDialog::getOpenFileNames(this, QCoreApplication::applicationName(), QString(), "Database DLL (*Database.dll *Database.so)");
+	QStringList fileToAdd = QFileDialog::getOpenFileNames(this, QCoreApplication::applicationName(), QString(), tr("Database DLL (*Database.dll *Database.so)", "File dialogbox filter for database description DLL"));
 
 	for(int i = 0; i < fileToAdd.size(); i++) {
 		const QString& fileName = fileToAdd.at(i);
@@ -50,17 +50,22 @@ void DatabaseDescManageDialog::onAdd() {
 			switch(result) {
 				case ENOENT:
 					QMessageBox::warning(this, QCoreApplication::applicationName(),
-										 tr("Can\'t load %1, are you sure the file exist and has the same bits (32 or 64) as this gui ?\nAdditional error code: %2").arg(QString::fromLocal8Bit(fileName8bits.constData())).arg(sysError));
+										 tr("Can\'t load %1, are you sure the file exist and has the same bits (32 or 64) as this gui ?\nAdditional error code: %2", "Error while loading a database description DLL")
+										 .arg(QString::fromLocal8Bit(fileName8bits.constData()))
+										 .arg(sysError));
 					break;
 
 				case EINVAL:
 					QMessageBox::warning(this, QCoreApplication::applicationName(),
-										 tr("Can\'t use %1, this is not a database description file").arg(QString::fromLocal8Bit(fileName8bits.constData())));
+										 tr("Can\'t use %1, this is not a database description file", "Error while loading a database description DLL")
+										 .arg(QString::fromLocal8Bit(fileName8bits.constData())));
 					break;
 
 				default:
 					QMessageBox::warning(this, QCoreApplication::applicationName(),
-										 tr("Unknown error while loading %1.\nAdditional error code: %2").arg(QString::fromLocal8Bit(fileName8bits.constData()), sysError));
+										 tr("Unknown error while loading %1.\nAdditional error code: %2", "Error while loading a database description DLL")
+										 .arg(QString::fromLocal8Bit(fileName8bits.constData()))
+										 .arg(sysError));
 					break;
 			}
 		}

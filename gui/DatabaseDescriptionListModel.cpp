@@ -95,11 +95,11 @@ QVariant DatabaseDescriptionListModel::headerData(int section, Qt::Orientation o
 		return QVariant();
 
 	switch(section) {
-		case 0: return tr("Name");
-		case 1: return tr("File name");
-		case 2: return tr("Default DB file base name");
-		case 3: return tr("Default DB table");
-		case 4: return tr("Default RDB hash");
+		case 0: return tr("Name", "column name in Database description file manage dialogbox");
+		case 1: return tr("File name", "column name in Database description file manage dialogbox");
+		case 2: return tr("Default DB file base name", "column name in Database description file manage dialogbox");
+		case 3: return tr("Default DB table", "column name in Database description file manage dialogbox");
+		case 4: return tr("Default RDB hash", "column name in Database description file manage dialogbox");
 	}
 
 	return QVariant();

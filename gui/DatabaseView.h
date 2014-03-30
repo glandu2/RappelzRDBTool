@@ -73,6 +73,7 @@ class DatabaseView : public QWidget
 		void setStatus(eToolStatus newStatus);
 		void setDbDescButtonChecked(bool checked);
 		void setWindowTitle(const QString &title);
+		QString errorToString(eDataSourceType type, int error, bool save);
 
 		
 	private:

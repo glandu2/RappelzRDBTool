@@ -55,10 +55,10 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 	QString filter;
 	QString selectedFilter;
 
-	QString allFiles = tr("All files (*)");
-	QString rdbFiles = tr("Client Database (*.rdb %1)").arg(defaultName);
-	QString csvFiles = tr("Tabulation separated table (*.csv *.tsv *.txt)");
-	QString sqlFiles = tr("SQL Script (*.sql)");
+	QString allFiles = tr("All files (*)", "File dialogbox filter");
+	QString rdbFiles = tr("Client Database (*.rdb %1)", "File dialogbox filter").arg(defaultName);
+	QString csvFiles = tr("Tabulation separated table (*.csv *.tsv *.txt)", "File dialogbox filter");
+	QString sqlFiles = tr("SQL Script (*.sql)", "File dialogbox filter");
 
 	if(autoDetectSourceType)
 		filterList << allFiles;
@@ -73,11 +73,11 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 	filter = filterList.join(";;");
 
 	if(save) {
-		*sourceName = FileDialog::getSaveFileName(0, tr("Choose Database Source"), defaultDirSourceSave.value(defaultDirSourceOpen.value()).toString() + "/" + defaultName, filter, &selectedFilter);
+		*sourceName = FileDialog::getSaveFileName(0, tr("Choose Database Source", "File dialogbox title when saving"), defaultDirSourceSave.value(defaultDirSourceOpen.value(".")).toString() + "/" + defaultName, filter, &selectedFilter);
 		if(!sourceName->isNull())
 			defaultDirSourceSave = QFileInfo(*sourceName).absolutePath();
 	} else {
-		*sourceName = FileDialog::getOpenFileName(0, tr("Choose Database Source"), defaultDirSourceOpen.value().toString() + "/" + defaultName, filter, &selectedFilter);
+		*sourceName = FileDialog::getOpenFileName(0, tr("Choose Database Source", "File dialogbox title when loading"), defaultDirSourceOpen.value(".").toString() + "/" + defaultName, filter, &selectedFilter);
 		if(!sourceName->isNull())
 			defaultDirSourceOpen = QFileInfo(*sourceName).absolutePath();
 	}

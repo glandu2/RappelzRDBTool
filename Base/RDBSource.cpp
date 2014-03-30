@@ -25,7 +25,12 @@ int RDBSource::open(const char* source, eOpenMode openMode,  const char* locatio
 	rdbFile = fopen(source, fopenOpenMode);
 	rowRead = 0;
 
-	if(!rdbFile) return errno;
+	if(!rdbFile) {
+		if(errno == ENOENT)
+			return ENOENT;
+		else
+			return EIO;
+	}
 
 	io_buffer = malloc(65536);
 	setvbuf(rdbFile, (char*)io_buffer, _IOFBF, 65536);
@@ -37,6 +42,7 @@ void RDBSource::close() {
 	fclose(rdbFile);
 	rdbFile = 0;
 	free(io_buffer);
+	io_buffer = 0;
 }
 
 void copyWithNOT(char *buffer, const char *src) {
@@ -105,7 +111,7 @@ int RDBSource::readRow() {
 				for(; count > 0; count--) {
 					if(bitAvailable == 0) {
 						if(fread(&currentByte, 1, 1, rdbFile) != 1) {
-							if(errno) return errno;
+							if(errno) return EIO;
 							else return EOF;
 						}
 						bitAvailable = 8;
@@ -127,14 +133,14 @@ int RDBSource::readRow() {
 			case TYPE_CHAR:
 			case TYPE_INT8:
 				if(fread(buffer, 1, count, rdbFile) != count) {
-					if(errno) return errno;
+					if(errno) return EIO;
 					else return EOF;
 				}
 				break;
 
 			case TYPE_INT16:
 				if(fread(buffer, 2, count, rdbFile) != count) {
-					if(errno) return errno;
+					if(errno) return EIO;
 					else return EOF;
 				}
 				break;
@@ -144,7 +150,7 @@ int RDBSource::readRow() {
 			case TYPE_DECIMAL:
 			case TYPE_INT32:
 				if(fread(buffer, 4, count, rdbFile) != count) {
-					if(errno) return errno;
+					if(errno) return EIO;
 					else return EOF;
 				}
 				break;
@@ -152,7 +158,7 @@ int RDBSource::readRow() {
 			case TYPE_FLOAT64:
 			case TYPE_INT64:
 				if(fread(buffer, 8, count, rdbFile) != count) {
-					if(errno) return errno;
+					if(errno) return EIO;
 					else return EOF;
 				}
 				break;
@@ -183,7 +189,7 @@ int RDBSource::writeRow() {
 		if(row->getType(curCol) != TYPE_BIT) {
 			if(bitAvailable != 8)
 				if(fwrite(&currentByte, 1, 1, rdbFile) != 1) {
-					if(errno) return errno;
+					if(errno) return EIO;
 					else return EOF;
 				}
 			bitAvailable = 8;
@@ -196,7 +202,7 @@ int RDBSource::writeRow() {
 				for(; count > 0; count--) {
 					if(bitAvailable == 0) {
 						if(fwrite(&currentByte, 1, 1, rdbFile) != 1) {
-							if(errno) return errno;
+							if(errno) return EIO;
 							else return EOF;
 						}
 						bitAvailable = 8;
@@ -217,14 +223,14 @@ int RDBSource::writeRow() {
 			case TYPE_CHAR:
 			case TYPE_INT8:
 				if(fwrite(buffer, 1, count, rdbFile) != count) {
-					if(errno) return errno;
+					if(errno) return EIO;
 					else return EOF;
 				}
 				break;
 
 			case TYPE_INT16:
 				if(fwrite(buffer, 2, count, rdbFile) != count) {
-					if(errno) return errno;
+					if(errno) return EIO;
 					else return EOF;
 				}
 				break;
@@ -234,7 +240,7 @@ int RDBSource::writeRow() {
 			case TYPE_DECIMAL:
 			case TYPE_INT32:
 				if(fwrite(buffer, 4, count, rdbFile) != count) {
-					if(errno) return errno;
+					if(errno) return EIO;
 					else return EOF;
 				}
 				break;
@@ -242,7 +248,7 @@ int RDBSource::writeRow() {
 			case TYPE_FLOAT64:
 			case TYPE_INT64:
 				if(fwrite(buffer, 8, count, rdbFile) != count) {
-					if(errno) return errno;
+					if(errno) return EIO;
 					else return EOF;
 				}
 				break;

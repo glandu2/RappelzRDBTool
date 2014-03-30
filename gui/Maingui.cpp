@@ -186,7 +186,7 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 
 	if(!save && currentView->isSaved() == false) {
 		QMessageBox::StandardButton button;
-		button = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?").arg(currentView->getLoadedDatabaseName()), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+		button = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?", "User wants to load another database but the current is modified and not saved").arg(currentView->getLoadedDatabaseName()), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 		if(button == QMessageBox::No)
 			return;
 	}
@@ -267,7 +267,7 @@ void Maingui::closeEvent(QCloseEvent *event)
 		if(!currentView->isSaved()) {
 			ui->databaseTab->setCurrentIndex(i);
 			QMessageBox::StandardButton retButton;
-			retButton = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?").arg(currentView->getLoadedDatabaseName()), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+			retButton = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?", "User want to quit but there is at least one database modified but not saved").arg(currentView->getLoadedDatabaseName()), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 			if(retButton != QMessageBox::Yes) {
 				event->ignore();
 				return;

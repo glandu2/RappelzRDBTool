@@ -45,7 +45,7 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 	setDbDescButtonChecked(false);
 
 	savedData = true;
-	loadedDatabaseName = tr("<No database>");
+	loadedDatabaseName = tr("<No database>", "tab text when no database loaded");
 	setWindowTitle(loadedDatabaseName);
 
 	searchNotFoundStyleTimer.setInterval(2000);
@@ -98,7 +98,7 @@ bool DatabaseView::loadCloseDbDescriptionFile(bool isLoad) {
 
 	if(isLoad) {
 		if(ui->dbStructCombo->currentIndex() == -1) {
-			QMessageBox::warning(this, QCoreApplication::applicationName(), tr("You must add Database Description files first !"));
+			QMessageBox::warning(this, QCoreApplication::applicationName(), tr("You must add Database Description files first !", "Error when there is no db description files but the user attempt to load one"));
 			setDbDescButtonChecked(false);
 			return false;
 		}
@@ -195,7 +195,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 		closeDb();
 		setStatus(TS_NoDbLoaded);
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't load the database file: %1(%2)").arg(strerror(result)).arg(result));
+		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't load the database file: %1(%2)", "Load error global message in messagebox").arg(errorToString(type, result, false)).arg(result));
 	} else {
 		loadedDatabaseName = filename;
 		setWindowTitle(loadedDatabaseName);
@@ -247,7 +247,7 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 
 	if(result != 0) {
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't save the database file: %1(%2)").arg(strerror(result)).arg(result));
+		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't save the database file: %1(%2)", "Save error global message in messagebox").arg(errorToString(type, result, true)).arg(result));
 	} else {
 		savedData = true;
 		loadedDatabaseName = filename;
@@ -262,7 +262,7 @@ bool DatabaseView::closeDb(bool force) {
 	if(db) {
 		if(!force && savedData == false) {
 			QMessageBox::StandardButton button;
-			button = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?").arg(loadedDatabaseName), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+			button = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?", "User closes unsaved database").arg(loadedDatabaseName), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 			if(button == QMessageBox::No)
 				return false;
 		}
@@ -272,7 +272,7 @@ bool DatabaseView::closeDb(bool force) {
 		databaseModel->unbindDatabase();
 		db->close(&progressBarUpdateCallback, this);
 		progressBarUpdate(100, 100);
-		loadedDatabaseName = "<No database>";
+		loadedDatabaseName = tr("<No database>", "tab text when no database loaded");
 		setWindowTitle(loadedDatabaseName);
 		setStatus(TS_NoDbLoaded);
 		savedData = true;
@@ -327,17 +327,17 @@ void DatabaseView::setStatus(eToolStatus newStatus) {
 	currentStatus = newStatus;
 
 	switch(currentStatus) {
-		case TS_NoDbDescLoaded: newMessage = tr("No Database Description Loaded");   break;
-		case TS_LoadingDbDesc:  newMessage = tr("Loading Database Description ..."); break;
-		case TS_NoDbLoaded:     newMessage = tr("No Database Loaded");               break;
-		case TS_LoadingDB:      newMessage = tr("Loading Database ...");             break;
-		case TS_DbLoaded:       newMessage = tr("Database loaded, %1 rows").arg(db ? db->getRowCount() : 0);                  break;
-		case TS_SavingDB:       newMessage = tr("Saving Database ...");              break;
-		case TS_ClosingDB:      newMessage = tr("Closing Database ...");             break;
+		case TS_NoDbDescLoaded: newMessage = tr("No Database Description Loaded", "Status in statusbar");   break;
+		case TS_LoadingDbDesc:  newMessage = tr("Loading Database Description ...", "Status in statusbar"); break;
+		case TS_NoDbLoaded:     newMessage = tr("No Database Loaded", "Status in statusbar");               break;
+		case TS_LoadingDB:      newMessage = tr("Loading Database ...", "Status in statusbar");             break;
+		case TS_DbLoaded:       newMessage = tr("Database loaded, %1 rows", "Status in statusbar").arg(db ? db->getRowCount() : 0);                  break;
+		case TS_SavingDB:       newMessage = tr("Saving Database ...", "Status in statusbar");              break;
+		case TS_ClosingDB:      newMessage = tr("Closing Database ...", "Status in statusbar");             break;
 	}
 
 	if(db && db->getDate() && currentStatus == TS_DbLoaded) {
-		newMessage += " | " + tr("Creation date: %1").arg(QDateTime::fromTime_t(db->getDate()).toString(tr("yyyy/MM/dd", "RDB Creation date format")));
+		newMessage += " | " + tr("Creation date: %1").arg(QDateTime::fromTime_t(db->getDate()).toString(tr("yyyy/MM/dd", "RDB Creation date format shown in statusbar")));
 	}
 
 	if(!newMessage.isNull())
@@ -352,4 +352,45 @@ void DatabaseView::setWindowTitle(const QString &title) {
 		QWidget::setWindowTitle(shortTitle);
 
 	emit titleChanged(this);
+}
+
+QString DatabaseView::errorToString(eDataSourceType type, int error, bool save) {
+	switch(error) {
+		case ENOENT:
+			if(IS_DST_FILESOURCE(type))
+				return tr("The file does not exist", "Load/Save file error messagebox");
+			else if(!save)
+				return tr("The SQL table or database does not exist", "Load SQL table error messagebox");
+			else
+				return tr("The database does not exist", "Save SQL table error messagebox");
+
+			break;
+
+		case ENXIO:
+			return tr("Can\'t connect to data source, check SQL configuration and ODBC data sources", "Load/Save SQL table error messagebox");
+
+		case EIO:
+			if(save)
+				return tr("Can\'t save the file, I/O error", "Load/Save file error messagebox");
+			else
+				return tr("Can\'t load the file, I/O error", "Load/Save file error messagebox, not related to the existence of the file");
+
+		case EINVAL:
+			return tr("Can\'t read the file, invalid format", "Load/Save file error messagebox, the file has not the expected file format");
+
+		case ENOMEM:
+			return tr("No enough memory", "Load/Save error messagebox, memory allocation failed, will probably cause a crash later");
+
+		case ENOSYS:
+			return tr("Operation not supported", "Load/Save error messagebox, non implemented/unsuppored operation");
+
+		case ENOEXEC:
+			return tr("Error while executing a SQL query, aborting", "Load/Save SQL table error messagebox");
+
+		case EILSEQ:
+			return tr("Error while executing a INSERT sql query, aborting", "Save SQL table error messagebox");
+
+		default:
+			return tr("Unknown error: %1", "Load/Save error messagebox, unknown error, %1 is a generated message from the error").arg(strerror(error));
+	}
 }

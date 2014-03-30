@@ -59,8 +59,13 @@ int SQLFileSource::open(const char* source, eOpenMode openMode,  const char* loc
 		return ENOSYS;
 
 	outputFile = fopen(source, "w");
-	if(!outputFile)
-		return errno;
+
+	if(!outputFile) {
+		if(errno == ENOENT)
+			return ENOENT;
+		else
+			return EIO;
+	}
 
 	const char *p = source + strlen(source) - 1;
 	while(p >= source && *p != '/' && *p != '\\')
@@ -103,7 +108,7 @@ int SQLFileSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 	fprintf(outputFile, "DROP TABLE %s;\n", tableName);
 
 	if(createSQLTable())
-		return EACCES;
+		return ENOENT;
 
 	fputc('\n', outputFile);
 

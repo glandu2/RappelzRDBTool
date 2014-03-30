@@ -71,12 +71,14 @@ int RDBSkillTreeSource::writeRow() {
 }
 
 void RDBSkillTreeSource::close() {
-	if(lastSubNumberPos > 0) {
-		fseek(rdbFile, lastSubNumberPos, SEEK_SET);
-		fwrite(&subNumber, 1, 4, rdbFile);
+	if(getOpenMode() == OM_Write) {
+		if(lastSubNumberPos > 0) {
+			fseek(rdbFile, lastSubNumberPos, SEEK_SET);
+			fwrite(&subNumber, 1, 4, rdbFile);
+		}
+		fseek(rdbFile, 0x80, SEEK_SET);
+		fwrite(&recordNumber, 1, 4, rdbFile);
 	}
-	fseek(rdbFile, 0x80, SEEK_SET);
-	fwrite(&recordNumber, 1, 4, rdbFile);
 	RDBSource::close();
 }
 

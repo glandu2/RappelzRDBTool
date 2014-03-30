@@ -48,7 +48,7 @@ int SQLSource::checkSqlResult(int result, const char* functionName) {
 		printOdbcStatus(SQL_HANDLE_DBC, hdbc);
 		printOdbcStatus(SQL_HANDLE_ENV, henv);
 		commitTransaction = false;
-		return EILSEQ;
+		return ENOEXEC;
 	}
 
     return 0;
@@ -100,7 +100,7 @@ int SQLSource::open(const char* source, eOpenMode openMode,  const char* locatio
 		SQLFreeHandle(SQL_HANDLE_ENV, henv);
 		hdbc = 0;
 		henv = 0;
-		return ENOENT;
+		return ENXIO;
 	}
 
 	SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
@@ -178,7 +178,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 	SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
 
 	if(createSQLTable(hstmt, tableName))
-		return EACCES;
+		return ENOENT;
 
 	SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
 
@@ -186,7 +186,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 
 	int result = SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS);
 	if(checkSqlResult(result, "writeRow.SQLExecute"))
-		return EILSEQ;
+		return ENOEXEC;
 
 	return 0;
 }
@@ -228,7 +228,7 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 
 	int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
 	if(checkSqlResult(result, "createSQLTable.SQLExecDirect"))
-		return EILSEQ;
+		return ENOENT;
 
 	return 0;
 }
@@ -392,7 +392,7 @@ int SQLSource::prepareWriteQuery() {
 		ParameterInfo* paramInfo = initParameter(curCol, bufferSize);
 		int result = SQLBindParameter(hstmt, i, SQL_PARAM_INPUT, columnType, dbType, columnSize, precision, paramInfo->data, 0, &paramInfo->dataSizeOrInd);
 		if(checkSqlResult(result, "prepareWriteQuery.SQLBindParameter"))
-			return EILSEQ;
+			return ENOEXEC;
 		i++;
 	}
 

@@ -60,7 +60,7 @@ void RowManipulator::initRow(bool initializedFields) {
 //linear
 int RowManipulator::allocRow() {
 	row = (void**) malloc(columnsType->numFields*sizeof(void*));
-	if(!row) return errno;
+	if(!row) return ENOMEM;
 
 	initRow(false);
 	return 0;

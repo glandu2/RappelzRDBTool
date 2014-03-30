@@ -78,8 +78,12 @@ int CSVSource::open(const char* source, eOpenMode openMode,  const char* locatio
 		setvbuf(csvFile, (char*)io_buffer, _IOFBF, 65536);
 	}
 
-	if(!csvFile)
-		return errno;
+	if(!csvFile) {
+		if(errno == ENOENT)
+			return ENOENT;
+		else
+			return EIO;
+	}
 
 	return 0;
 }
