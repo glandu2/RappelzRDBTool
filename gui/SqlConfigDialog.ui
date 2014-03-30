@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>263</height>
+    <width>318</width>
+    <height>261</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,19 +17,19 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>SQL Configuration</string>
+   <string comment="Dialogbox title">SQL Configuration</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="serverInfoGroup">
      <property name="title">
-      <string>Server Informations</string>
+      <string comment="Groupbox title">Server Informations</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <item row="1" column="0">
        <widget class="QLabel" name="serverNameLabel">
         <property name="text">
-         <string>Data source name</string>
+         <string comment="Label">Data source name</string>
         </property>
        </widget>
       </item>
@@ -39,7 +39,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="serverTypeLabel">
         <property name="text">
-         <string>Server Type</string>
+         <string comment="Label">Server Type</string>
         </property>
        </widget>
       </item>
@@ -47,12 +47,12 @@
        <widget class="QComboBox" name="serverTypeCombo">
         <item>
          <property name="text">
-          <string>Microsoft SQL Server</string>
+          <string notr="true">Microsoft SQL Server</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>ProsgreSQL</string>
+          <string notr="true">ProsgreSQL</string>
          </property>
         </item>
        </widget>
@@ -63,7 +63,7 @@
    <item>
     <widget class="QGroupBox" name="accountGroup">
      <property name="title">
-      <string>Account</string>
+      <string comment="Groupbox title">Account</string>
      </property>
      <layout class="QFormLayout" name="formLayout">
       <item row="1" column="1">
@@ -76,14 +76,14 @@
       <item row="1" column="0">
        <widget class="QLabel" name="passwordLabel">
         <property name="text">
-         <string>Password</string>
+         <string comment="Label">Password</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="usernameLabel">
         <property name="text">
-         <string>Username</string>
+         <string comment="Label">Username</string>
         </property>
        </widget>
       </item>
@@ -93,7 +93,7 @@
       <item row="2" column="0" colspan="2">
        <widget class="QCheckBox" name="passwordSaveCheck">
         <property name="text">
-         <string>Save password (it will be in plain text)</string>
+         <string comment="Checkbox">Save password (it will be in plain text)</string>
         </property>
        </widget>
       </item>
@@ -103,7 +103,7 @@
    <item>
     <widget class="QPushButton" name="configureOdbcButton">
      <property name="text">
-      <string>Configure ODBC</string>
+      <string comment="Button to open ODBC data source manager">Configure ODBC</string>
      </property>
     </widget>
    </item>

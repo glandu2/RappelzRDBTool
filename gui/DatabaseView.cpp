@@ -27,12 +27,12 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 	const struct CharsetInfo * codepageList = availableCharsets();
 	QString defaultCodec = Settings::getSettings()->value("charset", "CP1252").toString();
 	for(int i = 0; codepageList[i].name; i++) {
-		ui->localeCombo->insertItem(i, QString::fromLatin1(codepageList[i].description), QString::fromLatin1(codepageList[i].name));
+		ui->encodingCombo->insertItem(i, QString::fromLatin1(codepageList[i].description), QString::fromLatin1(codepageList[i].name));
 		if(QString::fromLatin1(codepageList[i].name) == defaultCodec)
-			ui->localeCombo->setCurrentIndex(i);
+			ui->encodingCombo->setCurrentIndex(i);
 	}
 
-	databaseModel = new DatabaseTableModel(ui->localeCombo->itemData(ui->localeCombo->currentIndex()).toByteArray(), this);
+	databaseModel = new DatabaseTableModel(ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray(), this);
 	statusBarLabel = new QLabel(this);
 	statusBarLabel->hide();
 	setStatus(TS_NoDbDescLoaded);
@@ -53,7 +53,7 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 
 	connect(&searchNotFoundStyleTimer, SIGNAL(timeout()), this, SLOT(onSearchResetStyle()));
 
-	connect(ui->localeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onChangeLocale(int)));
+	connect(ui->encodingCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onChangeLocale(int)));
 
 	connect(ui->searchButton, SIGNAL(clicked()), this, SLOT(onSearch()));
 	connect(ui->searchTextEdit, SIGNAL(returnPressed()), this, SLOT(onSearch()));
@@ -66,7 +66,7 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 
 DatabaseView::~DatabaseView()
 {
-	Settings::getSettings()->setValue("charset", ui->localeCombo->itemData(ui->localeCombo->currentIndex()));
+	Settings::getSettings()->setValue("charset", ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()));
 	delete ui;
 	if(db)
 		db->destroy();
@@ -159,7 +159,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 	QByteArray usernameStr;
 	QByteArray passwordStr;
 
-	options += QByteArray("charset=") + ui->localeCombo->itemData(ui->localeCombo->currentIndex()).toByteArray() + ";";
+	options += QByteArray("charset=") + ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray() + ";";
 
 	setStatus(TS_LoadingDB);
 
@@ -224,7 +224,7 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 	QByteArray usernameStr;
 	QByteArray passwordStr;
 
-	options += QByteArray("charset=") + ui->localeCombo->itemData(ui->localeCombo->currentIndex()).toByteArray() + ";";
+	options += QByteArray("charset=") + ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray() + ";";
 
 	setStatus(TS_SavingDB);
 
@@ -313,7 +313,7 @@ void DatabaseView::onSearchResetStyle() {
 }
 
 void DatabaseView::onChangeLocale(int newIndex) {
-	databaseModel->changeLocale(ui->localeCombo->itemData(newIndex).toByteArray());
+	databaseModel->changeLocale(ui->encodingCombo->itemData(newIndex).toByteArray());
 }
 
 void DatabaseView::onModifyDb(QModelIndex, QModelIndex) {
@@ -337,7 +337,7 @@ void DatabaseView::setStatus(eToolStatus newStatus) {
 	}
 
 	if(db && db->getDate() && currentStatus == TS_DbLoaded) {
-		newMessage += " | " + tr("Creation date: %1").arg(QDateTime::fromTime_t(db->getDate()).toString(tr("yyyy/MM/dd", "RDB Creation date format shown in statusbar")));
+		newMessage += " | " + tr("Creation date: %1", "RDB Creation date label in statusbar").arg(QDateTime::fromTime_t(db->getDate()).toString(tr("yyyy/MM/dd", "RDB Creation date format shown in statusbar")));
 	}
 
 	if(!newMessage.isNull())

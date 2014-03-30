@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>525</width>
-    <height>402</height>
+    <width>523</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Database Description files management</string>
+   <string comment="Dialogbox title">Database Description files management</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="1">
@@ -30,10 +30,10 @@
    <item row="2" column="1">
     <widget class="QPushButton" name="removeButton">
      <property name="toolTip">
-      <string>Remove selected database description files</string>
+      <string comment="Button &quot;Remove&quot; tooltip">Remove selected database description files</string>
      </property>
      <property name="text">
-      <string>Remove</string>
+      <string comment="Button to remove a database description DLL">Remove</string>
      </property>
      <property name="autoDefault">
       <bool>false</bool>
@@ -43,10 +43,10 @@
    <item row="1" column="1">
     <widget class="QPushButton" name="addButton">
      <property name="toolTip">
-      <string>Add database description files</string>
+      <string comment="Button &quot;Add&quot; tooltip">Add database description files</string>
      </property>
      <property name="text">
-      <string>Add</string>
+      <string comment="Button to add new database description DLLs">Add</string>
      </property>
      <property name="autoDefault">
       <bool>false</bool>
@@ -56,17 +56,17 @@
    <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="dbDescLabel">
      <property name="text">
-      <string>Loaded database description files:</string>
+      <string comment="Label above the database DLL list">Loaded database description files:</string>
      </property>
     </widget>
    </item>
    <item row="3" column="1">
     <widget class="QPushButton" name="closeButton">
      <property name="toolTip">
-      <string>Close window</string>
+      <string comment="Button &quot;Close&quot; tooltip">Close window</string>
      </property>
      <property name="text">
-      <string>Close</string>
+      <string comment="Button to close the dialogbox">Close</string>
      </property>
      <property name="autoDefault">
       <bool>false</bool>

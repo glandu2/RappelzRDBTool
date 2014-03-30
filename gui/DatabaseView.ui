@@ -6,12 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>723</width>
-    <height>451</height>
+    <width>719</width>
+    <height>447</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Database View</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="3" colspan="2">
@@ -23,14 +20,14 @@
       </sizepolicy>
      </property>
      <property name="statusTip">
-      <string>Select the database structure to use and then click &quot;Load&quot;</string>
+      <string comment="Statusbar text when hovering the DB description combobox list">Select the database structure to use and then click &quot;Load&quot;</string>
      </property>
     </widget>
    </item>
    <item row="0" column="5">
     <widget class="QPushButton" name="dbLoadClose">
      <property name="statusTip">
-      <string>Load/Unload the selected database structure</string>
+      <string comment="Statusbar text when hovering the button next to DB description DLL combobox">Load/Unload the selected database structure</string>
      </property>
      <property name="text">
       <string notr="true">Loaded</string>
@@ -49,17 +46,17 @@
       </size>
      </property>
      <property name="statusTip">
-      <string>Search the written text from the current row</string>
+      <string comment="Statusbar text when hovering the search button">Search the written text from the current row</string>
      </property>
      <property name="text">
-      <string>Search</string>
+      <string comment="Button text">Search</string>
      </property>
     </widget>
    </item>
    <item row="0" column="1" colspan="2">
     <widget class="QLabel" name="dbStructLabel">
      <property name="text">
-      <string>Choose database structure:</string>
+      <string comment="Label next to DB description combobox">Choose database structure:</string>
      </property>
     </widget>
    </item>
@@ -72,7 +69,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Progress:</string>
+      <string comment="Label next to progressbar">Progress:</string>
      </property>
     </widget>
    </item>
@@ -92,7 +89,7 @@
       </sizepolicy>
      </property>
      <property name="statusTip">
-      <string>Select the column to be searched</string>
+      <string comment="Statusbar text when hovering the search column combobox">Select the column to be searched</string>
      </property>
      <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToMinimumContentsLength</enum>
@@ -145,21 +142,21 @@
    <item row="1" column="3">
     <widget class="QLineEdit" name="searchTextEdit">
      <property name="statusTip">
-      <string>Write the text to be searched</string>
+      <string comment="Statusbar text when hovering the search editfield">Write the text to be searched</string>
      </property>
     </widget>
    </item>
    <item row="1" column="2">
-    <widget class="QComboBox" name="localeCombo">
+    <widget class="QComboBox" name="encodingCombo">
      <property name="statusTip">
-      <string>The locale to use to display text data</string>
+      <string comment="Statusbar text when hovering the encoding combobox">The locale to use to display text data</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QLabel" name="localeLabel">
+    <widget class="QLabel" name="encodingLabel">
      <property name="text">
-      <string>Locale:</string>
+      <string comment="Label next to encoding combobox">Encoding:</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

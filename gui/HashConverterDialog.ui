@@ -6,18 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>524</width>
-    <height>161</height>
+    <width>522</width>
+    <height>159</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string comment="Title of the dialogbox">Hash / Name converter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="4">
     <widget class="QPushButton" name="closeButton">
      <property name="text">
-      <string>Close</string>
+      <string comment="Button text">Close</string>
      </property>
     </widget>
    </item>
@@ -43,28 +43,28 @@
    <item row="3" column="1">
     <widget class="QPushButton" name="nameToHashButton">
      <property name="text">
-      <string>Name &gt; Hash</string>
+      <string comment="Button text">Name &gt; Hash</string>
      </property>
     </widget>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="hashLabel">
      <property name="text">
-      <string>Hash:</string>
+      <string comment="Label next to hash editfield">Hash:</string>
      </property>
     </widget>
    </item>
    <item row="3" column="2">
     <widget class="QPushButton" name="hashToNameButton">
      <property name="text">
-      <string>Hash &gt; Name</string>
+      <string comment="Button text">Hash &gt; Name</string>
      </property>
     </widget>
    </item>
    <item row="0" column="0">
     <widget class="QLabel" name="nameLabel">
      <property name="text">
-      <string>Name:</string>
+      <string comment="Label next to name editfield">Name:</string>
      </property>
     </widget>
    </item>
