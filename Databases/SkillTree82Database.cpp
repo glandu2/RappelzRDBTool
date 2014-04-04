@@ -13,6 +13,7 @@ extern "C" {
 static FieldDescriptor df[] =
 	{{1, TYPE_INT32, "job_id"},
 	 {1, TYPE_INT32, "skill_id"},
+	 {1, TYPE_INT32, "unknown"},
 	 {1, TYPE_INT32, "min_skill_lv"},
 	 {1, TYPE_INT32, "max_skill_lv"},
 	 {1, TYPE_INT32, "lv"},

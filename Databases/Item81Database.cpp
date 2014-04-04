@@ -32,6 +32,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_FLOAT32, "weight"},
 	 {1, TYPE_INT32, "price"},
 	 {1, TYPE_INT32, "huntaholic_point"},
+	 {1, TYPE_INT32 | TYPE_RDBIGNORE, "arena_points"},
 	 {1, TYPE_INT32, "ethereal_durability"},
 	 {1, TYPE_INT32, "endurance"},
 	 {1, TYPE_INT32, "wear_type"},
@@ -173,6 +174,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"weight\0"
 			"price\0"
 			"huntaholic_point\0"
+			"arena_points\0"
 			"ethereal_durability\0"
 			"endurance\0"
 			"material\0"
@@ -254,6 +256,76 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"script_text\0";
 }
 
+typedef struct {
+	int id;
+	int arena_points;
+} ArenaPoints;
+
+//Data values by Ne0@NCarbon
+static ArenaPoints arenaPoints[] =
+//      id     arena_points
+	{{1100103, 20},
+	 {3800209, 80},
+	 {3800210, 80},
+	 {3800211, 80},
+	 {3800201, 90},
+	 {3800202, 90},
+	 {3800203, 110},
+	 {3800204, 110},
+	 {3800205, 110},
+	 {3800206, 110},
+	 {3800207, 110},
+	 {3800208, 110},
+	 {3800229, 6250},
+	 {3800241, 6250},
+	 {3800253, 6250},
+	 {693030 , 6817},
+	 {693031 , 6817},
+	 {693032 , 6817},
+	 {693033 , 6817},
+	 {693034 , 6817},
+	 {3800242, 8520},
+	 {3800230, 8520},
+	 {3800254, 8520},
+	 {3800240, 11360},
+	 {3800252, 11360},
+	 {3800228, 11360},
+	 {3800257, 18750},
+	 {3800245, 18750},
+	 {3800233, 18750},
+	 {3800255, 19310},
+	 {3800243, 19310},
+	 {3800231, 19310},
+	 {3800234, 25560},
+	 {3800258, 25560},
+	 {3800246, 25560},
+	 {3800256, 34080},
+	 {3800244, 34080},
+	 {3800232, 34080},
+	 {3800264, 56810},
+	 {3800259, 57940},
+	 {3800247, 57940},
+	 {3800235, 57940},
+	 {3800265, 78400},
+	 {3800261, 93730},
+	 {3800237, 93730},
+	 {3800249, 93730},
+	 {3800250, 127820},
+	 {3800238, 127820},
+	 {3800262, 127820},
+	 {3800248, 170420},
+	 {3800260, 170420},
+	 {3800236, 170420},
+	 {3800001, 227230},
+	 {3800002, 227230},
+	 {3800003, 227230},
+	 {3800004, 227230},
+	 {3800005, 227230},
+	 {3800239, 289720},
+	 {3800251, 289720},
+	 {3800263, 289720},
+	 {3800101, 1136160}};
+
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Write && dst == DF_RDB) {
@@ -271,6 +343,17 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
 		}
 		*static_cast<short*>(row->getValuePtr("nv9")) = 0;
+	} else if(mode == DCT_Read && dst == DF_RDB) {
+		int id = *static_cast<int*>(row->getValuePtr("id"));
+		int* arena_points_column = static_cast<int*>(row->getValuePtr("arena_points"));
+		int i;
+		*arena_points_column = 0;
+		for(i = 0; i < sizeof(arenaPoints) / sizeof(ArenaPoints); i++) {
+			if(arenaPoints[i].id == id) {
+				*arena_points_column = arenaPoints[i].arena_points;
+				break;
+			}
+		}
 	}
 }
 
