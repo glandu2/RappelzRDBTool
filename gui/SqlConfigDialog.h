@@ -23,6 +23,7 @@ class SqlConfigDialog : public QDialog
 
 	protected slots:
 		void onConfigureOdbc();
+		void updateDsnList();
 		
 	private:
 		Ui::SqlConfigDialog *ui;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>318</width>
-    <height>261</height>
+    <width>314</width>
+    <height>252</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,9 +33,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="serverNameEdit"/>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="serverTypeLabel">
         <property name="text">
@@ -45,6 +42,12 @@
       </item>
       <item row="0" column="1">
        <widget class="QComboBox" name="serverTypeCombo">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <item>
          <property name="text">
           <string notr="true">Microsoft SQL Server</string>
@@ -55,6 +58,19 @@
           <string notr="true">ProsgreSQL</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="serverNameCombo">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -120,12 +136,13 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>serverNameEdit</tabstop>
   <tabstop>usernameEdit</tabstop>
   <tabstop>passwordEdit</tabstop>
+  <tabstop>passwordSaveCheck</tabstop>
   <tabstop>configureOdbcButton</tabstop>
   <tabstop>confirmationButtons</tabstop>
   <tabstop>serverTypeCombo</tabstop>
+  <tabstop>serverNameCombo</tabstop>
  </tabstops>
  <resources/>
  <connections>

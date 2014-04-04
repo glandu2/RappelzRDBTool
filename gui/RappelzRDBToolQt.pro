@@ -20,10 +20,10 @@ CONFIG += debug_and_release debug_and_release_target
 DESTDIR = ../bin
 
 win32 {
-LIBS += ../bin/RpzRdbBase.lib Shell32.lib comdlg32.lib
+LIBS += ../bin/RpzRdbBase.lib Shell32.lib comdlg32.lib odbc32.lib
 }
 unix {
-LIBS += ../bin/RpzRdbBase.so -Wl,-R,\'\$\$ORIGIN/\'
+LIBS += ../bin/RpzRdbBase.so -Wl,-R,\'\$\$ORIGIN/\' -lodbc
 }
 
 FORMS += \
