@@ -9,6 +9,7 @@
 #ifdef __unix__
 #  include <sql.h>
 #else
+#  undef UNICODE
 #  include <windows.h>
 #endif
 #include <sqlext.h>
@@ -51,7 +52,7 @@ SqlConfigDialog::~SqlConfigDialog()
 
 void SqlConfigDialog::onConfigureOdbc() {
 #ifdef WIN32
-	ShellExecute(0, L"runas", L"odbcad32.exe", 0, 0, SW_SHOWNORMAL);
+	ShellExecute(0, "runas", "odbcad32.exe", 0, 0, SW_SHOWNORMAL);
 #elif defined(__unix__)
 	QDesktopServices::openUrl(QUrl(QDir::homePath() + "/.odbc.ini"));
 #endif
@@ -74,8 +75,8 @@ static void printOdbcStatus(SQLSMALLINT type, HSTMT hstmt) {
 
 void SqlConfigDialog::updateDsnList() {
 	HENV henv;
-	char dsn[128];
-	char desc[128];
+	char dsn[128] = {0};
+	char desc[128] = {0};
 	SQLSMALLINT dummy;
 	int result;
 
@@ -95,6 +96,8 @@ void SqlConfigDialog::updateDsnList() {
 	result = SQLDataSources(henv, SQL_FETCH_FIRST, (SQLCHAR*)dsn, 128, &dummy, (SQLCHAR*)desc, 128, &dummy);
 	while(SQL_SUCCEEDED(result)) {
 		ui->serverNameCombo->addItem(QString(dsn) + " - " + QString(desc));
+		memset(dsn, 0, 128);
+		memset(desc, 0, 128);
 		result = SQLDataSources(henv, SQL_FETCH_NEXT, (SQLCHAR*)dsn, 128, &dummy, (SQLCHAR*)desc, 128, &dummy);
 	}
 
