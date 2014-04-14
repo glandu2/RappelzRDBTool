@@ -166,6 +166,7 @@ int RDBSource::readRow() {
 				break;
 		}
 
+#ifndef _MSC_VER
 		if(row->getType(curCol) == TYPE_FLOAT32 && buffer) {
 			float* val = (float*) buffer;
 			switch(std::fpclassify(*val)) {
@@ -197,6 +198,33 @@ int RDBSource::readRow() {
 					break;
 			}
 		}
+#else
+		if(row->getType(curCol) == TYPE_FLOAT32 && buffer) {
+			float* val = (float*) buffer;
+
+			if(_finite(*val)) {
+				if(*val < 0)
+					*val = -FLT_MAX;
+				else
+					*val = FLT_MAX;
+			}
+
+			if(_isnan(*val))
+				*val = 0;
+		} else if(row->getType(curCol) == TYPE_FLOAT64 && buffer) {
+			double* val = (double*) buffer;
+
+			if(_finite(*val)) {
+				if(*val < 0)
+					*val = -FLT_MAX;
+				else
+					*val = FLT_MAX;
+			}
+
+			if(_isnan(*val))
+				*val = 0;
+		}
+#endif
 
 		if(row->getType(curCol) != TYPE_BIT) {
 			bitAvailable = 0;
