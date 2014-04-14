@@ -5,6 +5,8 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <cmath>
+#include <float.h>
 
 namespace RappelzRDBBase {
 
@@ -163,6 +165,39 @@ int RDBSource::readRow() {
 				}
 				break;
 		}
+
+		if(row->getType(curCol) == TYPE_FLOAT32 && buffer) {
+			float* val = (float*) buffer;
+			switch(std::fpclassify(*val)) {
+				case FP_INFINITE:
+					if(*val < 0)
+						*val = -FLT_MAX;
+					else
+						*val = FLT_MAX;
+					break;
+
+				case FP_NAN:
+				case FP_SUBNORMAL:
+					*val = 0;
+					break;
+			}
+		} else if(row->getType(curCol) == TYPE_FLOAT64 && buffer) {
+			double* val = (double*) buffer;
+			switch(std::fpclassify(*val)) {
+				case FP_INFINITE:
+					if(*val < 0)
+						*val = -FLT_MAX;
+					else
+						*val = FLT_MAX;
+					break;
+
+				case FP_NAN:
+				case FP_SUBNORMAL:
+					*val = 0;
+					break;
+			}
+		}
+
 		if(row->getType(curCol) != TYPE_BIT) {
 			bitAvailable = 0;
 		}
