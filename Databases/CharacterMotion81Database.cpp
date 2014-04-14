@@ -1,3 +1,4 @@
+#include "IRowManipulator.h"
 #include "DataType.h"
 #include "ExportDLL.h"
 #include <stdlib.h>
@@ -19,7 +20,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "graphic_effect_position"},
 	 {1, TYPE_INT8, "graphic_effect_follow"},
 	 {1, TYPE_INT8, "graphic_effect_disappear"},
-	 {1, TYPE_INT16, "padding0"},
+	 {1, TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "padding0"},
 	 {1, TYPE_INT32, "sound_file_ID"},
 	 {1, TYPE_INT32, "sound_volumn"},
 	 {1, TYPE_INT32, "sound_play_probability"},
@@ -27,7 +28,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT8, "sound_reverb_apply"},
 	 {1, TYPE_INT8, "sound_filter_apply"},
 	 {1, TYPE_INT8, "sound_stereo_apply"},
-	 {1, TYPE_INT8, "padding1"},
+	 {1, TYPE_INT8 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "padding1"},
 	 {1, TYPE_INT32, "fx_id"},
 	 {1, TYPE_INT32, "fx_timing"},
 	 {1, TYPE_INT32, "fx_position"},
@@ -57,6 +58,19 @@ static FieldDescriptor df[] =
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
+}
+
+#pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
+	if(mode == DCT_Read && (dst == DF_CSV || dst == DF_SQL)) {
+		*static_cast<short*>(row->getValuePtr("padding0")) = 103;
+		*static_cast<char*>(row->getValuePtr("padding1")) = 0;
+	}
+}
+
+#pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {
+	return "CharacterMotion";
 }
 
 #ifdef __cplusplus

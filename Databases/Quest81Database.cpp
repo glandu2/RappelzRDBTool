@@ -103,18 +103,22 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	if(mode == DCT_Write && dst == DF_RDB) {
-		int questId = *static_cast<short*>(row->getValuePtr("id"));
+	if(mode == DCT_Read && dst == DF_SQL) {
 		*static_cast<char*>(row->getValuePtr("nv")) = 0;
 		*static_cast<char*>(row->getValuePtr("unknown0")) = 0;
 		*static_cast<char*>(row->getValuePtr("unknown1")) = 0;
 		*static_cast<char*>(row->getValuePtr("unknown2")) = 0;
 		*static_cast<char*>(row->getValuePtr("unknownPadding")) = 0;
-		*static_cast<short*>(row->getValuePtr("limit_favor_group_id")) = 0;
-		*static_cast<short*>(row->getValuePtr("favor_group_id")) = 999;
+	} else if(mode == DCT_Read && dst == DF_RDB) {
+		int questId = *static_cast<short*>(row->getValuePtr("id"));
+
 		if(questId >= 3600 && questId <= 3611 && questId != 3610)
 			*static_cast<short*>(row->getValuePtr("hate_group_id")) = 1;
-		else *static_cast<short*>(row->getValuePtr("hate_group_id")) = 0;
+		else
+			*static_cast<short*>(row->getValuePtr("hate_group_id")) = 0;
+
+		*static_cast<short*>(row->getValuePtr("favor_group_id")) = 999;
+		*static_cast<short*>(row->getValuePtr("limit_favor_group_id")) = 0;
 	}
 }
 

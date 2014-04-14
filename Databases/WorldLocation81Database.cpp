@@ -216,6 +216,11 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"aurora_h\0";
 }
 
+
+#pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {
+	return "WorldLocation";
+}
 #ifdef __cplusplus
 }
 #endif
