@@ -187,9 +187,9 @@ int RDBSource::readRow() {
 			switch(std::fpclassify(*val)) {
 				case FP_INFINITE:
 					if(*val < 0)
-						*val = -FLT_MAX;
+						*val = -DBL_MAX;
 					else
-						*val = FLT_MAX;
+						*val = DBL_MAX;
 					break;
 
 				case FP_NAN:
@@ -202,27 +202,45 @@ int RDBSource::readRow() {
 		if(row->getType(curCol) == TYPE_FLOAT32 && buffer) {
 			float* val = (float*) buffer;
 
-			if(_finite(*val)) {
-				if(*val < 0)
+			switch(_fpclass(*val)) {
+				case _FPCLASS_NINF:
 					*val = -FLT_MAX;
-				else
+					break;
+
+				case _FPCLASS_PINF:
 					*val = FLT_MAX;
+					break;
+
+				case _FPCLASS_QNAN:
+				case _FPCLASS_SNAN:
+				case _FPCLASS_ND:
+				case _FPCLASS_PD:
+					*val = 0;
+					break;
 			}
 
-			if(_isnan(*val))
+			//Denormalized numbers are not correctly detected on msvc2010
+			if(*val < FLT_MIN || *val > -FLT_MIN)
 				*val = 0;
 		} else if(row->getType(curCol) == TYPE_FLOAT64 && buffer) {
 			double* val = (double*) buffer;
 
-			if(_finite(*val)) {
-				if(*val < 0)
-					*val = -FLT_MAX;
-				else
-					*val = FLT_MAX;
-			}
+			switch(_fpclass(*val)) {
+				case _FPCLASS_NINF:
+					*val = -DBL_MAX;
+					break;
 
-			if(_isnan(*val))
-				*val = 0;
+				case _FPCLASS_PINF:
+					*val = DBL_MAX;
+					break;
+
+				case _FPCLASS_QNAN:
+				case _FPCLASS_SNAN:
+				case _FPCLASS_ND:
+				case _FPCLASS_PD:
+					*val = 0;
+					break;
+			}
 		}
 #endif
 
