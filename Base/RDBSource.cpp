@@ -220,7 +220,7 @@ int RDBSource::readRow() {
 			}
 
 			//Denormalized numbers are not correctly detected on msvc2010
-			if(*val < FLT_MIN || *val > -FLT_MIN)
+			if((*val > 0 && *val < FLT_MIN) || (*val < 0 && *val > -FLT_MIN))
 				*val = 0;
 		} else if(row->getType(curCol) == TYPE_FLOAT64 && buffer) {
 			double* val = (double*) buffer;

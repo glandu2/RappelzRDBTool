@@ -138,7 +138,6 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 }
 
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
-#pragma comment(linker, "/EXPORT:getCSVColumnOrder=_getSQLColumnOrder@0")
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 	return  "id\0"
 			"monster_group\0"
@@ -215,6 +214,11 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"texture_group\0"
 			"local_flag\0"
 			"script_on_dead\0";
+}
+
+#pragma comment(linker, "/EXPORT:getCSVColumnOrder=_getSQLColumnOrder@0")
+EDATABASEDLL const char* DLLCALLCONV getCSVColumnOrder() {
+	return getSQLColumnOrder();
 }
 
 #ifdef __cplusplus

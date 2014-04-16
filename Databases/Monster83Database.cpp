@@ -92,8 +92,8 @@ static FieldDescriptor df[] =
 	{ 1, TYPE_FLOAT32, "target_z" },
 	{ 1, TYPE_INT32, "ability" },
 	{ 1, TYPE_INT32, "material" },
-	{ 1, TYPE_INT32, "attack_motion_speed" },
 	{ 1, TYPE_INT32, "weapon_type" },
+	{ 1, TYPE_INT32, "attack_motion_speed" },
 	{ 256, TYPE_CHAR | TYPE_RDBIGNORE, "script_on_dead" }};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
@@ -299,7 +299,6 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 }
 
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
-#pragma comment(linker, "/EXPORT:getCSVColumnOrder=_getSQLColumnOrder@0")
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 	return  "id\0"
 			"monster_group\0"
@@ -377,6 +376,11 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"texture_group\0"
 			"local_flag\0"
 			"script_on_dead\0";
+}
+
+#pragma comment(linker, "/EXPORT:getCSVColumnOrder=_getSQLColumnOrder@0")
+EDATABASEDLL const char* DLLCALLCONV getCSVColumnOrder() {
+	return getSQLColumnOrder();
 }
 
 #ifdef __cplusplus
