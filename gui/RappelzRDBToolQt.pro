@@ -31,7 +31,8 @@ FORMS += \
     SqlConfigDialog.ui \
     DatabaseView.ui \
     DatabaseDescManageDialog.ui \
-    HashConverterDialog.ui
+    HashConverterDialog.ui \
+    SqlOpenSaveDialog.ui
 
 SOURCES += \
     main.cpp \
@@ -49,7 +50,8 @@ SOURCES += \
     HashConverterDialog.cpp \
     HashToName.c \
     FileDialog.cpp \
-    FileToRenameListModel.cpp
+    FileToRenameListModel.cpp \
+    SqlOpenSaveDialog.cpp
 
 HEADERS += \
     Maingui.h \
@@ -73,6 +75,7 @@ HEADERS += \
     HashConverterDialog.h \
     HashToName.h \
     FileDialog.h \
-    FileToRenameListModel.h
+    FileToRenameListModel.h \
+    SqlOpenSaveDialog.h
 
 TRANSLATIONS = RappelzRDBToolQt_sample.ts

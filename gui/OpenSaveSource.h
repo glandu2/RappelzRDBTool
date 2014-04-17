@@ -12,7 +12,7 @@ class OpenSaveSource : public QObject
 		OpenSaveSource();
 		void setSourceType(eDataSourceType type);
 		void setAutoDetectSourceType();
-		bool getSource(bool save, QString defaultName, QString *sourceName, eDataSourceType *sourceType);
+		bool getSource(bool save, QString defaultName, QString *sourceName, eDataSourceType *sourceType, QByteArray* options);
 
 	private:
 		bool autoDetectSourceType;

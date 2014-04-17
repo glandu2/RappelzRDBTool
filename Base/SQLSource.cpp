@@ -32,6 +32,7 @@ SQLSource::SQLSource(SQLLanguage *language) {
 	tableName = 0;
 	sqlLanguage = language;
 	utf16To8bits = 0;
+	reuseTableSchema = false;
 }
 
 SQLSource::~SQLSource() {
@@ -75,6 +76,8 @@ int SQLSource::open(const char* source, eOpenMode openMode,  const char* locatio
 			fprintf(stderr, "Using target charset \"%s\"\n", targetCharset);
 			utf16To8bits = createCharsetConverter(targetCharset);
 		}
+		if(strstr(options, "reusetable;"))
+			reuseTableSchema = true;
 	}
 	if(utf16To8bits == 0)
 		utf16To8bits = createCharsetConverter("");
@@ -173,14 +176,20 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 	clearBoundParameters(row->getColumnCount());
 
-	sprintf(query, "DROP TABLE %s;", tableName);
-	SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-	SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
+	if(reuseTableSchema) {
+		sprintf(query, "TRUNCATE TABLE %s;", tableName);
+		SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+		SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
+	} else {
+		sprintf(query, "DROP TABLE %s;", tableName);
+		SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+		SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
 
-	if(createSQLTable(hstmt, tableName))
-		return ENOENT;
+		if(createSQLTable(hstmt, tableName))
+			return ENOENT;
 
-	SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
+		SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
+	}
 
 	prepareWriteQuery();
 

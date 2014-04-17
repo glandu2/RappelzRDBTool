@@ -69,6 +69,7 @@ class SQLSource : public IDataSource
 		char *tableName;
 		SQLLanguage *sqlLanguage;
 		char query[256*1024];
+		bool reuseTableSchema;
 
 		std::vector<ParameterInfo> boundBuffers;
 

@@ -171,6 +171,7 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 	QByteArray defaultSourceName;
 	eDataSourceType sourceType;
 	DatabaseView *currentView = databaseViews.value(ui->databaseTab->currentIndex(), 0);
+	QByteArray options;
 
 	if(currentView == 0)
 		return;
@@ -240,7 +241,7 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 	else
 		openSaveSource->setSourceType(sourceType);
 
-	ok = openSaveSource->getSource(save, defaultSourceName, &sourceName, &sourceType);
+	ok = openSaveSource->getSource(save, defaultSourceName, &sourceName, &sourceType, &options);
 
 	delete openSaveSource;
 
@@ -248,8 +249,8 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 		if(!save) currentView->closeDb(true);
 
 		if(!save)
-			currentView->loadDb(sourceType, sourceName, sqlConfigDialog->getServerName(), sqlConfigDialog->getUsername(), sqlConfigDialog->getPassword());
-		else currentView->saveDb(sourceType, sourceName, sqlConfigDialog->getServerName(), sqlConfigDialog->getUsername(), sqlConfigDialog->getPassword());
+			currentView->loadDb(sourceType, sourceName, sqlConfigDialog->getServerName(), sqlConfigDialog->getUsername(), sqlConfigDialog->getPassword(), options);
+		else currentView->saveDb(sourceType, sourceName, sqlConfigDialog->getServerName(), sqlConfigDialog->getUsername(), sqlConfigDialog->getPassword(), options);
 	}
 }
 

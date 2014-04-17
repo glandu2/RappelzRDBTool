@@ -1,10 +1,10 @@
 #include "OpenSaveSource.h"
 #include <QFileDialog>
-#include <QInputDialog>
 #include <QCoreApplication>
 #include <QString>
 #include "Settings.h"
 #include "FileDialog.h"
+#include "SqlOpenSaveDialog.h"
 
 OpenSaveSource::OpenSaveSource()
 {
@@ -31,7 +31,7 @@ void OpenSaveSource::setAutoDetectSourceType() {
 	autoDetectSourceType = true;
 }
 
-bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceName, eDataSourceType *sourceType) {
+bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceName, eDataSourceType *sourceType, QByteArray* options) {
 	eDataSourceType dummySource = DST_CSV;
 
 	if(sourceType == 0)
@@ -46,8 +46,17 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 		else
 			message = tr("Enter full SQL target table (like Arcadia.dbo.StringResource)", "Load from SQL database inputbox label");
 
-		*sourceName = QInputDialog::getText(0, QCoreApplication::applicationName(), message, QLineEdit::Normal, defaultName, &ok);
+		SqlOpenSaveDialog sqlDialog;
+		sqlDialog.setMessage(message);
+		sqlDialog.setTableName(defaultName);
+		sqlDialog.setUseExistingTableSchemaEnabled(save); //enable use existing table schema only when saving
+
+		ok = sqlDialog.exec() == QDialog::Accepted;
+
+		*sourceName = sqlDialog.getTableName();
 		*sourceType = source;
+		if(sqlDialog.useExistingTableSchema())
+			options->append("reusetable;");
 		return ok;
 	}
 
