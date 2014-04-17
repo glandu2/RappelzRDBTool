@@ -610,7 +610,7 @@ bool SQLSource::hasNext() {
 void SQLSource::clearBoundParameters(int newCount) {
 	if(hstmt)
 		SQLFreeStmt(hstmt, SQL_RESET_PARAMS);
-	for(int i = 0; i < boundBuffers.size(); i++) {
+	for(size_t i = 0; i < boundBuffers.size(); i++) {
 		if(boundBuffers[i].data)
 			free(boundBuffers[i].data);
 		boundBuffers[i].data = 0;
