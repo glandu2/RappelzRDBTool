@@ -195,7 +195,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 		closeDb();
 		setStatus(TS_NoDbLoaded);
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't load the database file: %1(%2)", "Load error global message in messagebox").arg(errorToString(type, result, false)).arg(result));
+		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't load the database file: %1 (error code %2)", "Load error global message in messagebox").arg(errorToString(type, result, false)).arg(result));
 	} else {
 		loadedDatabaseName = filename;
 		setWindowTitle(loadedDatabaseName);
@@ -247,7 +247,7 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 
 	if(result != 0) {
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't save the database file: %1(%2)", "Save error global message in messagebox").arg(errorToString(type, result, true)).arg(result));
+		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't save the database file: %1 (error code %2)", "Save error global message in messagebox").arg(errorToString(type, result, true)).arg(result));
 	} else {
 		savedData = true;
 		loadedDatabaseName = filename;
