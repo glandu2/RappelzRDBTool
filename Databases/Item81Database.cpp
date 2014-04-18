@@ -32,7 +32,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_FLOAT32, "weight"},
 	 {1, TYPE_INT32, "price"},
 	 {1, TYPE_INT32, "huntaholic_point"},
-	 {1, TYPE_INT32 | TYPE_RDBIGNORE, "arena_points"},
+	 {1, TYPE_INT32 | TYPE_RDBIGNORE, "arena_point"},
 	 {1, TYPE_INT32, "ethereal_durability"},
 	 {1, TYPE_INT32, "endurance"},
 	 {1, TYPE_INT32, "wear_type"},
@@ -174,7 +174,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"weight\0"
 			"price\0"
 			"huntaholic_point\0"
-			"arena_points\0"
+			"arena_point\0"
 			"ethereal_durability\0"
 			"endurance\0"
 			"material\0"
@@ -258,12 +258,12 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 
 typedef struct {
 	int id;
-	int arena_points;
+	int arena_point;
 } ArenaPoints;
 
 //Data values by Ne0@NCarbon
 static ArenaPoints arenaPoints[] =
-//      id     arena_points
+//      id     arena_point
 	{{1100103, 20},
 	 {3800209, 80},
 	 {3800210, 80},
@@ -345,12 +345,12 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		*static_cast<short*>(row->getValuePtr("nv9")) = 0;
 	} else if(mode == DCT_Read && dst == DF_RDB) {
 		int id = *static_cast<int*>(row->getValuePtr("id"));
-		int* arena_points_column = static_cast<int*>(row->getValuePtr("arena_points"));
+		int* arena_point_column = static_cast<int*>(row->getValuePtr("arena_point"));
 		int i;
-		*arena_points_column = 0;
+		*arena_point_column = 0;
 		for(i = 0; i < sizeof(arenaPoints) / sizeof(ArenaPoints); i++) {
 			if(arenaPoints[i].id == id) {
-				*arena_points_column = arenaPoints[i].arena_points;
+				*arena_point_column = arenaPoints[i].arena_point;
 				break;
 			}
 		}
