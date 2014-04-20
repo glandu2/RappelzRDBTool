@@ -359,11 +359,8 @@ QString DatabaseView::errorToString(eDataSourceType type, int error, bool save) 
 		case ENOENT:
 			if(IS_DST_FILESOURCE(type))
 				return tr("The file does not exist", "Load/Save file error messagebox");
-			else if(!save)
-				return tr("The SQL table or database does not exist", "Load SQL table error messagebox");
 			else
-				return tr("The database does not exist", "Save SQL table error messagebox");
-
+				return tr("The SQL database or table does not exist. Double-quotes are needed around words with special characters (for example: \"Arcadia-8.1\".\"dbo\".\"StringResource\")", "Load/Save SQL table error messagebox");
 			break;
 
 		case ENXIO:
@@ -389,6 +386,9 @@ QString DatabaseView::errorToString(eDataSourceType type, int error, bool save) 
 
 		case EILSEQ:
 			return tr("Error while executing a INSERT sql query, aborting", "Save SQL table error messagebox");
+
+		case ESPIPE:
+			return tr("The target table has unknown columns", "Save SQL table error messagebox");
 
 		default:
 			return tr("Unknown error: %1", "Load/Save error messagebox, unknown error, %1 is a generated message from the error").arg(strerror(error));

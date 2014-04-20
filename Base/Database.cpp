@@ -195,7 +195,7 @@ int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCO
 
 	delete ds;
 
-	return 0;
+	return result;
 }
 
 
@@ -240,7 +240,7 @@ int Database::writeData(eDataSourceType type, const char* source, void (DLLCALLC
 
 	delete ds;
 
-	return 0;
+	return result;
 }
 
 void Database::close(void (DLLCALLCONV *progressCallBack)(void*, int, int), void *arg) {

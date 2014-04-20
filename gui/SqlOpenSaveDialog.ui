@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>375</width>
+    <width>389</width>
     <height>109</height>
    </rect>
   </property>
@@ -27,7 +27,7 @@
    <item row="2" column="0">
     <widget class="QCheckBox" name="useExistingTableCheckbox">
      <property name="text">
-      <string>Use existing table schema (truncate table instead of drop and create)</string>
+      <string>Use existing table schema (delete from table instead of drop and create)</string>
      </property>
     </widget>
    </item>

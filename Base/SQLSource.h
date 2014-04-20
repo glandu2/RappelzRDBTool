@@ -66,12 +66,15 @@ class SQLSource : public IDataSource
 		bool commitTransaction;
 
 	private:
+
+
 		char *tableName;
 		SQLLanguage *sqlLanguage;
 		char query[256*1024];
 		bool reuseTableSchema;
 
 		std::vector<ParameterInfo> boundBuffers;
+		std::vector<int> columnsToProcess;
 
 		bool endOfRecordSet;
 		ICharsetConverter* utf16To8bits;

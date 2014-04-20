@@ -142,27 +142,34 @@ void SQLSource::close() {
 }
 
 int SQLSource::prepareRead(IRowManipulator *row) {
-	int rowCount;
+	int rowCount = 0;
 
 	//retreive row count
 	sprintf(query, "SELECT COUNT(*) FROM %s;", tableName);
 	SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
 	if(checkSqlResult(SQLFetch(hstmt), "prepareRead.SQLFetch"))
-		return EINVAL;
+		return ENOENT;
 
 	SQLGetData(hstmt, 1, SQL_C_LONG, &rowCount, sizeof(int), NULL);
 	setRowNumber(rowCount);
 
 	SQLCloseCursor(hstmt);
 
+	columnsToProcess.clear();
+	for(int curCol=0; curCol<row->getColumnCount(); curCol++) {
+		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE) || row->getType(curCol) == TYPE_VARCHAR_SIZE)
+			continue;
+
+		columnsToProcess.push_back(curCol);
+	}
+
 	prepareReadQuery();
 
-	printf("Quering: \"%s\"\n", query);
 	if(checkSqlResult(SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS), "prepareRead.SQLPrepare"))
 		return ENOEXEC;
 
 	if(checkSqlResult(SQLExecute(hstmt), "prepareRead.SQLExecute"))
-		return ENOEXEC;
+		return EINVAL;
 
 
 	//rows are pre-fetched
@@ -177,16 +184,86 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 	clearBoundParameters(row->getColumnCount());
 
 	if(reuseTableSchema) {
-		sprintf(query, "TRUNCATE TABLE %s;", tableName);
-		SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+		SQLRETURN result;
+
+		sprintf(query, "DELETE FROM %s;", tableName);
+		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "prepareWrite.Delete")) {
+			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
+			return ENOENT;
+		}
+
+		std::vector<char*> dotPositions;
+		char columnName[128];
+		SQLLEN cbColumnName;
+		char *p = tableName;
+		char *tableNamePart, *endOfDatabasePart;
+
+		while(p) {
+			p = strchr(p, '.');
+			if(p) {
+				dotPositions.push_back(p);
+				p++;
+			}
+		}
+
+
+		if(dotPositions.size() >= 1)
+			tableNamePart = dotPositions[dotPositions.size()-1] + 1;
+		else
+			tableNamePart = tableName;
+
+
+		if(dotPositions.size() >= 2)
+			endOfDatabasePart = dotPositions[dotPositions.size()-2] + 1;
+		else
+			endOfDatabasePart = tableName;
+
+		sprintf(query, "SELECT COLUMN_NAME FROM %.*sINFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = \'%s\' ORDER BY ORDINAL_POSITION ASC;", endOfDatabasePart - tableName, tableName, tableNamePart);
+		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "prepareWrite.SQLExecDirect2")) {
+			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
+			return ENOEXEC;
+		}
+
+		result = SQLBindCol(hstmt, 1, SQL_C_CHAR, &columnName, sizeof(columnName), &cbColumnName);
+		columnsToProcess.clear();
+		while(SQL_SUCCEEDED(result = SQLFetch(hstmt))) {
+			if(cbColumnName != SQL_NO_TOTAL && cbColumnName != SQL_NULL_DATA) {
+				int index = row->getColumnIndex(columnName);
+				if(index >= 0) {
+					columnsToProcess.push_back(index);
+				} else {
+					printf("Unknown column name: %s\n", columnName);
+					SQLBindCol(hstmt, 1, SQL_C_CHAR, NULL, 0, NULL);
+					SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
+					return ESPIPE;
+				}
+			}
+		}
+		SQLBindCol(hstmt, 1, SQL_C_CHAR, NULL, 0, NULL);
+
+		if(columnsToProcess.size() == 0) {
+			printf("No columns ! Query: %s\n", query);
+			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
+			return ENOEXEC;
+		}
+
 		SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
 	} else {
 		sprintf(query, "DROP TABLE %s;", tableName);
 		SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-		SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
 
-		if(createSQLTable(hstmt, tableName))
+		columnsToProcess.clear();
+		for(int curCol=0; curCol<row->getColumnCount(); curCol++) {
+			if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE) || row->getType(curCol) == TYPE_VARCHAR_SIZE)
+				continue;
+
+			columnsToProcess.push_back(curCol);
+		}
+
+		if(createSQLTable(hstmt, tableName)) {
+			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 			return ENOENT;
+		}
 
 		SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
 	}
@@ -204,13 +281,14 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 	char *p;
 	int isFirstColumn = 1, curCol;
 	IRowManipulator *row = getRowManipulator();
+	size_t i;
 
 	p = query;
 	sprintf(p, "CREATE TABLE %s (", table);
 	p += strlen(p);
 
-	for(curCol=0; curCol<row->getColumnCount(); curCol++) {
-		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE)) continue;
+	for(i = 0; i < columnsToProcess.size(); i++) {
+		curCol = columnsToProcess[i];
 
 		if(isFirstColumn)
 			isFirstColumn = 0;
@@ -266,20 +344,17 @@ int SQLSource::writeRow() {
 
 char* SQLSource::appendColumnNames(char *p) {
 	bool isFirstColumn = true;
-	int i;
+	size_t i;
 	IRowManipulator *row = getRowManipulator();
 
-	for(i=0; i<row->getColumnCount(); i++) {
-		if(GET_FLAGBIT(row->getIgnoreType(i), TYPE_SQLIGNORE))
-			continue;
-
+	for(i = 0; i < columnsToProcess.size(); i++) {
 		if(isFirstColumn) {
 			isFirstColumn = false;
 		} else {
 			strcpy(p, ", ");
 			p += strlen(p);
 		}
-		p += sprintf(p, "\"%s\"", row->getColumnName(i));
+		p += sprintf(p, "\"%s\"", row->getColumnName(columnsToProcess[i]));
 	}
 
 	return p;
@@ -300,7 +375,8 @@ int SQLSource::prepareReadQuery() {
 
 int SQLSource::prepareWriteQuery() {
 	char *p = query;
-	int i, curCol;
+	int curCol;
+	size_t i;
 	bool isFirstColumn = true;
 	IRowManipulator *row = getRowManipulator();
 
@@ -311,9 +387,8 @@ int SQLSource::prepareWriteQuery() {
 	strcpy(p, ") VALUES (");
 	p += strlen(p);
 
-	for(i=1, curCol=0; curCol<row->getColumnCount(); curCol++) {
-		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE) || row->getType(curCol) == TYPE_VARCHAR_SIZE)
-			continue;
+	for(i = 0; i < columnsToProcess.size(); i++) {
+		curCol = columnsToProcess[i];
 
 		if(isFirstColumn) {
 			isFirstColumn = false;
@@ -399,10 +474,9 @@ int SQLSource::prepareWriteQuery() {
 				break;
 		}
 		ParameterInfo* paramInfo = initParameter(curCol, bufferSize);
-		int result = SQLBindParameter(hstmt, i, SQL_PARAM_INPUT, columnType, dbType, columnSize, precision, paramInfo->data, 0, &paramInfo->dataSizeOrInd);
+		int result = SQLBindParameter(hstmt, i+1, SQL_PARAM_INPUT, columnType, dbType, columnSize, precision, paramInfo->data, 0, &paramInfo->dataSizeOrInd);
 		if(checkSqlResult(result, "prepareWriteQuery.SQLBindParameter"))
 			return ENOEXEC;
-		i++;
 	}
 
 	strcpy(p, ");");
@@ -415,10 +489,10 @@ int SQLSource::prepareWriteRowQuery() {
 	IRowManipulator *row = getRowManipulator();
 	void *buffer;
 	int curCol, count;
+	size_t i;
 
-	for(curCol = 0; curCol < row->getColumnCount(); curCol++) {
-		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE) || row->getType(curCol) == TYPE_VARCHAR_SIZE)
-			continue;
+	for(i = 0; i < columnsToProcess.size(); i++) {
+		curCol = columnsToProcess[i];
 
 		count = row->getDataCount(curCol);
 		buffer = row->getValuePtr(curCol);
@@ -481,12 +555,13 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 	IRowManipulator *row = getRowManipulator();
 	void *buffer;
 	int curCol, columnIndex, dummy;
+	size_t i;
 	SQLLEN dataSize;
 	SQLLEN isDataNull;
 
-	for(curCol=0, columnIndex=0; curCol<row->getColumnCount(); curCol++) {
-		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE)) continue;
-		columnIndex++;	//do not count ignored columns
+	for(i = 0; i < columnsToProcess.size(); i++) {
+		curCol = columnsToProcess[i];
+		columnIndex = i + 1;
 
 		//Special handling for varchar
 		if(row->getType(curCol) != TYPE_VARCHAR_STR && row->getType(curCol) != TYPE_NVARCHAR_STR)
