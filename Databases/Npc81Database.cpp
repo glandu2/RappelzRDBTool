@@ -71,7 +71,7 @@ static FieldDescriptor df[] =
 	 {256, TYPE_CHAR, "ai_script"},
 	 {256, TYPE_CHAR, "contact_script"},
 	 {1, TYPE_INT32, "texture_group"},
-	 {1, TYPE_INT8, "unknown"}};
+	 {1, TYPE_INT8, "type"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {

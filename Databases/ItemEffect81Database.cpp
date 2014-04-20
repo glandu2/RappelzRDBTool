@@ -17,7 +17,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT8, "effect_type"},
 	 {1, TYPE_INT16, "effect_id"},
 	 {1, TYPE_INT16, "effect_level"},
-	 {1, TYPE_FLOAT64, "value_0"},
+	 {1, TYPE_FLOAT64, "value_0"},   //all values field: decimal(12,2) in DB
 	 {1, TYPE_FLOAT64, "value_1"},
 	 {1, TYPE_FLOAT64, "value_2"},
 	 {1, TYPE_FLOAT64, "value_3"},
@@ -37,7 +37,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_FLOAT64, "value_17"},
 	 {1, TYPE_FLOAT64, "value_18"},
 	 {1, TYPE_FLOAT64, "value_19"},
-	 {1, TYPE_INT32, "effect_id2"}};
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE, "unknown"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
@@ -50,6 +50,8 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 	if(mode == DCT_Read && dst == DF_RDB) {
 		*static_cast<int*>(row->getValuePtr("min_level")) = 0;
 		*static_cast<int*>(row->getValuePtr("max_level")) = 0;
+	} else if(mode == DCT_Read && dst == DF_SQL) {
+		*static_cast<int*>(row->getValuePtr("unknown")) = 0;
 	}
 }
 

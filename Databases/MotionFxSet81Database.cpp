@@ -53,7 +53,7 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 
 #pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
 EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {
-	return "MonsterFxSet";
+	return "MotionFXSet";
 }
 
 #ifdef __cplusplus

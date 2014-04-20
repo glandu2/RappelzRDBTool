@@ -1,3 +1,4 @@
+#include "IRowManipulator.h"
 #include "DataType.h"
 #include "ExportDLL.h"
 #include <stdlib.h>
@@ -67,16 +68,16 @@ static FieldDescriptor df[] =
 	 {256, TYPE_CHAR, "sun_texture_file"},
 	 {256, TYPE_CHAR, "moon_texture_file"},
 	 {256, TYPE_CHAR, "cloud_texture_file"},
-	 {1, TYPE_INT32, "bgm1_id"},
-	 {1, TYPE_INT32, "bgm2_id"},
-	 {1, TYPE_INT32, "bgm3_id"},
+	 {1, TYPE_INT32, "bgm1_ID"},
+	 {1, TYPE_INT32, "bgm2_ID"},
+	 {1, TYPE_INT32, "bgm3_ID"},
 	 {1, TYPE_INT32, "bgm1_ratio"},
 	 {1, TYPE_INT32, "bgm2_ratio"},
 	 {1, TYPE_INT32, "bgm3_ratio"},
-	 {1, TYPE_INT32, "environmental_sound1_id"},
-	 {1, TYPE_INT32, "environmental_sound2_id"},
-	 {1, TYPE_INT32, "environmental_sound3_id"},
-	 {1, TYPE_INT32, "environmental_sound4_id"},
+	 {1, TYPE_INT32, "environmental_sound1_ID"},
+	 {1, TYPE_INT32, "environmental_sound2_ID"},
+	 {1, TYPE_INT32, "environmental_sound3_ID"},
+	 {1, TYPE_INT32, "environmental_sound4_ID"},
 	 {1, TYPE_INT32, "environmental_sound1_ratio"},
 	 {1, TYPE_INT32, "environmental_sound2_ratio"},
 	 {1, TYPE_INT32, "environmental_sound3_ratio"},
@@ -84,9 +85,9 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "environmental_sound_reverb"},
 	 {1, TYPE_INT32, "environmental_sound_volume"},
 	 {1, TYPE_INT32, "environmental_sound_equalizer"},
-	 {1, TYPE_INT16, "minimap_ani_file_id"},
-	 {1, TYPE_INT16, "worldmap_ani_file_id"},
-	 {1, TYPE_INT8, "unknownvalue0"},
+	 {1, TYPE_INT16, "minimap_ani_file_ID"},
+	 {1, TYPE_INT16, "worldmap_ani_file_ID"},
+	 {1, TYPE_INT8 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknownvalue0"},
 	 {1, TYPE_INT32, "zoom_map_type"},
 	 {1, TYPE_INT32, "display_positoin_x"},
 	 {1, TYPE_INT32, "display_positoin_y"},
@@ -95,7 +96,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "offset_y"},
 	 {1, TYPE_INT32, "size_x"},
 	 {1, TYPE_INT32, "size_y"},
-	 {1, TYPE_INT32, "blank_resource_id"},
+	 {1, TYPE_INT32, "blank_resource_ID"},
 	 {1, TYPE_INT32, "blank_a"},
 	 {1, TYPE_INT32, "blank_r"},
 	 {1, TYPE_INT32, "blank_g"},
@@ -216,6 +217,12 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"aurora_h\0";
 }
 
+#pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
+	if(mode == DCT_Read && dst != DF_RDB) {
+		*static_cast<char*>(row->getValuePtr("unknownvalue0")) = 0;
+	}
+}
 
 #pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
 EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {

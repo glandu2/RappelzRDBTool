@@ -9,12 +9,12 @@ extern "C" {
 #endif
 
 static FieldDescriptor df[] =
-	{{1, TYPE_INT32 | TYPE_RDBIGNORE, "lvl"},
-	 {1, TYPE_INT64, "normal_exp"},
-	 {1, TYPE_INT32, "jl1"},
-	 {1, TYPE_INT32, "jl2"},
-	 {1, TYPE_INT32, "jl3"},
-	 {1, TYPE_INT32, "jl4"}};
+	{{1, TYPE_INT32 | TYPE_RDBIGNORE, "level"},
+	 {1, TYPE_INT64, "exp"},
+	 {1, TYPE_INT32, "jp_0"},
+	 {1, TYPE_INT32, "jp_1"},
+	 {1, TYPE_INT32, "jp_2"},
+	 {1, TYPE_INT32, "jp_3"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {

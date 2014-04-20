@@ -1,3 +1,4 @@
+#include "IRowManipulator.h"
 #include "DataType.h"
 #include "ExportDLL.h"
 #include <stdlib.h>
@@ -12,7 +13,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "type"},
 	 {1, TYPE_INT32, "name_id"},
 	 {1, TYPE_INT32, "cage_id"},
-	 {1, TYPE_INT32, "rate"},
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE, "rate"},
 	 {1, TYPE_FLOAT32, "size"},
 	 {1, TYPE_FLOAT32, "scale"},
 	 {1, TYPE_FLOAT32, "target_fx_size"},
@@ -33,6 +34,17 @@ static FieldDescriptor df[] =
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
+}
+
+#pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
+	if(mode == DCT_Read && dst == DF_SQL) {
+		int id = *static_cast<int*>(row->getValuePtr("id"));
+		if(id >= 500 && id < 600)
+			*static_cast<int*>(row->getValuePtr("rate")) = 21;
+		else
+			*static_cast<int*>(row->getValuePtr("rate")) = 5;
+	}
 }
 
 #ifdef __cplusplus

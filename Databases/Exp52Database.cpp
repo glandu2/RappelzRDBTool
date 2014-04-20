@@ -1,3 +1,4 @@
+#include "IRowManipulator.h"
 #include "DataType.h"
 #include "ExportDLL.h"
 #include <stdlib.h>
@@ -8,11 +9,12 @@ extern "C" {
 #endif
 
 static FieldDescriptor df[] =
-	{{1, TYPE_INT16, "enhance_level"},
-	 {1, TYPE_FLOAT32, "stat_amplify"},
-	 {1, TYPE_INT16, "card_durability"},
-	 {1, TYPE_INT16, "slot_amount"},
-	 {1, TYPE_INT16, "jp_addition"}};
+	{{1, TYPE_INT32 | TYPE_RDBIGNORE, "level"},
+	 {1, TYPE_INT64, "normal_exp"},
+	 {1, TYPE_INT32, "jl1"},
+	 {1, TYPE_INT32, "jl2"},
+	 {1, TYPE_INT32, "jl3"},
+	 {1, TYPE_INT32, "jl4"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
@@ -20,9 +22,16 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
+	if(mode == DCT_Read && dst == DF_RDB) {
+		*static_cast<int*>(row->getValuePtr("lvl")) = rowNum + 1;
+	}
+}
+
 #pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
 EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {
-	return "CreatureEnhance";
+	return "LevelResource";
 }
 
 #ifdef __cplusplus

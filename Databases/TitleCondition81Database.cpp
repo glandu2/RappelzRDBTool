@@ -8,13 +8,12 @@ extern "C" {
 #endif
 
 static FieldDescriptor df[] =
-	{{1, TYPE_INT32, "id"},
+	{{1, TYPE_INT32, "title_id"},
 	 {1, TYPE_INT32, "sub_id"},
 	 {1, TYPE_INT32, "group_id"},
-	 {1, TYPE_INT32, "condition_type"},
-	 {1, TYPE_INT32, "condition_opt_0"},
-	 {1, TYPE_INT32, "condition_opt_1"},
-	 {1, TYPE_INT8, "visible_if_0"}};
+	 {1, TYPE_INT32, "condition_type_id"},
+	 {1, TYPE_INT64, "count"},
+	 {1, TYPE_BIT, "is_archieve_condition"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {

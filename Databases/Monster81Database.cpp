@@ -76,7 +76,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "gold_max_2"},
 	 {1, TYPE_INT32, "chaos_min_2"},
 	 {1, TYPE_INT32, "chaos_max_2"},
-	 {1, TYPE_INT32, "item_drop_table_id"},
+	 {1, TYPE_INT32, "drop_table_link_id"},
 	 {1, TYPE_INT32, "texture_group"},
 	 {1, TYPE_INT32, "local_flag"},
 	 {256, TYPE_CHAR, "model"},
@@ -210,7 +210,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"gold_max_2\0"
 			"chaos_min_2\0"
 			"chaos_max_2\0"
-			"item_drop_table_id\0"
+			"drop_table_link_id\0"
 			"texture_group\0"
 			"local_flag\0"
 			"script_on_dead\0";

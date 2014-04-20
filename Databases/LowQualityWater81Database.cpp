@@ -61,6 +61,11 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 	}
 }
 
+#pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {
+	return "LowQualityWater";
+}
+
 #ifdef __cplusplus
 }
 #endif

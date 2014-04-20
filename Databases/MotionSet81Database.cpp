@@ -115,6 +115,11 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {
+	return "MotionSet";
+}
+
 #ifdef __cplusplus
 }
 #endif
