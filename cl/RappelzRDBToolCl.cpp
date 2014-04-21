@@ -16,7 +16,7 @@
 /*
  * TODO:
  * - Continuer changement mode d'exportation + nouvelle utilisation de Database avec ExternDescriptedDatabase
- * - Faire un acces public pour les données (RowManipulator + choix colonne)
+ * - Faire un acces public pour les donnees (RowManipulator + choix colonne)
  */
 
 /*
