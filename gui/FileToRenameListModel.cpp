@@ -20,12 +20,11 @@ FileToRenameListModel::FileToRenameListModel(QObject *parent) :
 	while((value = Settings::getSettings()->value((optionGroupName + "/filepath/%1").arg(i)).toString()).isNull() == false) {
 		QFileInfo targetFileInfo(value);
 
-		if(targetFileInfo.isFile() && targetFileInfo.exists()) {
-			FileInfo fileInfo;
-			fileInfo.filename = targetFileInfo.absoluteFilePath();
-			fileInfo.isHashed = isHashedName(targetFileInfo.fileName());
-			fileList.append(fileInfo);
-		}
+		FileInfo fileInfo;
+		fileInfo.filename = targetFileInfo.absoluteFilePath();
+		fileInfo.isHashed = isHashedName(targetFileInfo.fileName());
+		fileList.append(fileInfo);
+
 		i++;
 	}
 }
