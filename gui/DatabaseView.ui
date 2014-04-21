@@ -22,6 +22,9 @@
      <property name="statusTip">
       <string comment="Statusbar text when hovering the DB description combobox list">Select the database structure to use and then click &quot;Load&quot;</string>
      </property>
+     <property name="maxVisibleItems">
+      <number>20</number>
+     </property>
     </widget>
    </item>
    <item row="0" column="5">
