@@ -59,10 +59,17 @@ void HashConverterDialog::addFile() {
 	}
 }
 
+static bool compareIndexAsc(const QModelIndex& i1, const QModelIndex& i2) {
+	//i1 is before i2 if it has a greater row index
+	return i1.row() > i2.row();
+}
+
 void HashConverterDialog::removeFile() {
 	QModelIndexList indices = ui->filesToRenameTable->selectionModel()->selectedRows();
 	QModelIndex index;
 
+	//We must remove latest entries before first one (to keep indices valid)
+	qSort(indices.begin(), indices.end(), &compareIndexAsc);
 	foreach(index, indices) {
 		if(index.isValid())
 			fileListmodel->remove(index.row());

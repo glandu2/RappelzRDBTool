@@ -72,10 +72,17 @@ void DatabaseDescManageDialog::onAdd() {
 	}
 }
 
+static bool compareIndexAsc(const QModelIndex& i1, const QModelIndex& i2) {
+	//i1 is before i2 if it has a greater row index
+	return i1.row() > i2.row();
+}
+
 void DatabaseDescManageDialog::onRemove() {
 	QModelIndexList indices = ui->dbDescTable->selectionModel()->selectedRows();
 	QModelIndex index;
 
+	//We must remove latest entries before first one (to keep indices valid)
+	qSort(indices.begin(), indices.end(), &compareIndexAsc);
 	foreach(index, indices) {
 		if(index.isValid())
 			dbDescriptionModel->remove(index.row());

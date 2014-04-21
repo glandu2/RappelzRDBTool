@@ -7,7 +7,7 @@
 #include <QDir>
 #include <QFileInfoList>
 
-bool compareDbDescriptionNameLessThan(IDatabaseDescription* a, IDatabaseDescription* b) {
+static bool compareDbDescriptionNameLessThan(IDatabaseDescription* a, IDatabaseDescription* b) {
 	return strcmp(a->getFilename(), b->getFilename()) < 0;
 }
 
