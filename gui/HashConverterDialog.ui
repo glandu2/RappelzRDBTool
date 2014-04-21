@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
-    <height>266</height>
+    <width>496</width>
+    <height>278</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string comment="Title of the dialogbox">Hash / Name converter</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="nameEdit"/>
+   </item>
    <item row="2" column="0" colspan="2">
     <widget class="QLabel" name="filesToRenameLabel">
      <property name="text">
@@ -24,30 +27,10 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="hashToNameButton">
-     <property name="text">
-      <string comment="Button text">Hash &gt; Name</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="hashEdit"/>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="nameEdit"/>
-   </item>
-   <item row="3" column="2">
-    <widget class="QPushButton" name="addButton">
-     <property name="text">
-      <string comment="Button to add files to rename list">Add</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="2">
+   <item row="7" column="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -60,10 +43,61 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="2">
-    <widget class="QPushButton" name="removeButton">
+   <item row="6" column="2">
+    <widget class="QProgressBar" name="renameProgress">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>1</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string comment="File hash rename progress bar tooltip">Progress</string>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="textVisible">
+      <bool>false</bool>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+     <property name="format">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="addButton">
      <property name="text">
-      <string comment="Button to remove files to rename list">Remove</string>
+      <string comment="Button to add files to rename list">Add</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QPushButton" name="renameButton">
+     <property name="text">
+      <string comment="Button to rename files in rename list">Rename files</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="hashToNameButton">
+     <property name="text">
+      <string comment="Button text">Hash &gt; Name</string>
      </property>
      <property name="autoDefault">
       <bool>false</bool>
@@ -90,6 +124,26 @@
      </property>
     </widget>
    </item>
+   <item row="8" column="2">
+    <widget class="QPushButton" name="closeButton">
+     <property name="text">
+      <string comment="Button text">Close</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="removeButton">
+     <property name="text">
+      <string comment="Button to remove files to rename list">Remove</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="nameLabel">
      <property name="text">
@@ -100,36 +154,40 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="hashEdit"/>
-   </item>
-   <item row="5" column="2">
-    <widget class="QPushButton" name="renameButton">
-     <property name="text">
-      <string comment="Button to rename files in rename list">Rename files</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="2">
-    <widget class="QPushButton" name="closeButton">
-     <property name="text">
-      <string comment="Button text">Close</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" rowspan="5" colspan="2">
+   <item row="3" column="0" rowspan="6" colspan="2">
     <widget class="QTableView" name="filesToRenameTable">
+     <property name="autoScroll">
+      <bool>false</bool>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="verticalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+     <property name="cornerButtonEnabled">
+      <bool>false</bool>
+     </property>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>70</number>
+     </attribute>
      <attribute name="horizontalHeaderHighlightSections">
       <bool>false</bool>
      </attribute>
      <attribute name="horizontalHeaderMinimumSectionSize">
-      <number>150</number>
+      <number>70</number>
      </attribute>
      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
       <bool>false</bool>

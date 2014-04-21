@@ -78,6 +78,12 @@
    </item>
    <item row="1" column="0" rowspan="4">
     <widget class="QTableView" name="dbDescTable">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
@@ -86,6 +92,12 @@
      </property>
      <property name="horizontalScrollMode">
       <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+     <property name="cornerButtonEnabled">
+      <bool>false</bool>
      </property>
      <attribute name="horizontalHeaderHighlightSections">
       <bool>false</bool>
