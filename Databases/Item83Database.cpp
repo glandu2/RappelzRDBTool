@@ -330,7 +330,7 @@ static ArenaPoints arenaPoints[] =
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	if(mode == DCT_Write && dst == DF_RDB) {
+	if(mode == DCT_Read && dst != DF_RDB) {
 		char *catValue = static_cast<char*>(row->getValuePtr("unkCatValue"));
 		catValue[0] = 'C';
 		catValue[1] = 'a';

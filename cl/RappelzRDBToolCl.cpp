@@ -67,7 +67,7 @@ void DLLCALLCONV progressPercentage(void *arg, int rowProceed, int totalRows) {
 	if(totalRows && newPercentage != lastPercentage) {
 		int i;
 		for(i=0; i<(newPercentage - lastPercentage); i++)
-			fputc('\xDB', stderr);
+			fputc('\xDB', stdout);
 		lastPercentage = newPercentage;
 	}
 	/*if(rowProceed == totalRows) {
@@ -75,7 +75,7 @@ void DLLCALLCONV progressPercentage(void *arg, int rowProceed, int totalRows) {
 		CONSOLE_SCREEN_BUFFER_INFO conInfo;
 		GetConsoleScreenBufferInfo(consoleHandle, &conInfo);
 		if(conInfo.dwCursorPosition.X != 0)
-			fputc('\n', stderr);
+			fputc('\n', stdout);
 	}*/
 }
 
@@ -107,7 +107,8 @@ void help(const char *arg) {
 			   "Notes:\n"
 			   " -CSV is read on standard input and written on standard output (screen), use pipes to redirect.\n"
 			   " - For more information about --src-<sqltype> and --dst-<sqltype>, type \""APPNAME" --help sql_opt\"\n"
-			   " -SQL ODBC Server are configurable with odbcad32, type \""APPNAME" --help  sql_opt\" to show all recognized sql servers\n");
+			   " -SQL ODBC Server are configurable with odbcad32, type \""APPNAME" --help  sql_opt\" to show all recognized sql servers\n"
+			   " -If the file name or table name after --src-<type> or --dst-<type> is omitted, the default name is used\n");
 }
 
 void tempFunction(IDatabase *database) {
@@ -211,40 +212,72 @@ int main(int argc, char *argv[])
 			i++;
 		}
 		//Source
-		else if(!strcmp(argv[i], "--src-csv") && (i+1) < argc) {
-			source = argv[i+1];
+		else if(!strcmp(argv[i], "--src-csv")) {
+			if((i+1) >= argc || argv[i+1][0] == '-')
+				source = NULL;
+			else {
+				source = argv[i+1];
+				i++;
+			}
 			sType = mDF_CSV;
-			i++;
-		} else if(!strcmp(argv[i], "--src-rdb") && (i+1) < argc) {
-			source = argv[i+1];
+		} else if(!strcmp(argv[i], "--src-rdb")) {
+			if((i+1) >= argc || argv[i+1][0] == '-')
+				source = NULL;
+			else {
+				source = argv[i+1];
+				i++;
+			}
 			sType = mDF_RDB;
-			i++;
-		} else if(!strcmp(argv[i], "--src-sqlserver") && (i+1) < argc) {
-			source = argv[i+1];
+		} else if(!strcmp(argv[i], "--src-sqlserver")) {
+			if((i+1) >= argc || argv[i+1][0] == '-')
+				source = NULL;
+			else {
+				source = argv[i+1];
+				i++;
+			}
 			sType = mDF_SQLServer;
-			i++;
-		} else if(!strcmp(argv[i], "--src-sqlpostgres") && (i+1) < argc) {
-			source = argv[i+1];
+		} else if(!strcmp(argv[i], "--src-sqlpostgres")) {
+			if((i+1) >= argc || argv[i+1][0] == '-')
+				source = NULL;
+			else {
+				source = argv[i+1];
+				i++;
+			}
 			sType = mDF_SQLPostgres;
-			i++;
 		}
 		//Destination
-		else if(!strcmp(argv[i], "--dst-csv") && (i+1) < argc) {
-			dest = argv[i+1];
+		else if(!strcmp(argv[i], "--dst-csv")) {
+			if((i+1) >= argc || argv[i+1][0] == '-')
+				dest = NULL;
+			else {
+				dest = argv[i+1];
+				i++;
+			}
 			dType = mDF_CSV;
-			i++;
-		} else if(!strcmp(argv[i], "--dst-rdb") && (i+1) < argc) {
-			dest = argv[i+1];
+		} else if(!strcmp(argv[i], "--dst-rdb")) {
+			if((i+1) >= argc || argv[i+1][0] == '-')
+				dest = NULL;
+			else {
+				dest = argv[i+1];
+				i++;
+			}
 			dType = mDF_RDB;
-			i++;
-		} else if(!strcmp(argv[i], "--dst-sqlserver") && (i+1) < argc) {
-			dest = argv[i+1];
+		} else if(!strcmp(argv[i], "--dst-sqlserver")) {
+			if((i+1) >= argc || argv[i+1][0] == '-')
+				dest = NULL;
+			else {
+				dest = argv[i+1];
+				i++;
+			}
 			dType = mDF_SQLServer;
-			i++;
-		} else if(!strcmp(argv[i], "--dst-sqlpostgres") && (i+1) < argc) {
-			dest = argv[i+1];
+		} else if(!strcmp(argv[i], "--dst-sqlpostgres")) {
+			if((i+1) >= argc || argv[i+1][0] == '-')
+				dest = NULL;
+			else {
+				dest = argv[i+1];
+				i++;
+			}
 			dType = mDF_SQLPostgres;
-			i++;
 		}
 		//SQL options
 		else if(!strcmp(argv[i], "--sql-user") && (i+1) < argc) {
@@ -262,6 +295,12 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	char buffer[512];
+	if(source == NULL)
+		source = buffer;
+	if(dest == NULL)
+		dest = buffer;
+
 	if(!database) {
 		fprintf(stderr, "You must specify the database structure DLL to use with --dbtype\n");
 		return 6;
@@ -274,18 +313,22 @@ int main(int argc, char *argv[])
 
 	switch(sType) {
 		case mDF_CSV:
+			sprintf(buffer, "%s.csv", database->getDatabaseDescription()->getDefaultFileName());
 			result = database->readData(DST_CSV, source, progressPercentage);
 			break;
 
 		case mDF_RDB:
+			sprintf(buffer, "%s.rdb", database->getDatabaseDescription()->getDefaultFileName());
 			result = database->readData(DST_RDB, source, progressPercentage);
 			break;
 
 		case mDF_SQLServer:
+			sprintf(buffer, "Arcadia.dbo.%s", database->getDatabaseDescription()->getDefaultTableName());
 			result = database->readData(DST_SQLServer, source, progressPercentage, NULL, sqlServer, sqlUser, sqlPassword);
 			break;
 
 		case mDF_SQLPostgres:
+			sprintf(buffer, "Arcadia.%s", database->getDatabaseDescription()->getDefaultTableName());
 			result = database->readData(DST_SQLPostgres, source, progressPercentage, NULL, sqlServer, sqlUser, sqlPassword);
 			break;
 	}
@@ -295,20 +338,24 @@ int main(int argc, char *argv[])
 	}
 	switch(dType) {
 		case mDF_CSV:
+			sprintf(buffer, "%s.csv", database->getDatabaseDescription()->getDefaultFileName());
 			if(!strcmp(dest, "con"))
 				printWritePercentage = false;
 			result = database->writeData(DST_CSV, dest, progressPercentage);
 			break;
 
 		case mDF_RDB:
+			sprintf(buffer, "%s.rdb", database->getDatabaseDescription()->getDefaultFileName());
 			result = database->writeData(DST_RDB, dest, progressPercentage);
 			break;
 
 		case mDF_SQLServer:
+			sprintf(buffer, "Arcadia.dbo.%s", database->getDatabaseDescription()->getDefaultTableName());
 			result = database->writeData(DST_SQLServer, dest, progressPercentage, NULL, sqlServer, sqlUser, sqlPassword);
 			break;
 
 		case mDF_SQLPostgres:
+			sprintf(buffer, "Arcadia.%s", database->getDatabaseDescription()->getDefaultTableName());
 			result = database->writeData(DST_SQLPostgres, dest, progressPercentage, NULL, sqlServer, sqlUser, sqlPassword);
 			break;
 	}

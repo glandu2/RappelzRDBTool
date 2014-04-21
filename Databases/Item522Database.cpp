@@ -58,11 +58,11 @@ static FieldDescriptor df[] =
 	 {1, TYPE_BIT, "flag_storage"},
 	 {1, TYPE_BIT, "flag_enhance"},
 	 {1, TYPE_BIT, "flag_use"},
-	 {1, TYPE_BIT, "flag_card"},
-	 {1, TYPE_BIT, "flag_socket"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_card"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_socket"},
 	 {1, TYPE_BIT, "flag_duplicate"},  //7
 	 {1, TYPE_BIT, "flag_target_use"},
-	 {1, TYPE_BIT, "flag_warp"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_warp"},
 	 {1, TYPE_BIT, "flag_trade"},
 	 {1, TYPE_BIT, "flag_sell"},
 	 {1, TYPE_BIT, "flag_quest"},
@@ -70,15 +70,15 @@ static FieldDescriptor df[] =
 	 {1, TYPE_BIT, "flag_riding"},
 	 {1, TYPE_BIT, "flag_drop"},
 	 {1, TYPE_BIT, "flag_move"},
-	 {1, TYPE_BIT, "flag_quest_distribute"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_quest_distribute"},
 	 {1, TYPE_BIT, "flag_sit"},
 	 {1, TYPE_BIT, "flag_raid"},
 	 {1, TYPE_BIT, "flag_secroute"},
 	 {1, TYPE_BIT, "flag_eventmap"},
 	 {1, TYPE_BIT, "flag_huntaholic"},
-	 {1, TYPE_BIT, "flag_huntaholic_useable_only"},
-	 {1, TYPE_BIT, "flag_deathmatch"},
-	 {1, TYPE_BIT, "flag_deathmatch_useable_only"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_huntaholic_useable_only"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_deathmatch"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_deathmatch_useable_only"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv10"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv11"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv12"},
@@ -127,7 +127,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "state_id"},
 	 {1, TYPE_INT32, "state_level"},
 	 {1, TYPE_INT32, "state_time"},
-	 {1, TYPE_INT8, "state_type?"},
+	 {1, TYPE_INT8, "state_type"},
 	 {1, TYPE_INT32, "cool_time"},
 	 {1, TYPE_INT16, "cool_time_group"},
 	 {1, TYPE_INT32, "available_period"},
@@ -184,7 +184,6 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"wear_type\0"
 			"set_id\0"
 			"set_part_flag\0"
-//			"grade\0"
 			"rank\0"
 			"level\0"
 			"enhance\0"
@@ -193,7 +192,6 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"limit_deva\0"
 			"limit_asura\0"
 			"limit_gaia\0"
-//			"job_depth\0"
 			"limit_fighter\0"
 			"limit_hunter\0"
 			"limit_magician\0"
@@ -206,30 +204,28 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"weight\0"
 			"price\0"
 			"huntaholic_point\0"
-//			"ethereal_durability\0"
 			"endurance\0"
 			"material\0"
 			"summon_id\0"
-			"item_use_flag\0"
-//			"flag_cashitem\0"
-//			"flag_wear\0"
-//			"flag_use\0"
-//			"flag_target_use\0"
-//			"flag_duplicate\0"
-//			"flag_drop\0"
-//			"flag_trade\0"
-//			"flag_sell\0"
-//			"flag_storage\0"
-//			"flag_overweight\0"
-//			"flag_riding\0"
-//			"flag_move\0"
-//			"flag_sit\0"
-//			"flag_enhance\0"
-//			"flag_quest\0"
-//			"flag_raid\0"
-//			"flag_secroute\0"
-//			"flag_eventmap\0"
-//			"flag_huntaholic\0"
+			"flag_cashitem\0"
+			"flag_wear\0"
+			"flag_use\0"
+			"flag_target_use\0"
+			"flag_duplicate\0"
+			"flag_drop\0"
+			"flag_trade\0"
+			"flag_sell\0"
+			"flag_storage\0"
+			"flag_overweight\0"
+			"flag_riding\0"
+			"flag_move\0"
+			"flag_sit\0"
+			"flag_enhance\0"
+			"flag_quest\0"
+			"flag_raid\0"
+			"flag_secroute\0"
+			"flag_eventmap\0"
+			"flag_huntaholic\0"
 			"available_period\0"
 			"decrease_type\0"
 			"throw_range\0"
@@ -258,7 +254,6 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"opt_type_3\0"
 			"opt_var1_3\0"
 			"opt_var2_3\0"
-//			"effect_id\0"
 			"enhance_0_id\0"
 			"enhance_0_01\0"
 			"enhance_0_02\0"
@@ -301,7 +296,6 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"model_15\0"
 			"model_16\0"
 			"model_17\0"
-//			"texture_filename\0"
 			"drop_type\0"
 			"icon_id\0"
 			"icon_file_name\0"
@@ -310,7 +304,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	if(mode == DCT_Write && dst == DF_RDB) {
+	if(mode == DCT_Read && dst != DF_RDB) {
 		char *catValue = static_cast<char*>(row->getValuePtr("unkCatValue"));
 		catValue[0] = 'y';
 		catValue[1] = ' ';
@@ -324,6 +318,16 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 			sprintf(nvValues, "nv%d", i);
 			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
 		}
+	}
+
+	if(mode == DCT_Read && dst == DF_SQL) {
+		*static_cast<char*>(row->getValuePtr("flag_card")) = 0;
+		*static_cast<char*>(row->getValuePtr("flag_socket")) = 0;
+		*static_cast<char*>(row->getValuePtr("flag_warp")) = 0;
+		*static_cast<char*>(row->getValuePtr("flag_quest_distribute")) = 0;
+		*static_cast<char*>(row->getValuePtr("flag_huntaholic_useable_only")) = 0;
+		*static_cast<char*>(row->getValuePtr("flag_deathmatch")) = 0;
+		*static_cast<char*>(row->getValuePtr("flag_deathmatch_useable_only")) = 0;
 	}
 }
 

@@ -147,7 +147,7 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 			break;
 
 		case TYPE_INT16:
-			return QVariant::fromValue(*(short*)buffer);
+			return QVariant::fromValue((int)*(short*)buffer);
 			break;
 
 		case TYPE_FLOAT32:

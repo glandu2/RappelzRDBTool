@@ -23,7 +23,7 @@ namespace RappelzRDBBase {
 
 FieldOrder Database::getFieldOrderFromColumnName(DataDescriptor *dataDescription, const char *columns) {
 	FieldOrder fo;
-	int i;
+	size_t i;
 	const char *p;
 
 	if(!columns) {

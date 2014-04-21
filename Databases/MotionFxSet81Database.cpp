@@ -20,7 +20,7 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT8 | TYPE_SQLIGNORE, "is_effect0"},
 	 {1, TYPE_INT8 | TYPE_SQLIGNORE, "is_effect1"},
 	 {1, TYPE_INT8 | TYPE_SQLIGNORE, "is_effect2"},
-	 {1, TYPE_INT8 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "unknown0"},
+	 {1, TYPE_INT8 | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "unknown0"},
 	 {1, TYPE_INT32, "sound_start_file_ID"},
 	 {1, TYPE_INT32, "sound_middle_file_ID"},
 	 {1, TYPE_INT32, "sound_end_file_ID"},
@@ -46,8 +46,22 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
-		*static_cast<int*>(row->getValuePtr("unknown0")) = 0;
+		*static_cast<int*>(row->getValuePtr("unknown0")) = 1;
 		strncpy(static_cast<char*>(row->getValuePtr("kagValue")), "kag", 3);
+
+		if(dst == DF_SQL) {
+			*static_cast<char*>(row->getValuePtr("is_effect0")) = *static_cast<int*>(row->getValuePtr("graphic_effect_start_file_ID")) != 0;
+			*static_cast<char*>(row->getValuePtr("is_effect1")) = *static_cast<int*>(row->getValuePtr("graphic_effect_middle_file_ID")) != 0;
+			*static_cast<char*>(row->getValuePtr("is_effect2")) = *static_cast<int*>(row->getValuePtr("graphic_effect_end_file_ID")) != 0;
+
+			*static_cast<char*>(row->getValuePtr("is_sound0")) = *static_cast<int*>(row->getValuePtr("sound_start_file_ID")) != 0;
+			*static_cast<char*>(row->getValuePtr("is_sound1")) = *static_cast<int*>(row->getValuePtr("sound_middle_file_ID")) != 0;
+			*static_cast<char*>(row->getValuePtr("is_sound2")) = *static_cast<int*>(row->getValuePtr("sound_end_file_ID")) != 0;
+
+			*static_cast<char*>(row->getValuePtr("sound_option0")) = 0;
+			*static_cast<char*>(row->getValuePtr("sound_option1")) = 0;
+			*static_cast<char*>(row->getValuePtr("sound_option2")) = 0;
+		}
 	}
 }
 

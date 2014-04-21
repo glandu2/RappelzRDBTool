@@ -73,17 +73,18 @@ int CSVSource::open(const char* source, eOpenMode openMode,  const char* locatio
 		csvFile = fopen(source, "wb");
 	}
 
-	if(csvFile != stdin && csvFile != stdout) {
-		io_buffer = malloc(65536);
-		setvbuf(csvFile, (char*)io_buffer, _IOFBF, 65536);
-	}
-
 	if(!csvFile) {
 		if(errno == ENOENT)
 			return ENOENT;
 		else
 			return EIO;
 	}
+
+	if(csvFile != stdin && csvFile != stdout) {
+		io_buffer = malloc(65536);
+		setvbuf(csvFile, (char*)io_buffer, _IOFBF, 65536);
+	}
+
 
 	return 0;
 }
@@ -108,7 +109,7 @@ int CSVSource::prepareWrite(IRowManipulator *row, unsigned int rowNumber) {
 		else fputc('\t', csvFile);
 		fprintf(csvFile, "%s", row->getColumnName(curCol));
 	}
-	putc('\n', csvFile);
+	fputc('\n', csvFile);
 	return 0;
 }
 
@@ -144,7 +145,7 @@ int CSVSource::readRow() {
 		}
 		*tabpos = 0;
 
-		if(row->getType(curCol) == TYPE_VARCHAR_STR)
+		if(row->getType(curCol) == TYPE_VARCHAR_STR || row->getType(curCol) == TYPE_NVARCHAR_STR)
 			row->initData(curCol, strlen(readptr)+1);
 		else row->initData(curCol);
 
@@ -162,7 +163,13 @@ int CSVSource::readRow() {
 			case TYPE_DECIMAL: {
 				double decimalTemp;
 				sscanf(readptr, "%lf", &decimalTemp);
-				*(int*)buffer = (int)(decimalTemp*pow(10.0, row->getDataIndex(curCol)) + 0.5);
+
+				decimalTemp = decimalTemp*pow((float)10, row->getDataIndex(curCol));
+				if(decimalTemp < 0)
+					decimalTemp -= 0.5;
+				else
+					decimalTemp += 0.5;
+				*(int*)buffer = (int)decimalTemp;
 				break;
 			}
 
@@ -234,6 +241,7 @@ int CSVSource::writeRow() {
 				fwrite(buffer, 1, strlen((char*)buffer), csvFile);
 				break;
 
+			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
 				if(((char*)buffer)[count-1] == 0)
 					fwrite(buffer, 1, count-1, csvFile);

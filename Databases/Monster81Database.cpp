@@ -133,7 +133,7 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		*static_cast<char*>(row->getValuePtr("padding0")) = 0;
 		*static_cast<short*>(row->getValuePtr("padding1")) = 0;
 	} else if(mode == DCT_Read && DF_SQL) {
-		*static_cast<int*>(row->getValuePtr("attack_speed_type")) = 10;
+		*static_cast<int*>(row->getValuePtr("attack_speed_type")) = 15;
 	}
 }
 
@@ -171,6 +171,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"monster_type\0"
 			"stat_id\0"
 			"fight_type\0"
+			"monster_skill_link_id\0"
 			"material\0"
 			"weapon_type\0"
 			"attack_motion_speed\0"

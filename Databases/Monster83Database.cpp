@@ -293,8 +293,6 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		*value = result;
 		*static_cast<char*>(row->getValuePtr("padding0")) = 0;
 		*static_cast<short*>(row->getValuePtr("padding1")) = 0;
-	} else if(mode == DCT_Read && DF_SQL) {
-		*static_cast<int*>(row->getValuePtr("attack_speed_type")) = 10;
 	}
 }
 

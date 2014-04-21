@@ -50,7 +50,7 @@ void RowManipulator::initRow(bool initializedFields) {
 			if(this->indexedSizePtrs.size() <= index) this->indexedSizePtrs.resize(index+1, 0);
 			this->indexedSizePtrs[index] = (int*)getValuePtr(i);
 			if(initializedFields == false)
-				*this->indexedSizePtrs[index] = 0;
+				*this->indexedSizePtrs[index] = 1; //minimal size
 		}
 		this->initializedFields[i] = initializedFields;
 	}
@@ -149,7 +149,7 @@ int RowManipulator::completeRowInit() {
 	setLinearMode();
 	for(i=0; i<columnsType->numFields; i++) {
 		if(this->initializedFields[i] == false) {
-			result = initData(i, 1);	//1 = minimal size
+			result = initData(i);
 			if(result) {
 				setOrderedMode();
 				return result;

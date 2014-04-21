@@ -130,57 +130,57 @@ static FieldDescriptor df[] =
 	 {1, TYPE_FLOAT32, "var18"},
 	 {1, TYPE_FLOAT32, "var19"},
 	 {1, TYPE_FLOAT32, "var20"},
-	 {1, TYPE_INT32, "jp_cost_lv1"},
-	 {1, TYPE_INT32, "jp_cost_lv2"},
-	 {1, TYPE_INT32, "jp_cost_lv3"},
-	 {1, TYPE_INT32, "jp_cost_lv4"},
-	 {1, TYPE_INT32, "jp_cost_lv5"},
-	 {1, TYPE_INT32, "jp_cost_lv6"},
-	 {1, TYPE_INT32, "jp_cost_lv7"},
-	 {1, TYPE_INT32, "jp_cost_lv8"},
-	 {1, TYPE_INT32, "jp_cost_lv9"},
-	 {1, TYPE_INT32, "jp_cost_lv10"},
-	 {1, TYPE_INT32, "jp_cost_lv11"},
-	 {1, TYPE_INT32, "jp_cost_lv12"},
-	 {1, TYPE_INT32, "jp_cost_lv13"},
-	 {1, TYPE_INT32, "jp_cost_lv14"},
-	 {1, TYPE_INT32, "jp_cost_lv15"},
-	 {1, TYPE_INT32, "jp_cost_lv16"},
-	 {1, TYPE_INT32, "jp_cost_lv17"},
-	 {1, TYPE_INT32, "jp_cost_lv18"},
-	 {1, TYPE_INT32, "jp_cost_lv19"},
-	 {1, TYPE_INT32, "jp_cost_lv20"},
-	 {1, TYPE_INT32, "jp_cost_lv21"},
-	 {1, TYPE_INT32, "jp_cost_lv22"},
-	 {1, TYPE_INT32, "jp_cost_lv23"},
-	 {1, TYPE_INT32, "jp_cost_lv24"},
-	 {1, TYPE_INT32, "jp_cost_lv25"},
-	 {1, TYPE_INT32, "jp_cost_lv26"},
-	 {1, TYPE_INT32, "jp_cost_lv27"},
-	 {1, TYPE_INT32, "jp_cost_lv28"},
-	 {1, TYPE_INT32, "jp_cost_lv29"},
-	 {1, TYPE_INT32, "jp_cost_lv30"},
-	 {1, TYPE_INT32, "jp_cost_lv31"},
-	 {1, TYPE_INT32, "jp_cost_lv32"},
-	 {1, TYPE_INT32, "jp_cost_lv33"},
-	 {1, TYPE_INT32, "jp_cost_lv34"},
-	 {1, TYPE_INT32, "jp_cost_lv35"},
-	 {1, TYPE_INT32, "jp_cost_lv36"},
-	 {1, TYPE_INT32, "jp_cost_lv37"},
-	 {1, TYPE_INT32, "jp_cost_lv38"},
-	 {1, TYPE_INT32, "jp_cost_lv39"},
-	 {1, TYPE_INT32, "jp_cost_lv40"},
-	 {1, TYPE_INT32, "jp_cost_lv41"},
-	 {1, TYPE_INT32, "jp_cost_lv42"},
-	 {1, TYPE_INT32, "jp_cost_lv43"},
-	 {1, TYPE_INT32, "jp_cost_lv44"},
-	 {1, TYPE_INT32, "jp_cost_lv45"},
-	 {1, TYPE_INT32, "jp_cost_lv46"},
-	 {1, TYPE_INT32, "jp_cost_lv47"},
-	 {1, TYPE_INT32, "jp_cost_lv48"},
-	 {1, TYPE_INT32, "jp_cost_lv49"},
-	 {1, TYPE_INT32, "jp_cost_lv50"},
-	 {1, TYPE_INT8, "hasJPCost"},
+	 {1, TYPE_INT32, "jp_01"},
+	 {1, TYPE_INT32, "jp_02"},
+	 {1, TYPE_INT32, "jp_03"},
+	 {1, TYPE_INT32, "jp_04"},
+	 {1, TYPE_INT32, "jp_05"},
+	 {1, TYPE_INT32, "jp_06"},
+	 {1, TYPE_INT32, "jp_07"},
+	 {1, TYPE_INT32, "jp_08"},
+	 {1, TYPE_INT32, "jp_09"},
+	 {1, TYPE_INT32, "jp_10"},
+	 {1, TYPE_INT32, "jp_11"},
+	 {1, TYPE_INT32, "jp_12"},
+	 {1, TYPE_INT32, "jp_13"},
+	 {1, TYPE_INT32, "jp_14"},
+	 {1, TYPE_INT32, "jp_15"},
+	 {1, TYPE_INT32, "jp_16"},
+	 {1, TYPE_INT32, "jp_17"},
+	 {1, TYPE_INT32, "jp_18"},
+	 {1, TYPE_INT32, "jp_19"},
+	 {1, TYPE_INT32, "jp_20"},
+	 {1, TYPE_INT32, "jp_21"},
+	 {1, TYPE_INT32, "jp_22"},
+	 {1, TYPE_INT32, "jp_23"},
+	 {1, TYPE_INT32, "jp_24"},
+	 {1, TYPE_INT32, "jp_25"},
+	 {1, TYPE_INT32, "jp_26"},
+	 {1, TYPE_INT32, "jp_27"},
+	 {1, TYPE_INT32, "jp_28"},
+	 {1, TYPE_INT32, "jp_29"},
+	 {1, TYPE_INT32, "jp_30"},
+	 {1, TYPE_INT32, "jp_31"},
+	 {1, TYPE_INT32, "jp_32"},
+	 {1, TYPE_INT32, "jp_33"},
+	 {1, TYPE_INT32, "jp_34"},
+	 {1, TYPE_INT32, "jp_35"},
+	 {1, TYPE_INT32, "jp_36"},
+	 {1, TYPE_INT32, "jp_37"},
+	 {1, TYPE_INT32, "jp_38"},
+	 {1, TYPE_INT32, "jp_39"},
+	 {1, TYPE_INT32, "jp_40"},
+	 {1, TYPE_INT32, "jp_41"},
+	 {1, TYPE_INT32, "jp_42"},
+	 {1, TYPE_INT32, "jp_43"},
+	 {1, TYPE_INT32, "jp_44"},
+	 {1, TYPE_INT32, "jp_45"},
+	 {1, TYPE_INT32, "jp_46"},
+	 {1, TYPE_INT32, "jp_47"},
+	 {1, TYPE_INT32, "jp_48"},
+	 {1, TYPE_INT32, "jp_49"},
+	 {1, TYPE_INT32, "jp_50"},
+	 {1, TYPE_INT8, "unknownValue0"},
 	 {1, TYPE_INT32, "tooltip_id"},
 	 {1, TYPE_INT32, "icon_id"},
 	 {256, TYPE_CHAR, "icon_file_name"},
@@ -368,12 +368,12 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"jp_48\0"
 			"jp_49\0"
 			"jp_50\0"
-			"unknownValue\0"
 			"icon_id\0"
 			"icon_file_name\0"
 			"is_projectile\0"
 			"projectile_speed\0"
-			"projectile_acceleration\0";
+			"projectile_acceleration\0"
+			"unknownValue0\0";
 }
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
@@ -381,6 +381,11 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 	if(mode == DCT_Read && dst == DF_RDB) {
 		*static_cast<int*>(row->getValuePtr("desc_id")) = 0;
 	}
+}
+
+#pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
+EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {
+	return "SkillFullResource";
 }
 
 #ifdef __cplusplus

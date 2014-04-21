@@ -11,7 +11,7 @@ static FieldDescriptor df[] =
 	{{1, TYPE_INT32, "id"},
 	 {1, TYPE_INT32, "unknown0"},
 	 {1, TYPE_INT32, "type"},
-	 {1, TYPE_INT32, "unknown1"},
+	 {1, TYPE_INT32, "model_id"},
 	 {1, TYPE_INT32, "name_id"},
 	 {1, TYPE_INT32, "cage_id"},
 	 {1, TYPE_INT32, "rate"},

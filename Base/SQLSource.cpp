@@ -16,9 +16,9 @@ static void printOdbcStatus(SQLSMALLINT type, HSTMT hstmt) {
 	SQLSMALLINT length;
 	int i=1;
 	while ( SQLGetDiagRec( type, hstmt, i, sqlstate, &sqlcode, buffer, SQL_MAX_MESSAGE_LENGTH + 1, &length) == SQL_SUCCESS ) {
-		printf("SQLSTATE: %s\n", sqlstate);
-		printf("Native Error Code: %ld\n", sqlcode);
-		printf("buffer: %s \n\n", buffer);
+		fprintf(stderr, "SQLSTATE: %s\n", sqlstate);
+		fprintf(stderr, "Native Error Code: %ld\n", sqlcode);
+		fprintf(stderr, "buffer: %s \n\n", buffer);
 		i++;
 	}
 }
@@ -98,7 +98,7 @@ int SQLSource::open(const char* source, eOpenMode openMode,  const char* locatio
 	result = SQLConnect(hdbc, (UCHAR*)location, SQL_NTS, (UCHAR*)user, SQL_NTS, (UCHAR*)password, SQL_NTS);
 	if(!SQL_SUCCEEDED(result)) {
 		printOdbcStatus(SQL_HANDLE_DBC, hdbc);
-		printf("%d\n", result);
+		fprintf(stderr, "result was: %d\n", result);
 		SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, henv);
 		hdbc = 0;
@@ -232,7 +232,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 				if(index >= 0) {
 					columnsToProcess.push_back(index);
 				} else {
-					printf("Unknown column name: %s\n", columnName);
+					fprintf(stderr, "Unknown column name: %s\n", columnName);
 					SQLBindCol(hstmt, 1, SQL_C_CHAR, NULL, 0, NULL);
 					SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 					return ESPIPE;
@@ -242,7 +242,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 		SQLBindCol(hstmt, 1, SQL_C_CHAR, NULL, 0, NULL);
 
 		if(columnsToProcess.size() == 0) {
-			printf("No columns ! Query: %s\n", query);
+			fprintf(stderr, "No columns ! Query: %s\n", query);
 			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 			return ENOEXEC;
 		}
@@ -598,13 +598,18 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 
 			case TYPE_DECIMAL:
 			{
-				char decimalTemp[14];
-				SQLGetData(hstmt, columnIndex, SQL_C_CHAR, decimalTemp, 13, &isDataNull);
+				char decimalTemp[20];
+				SQLGetData(hstmt, columnIndex, SQL_C_CHAR, decimalTemp, 19, &isDataNull);
 				if(isDataNull == SQL_NULL_DATA) *static_cast<int*>(buffer) = 0;
 				else {
 					float decimalValue;
 					sscanf(decimalTemp, "%f", &decimalValue);
-					*static_cast<int*>(buffer) = (int)(decimalValue*pow((float)10, row->getDataIndex(curCol))+0.5);
+					decimalValue = decimalValue*pow((float)10, row->getDataIndex(curCol));
+					if(decimalValue < 0)
+						decimalValue -= 0.5;
+					else
+						decimalValue += 0.5;
+					*static_cast<int*>(buffer) = (int)decimalValue;
 				}
 				break;
 			}
