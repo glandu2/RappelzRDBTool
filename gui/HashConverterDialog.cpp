@@ -10,6 +10,7 @@ HashConverterDialog::HashConverterDialog(QWidget *parent) :
     ui(new Ui::HashConverterDialog)
 {
 	ui->setupUi(this);
+	setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
 
 	fileListmodel = new FileToRenameListModel(this);
 	ui->filesToRenameTable->setModel(fileListmodel);
@@ -20,6 +21,8 @@ HashConverterDialog::HashConverterDialog(QWidget *parent) :
 	connect(ui->addButton, SIGNAL(clicked()), this, SLOT(addFile()));
 	connect(ui->removeButton, SIGNAL(clicked()), this, SLOT(removeFile()));
 	connect(ui->renameButton, SIGNAL(clicked()), this, SLOT(renameFiles()));
+
+	ui->filesToRenameTable->resizeColumnsToContents();
 }
 
 HashConverterDialog::~HashConverterDialog()
@@ -78,12 +81,27 @@ void HashConverterDialog::removeFile() {
 
 void HashConverterDialog::renameFiles() {
 	int count = fileListmodel->getCount();
+	int i;
 
-	for(int i = 0; i < count; i++) {
+	ui->renameProgress->setValue(0);
+	ui->renameProgress->setMaximum(count);
+
+	ui->filesToRenameTable->selectionModel()->clearSelection();
+	for(i = 0; i < count; i++) {
 		QFile file(fileListmodel->getSourceFilename(i));
 		if(file.exists()) {
 			QFile::remove(fileListmodel->getTargetFilename(i));
-			file.copy(fileListmodel->getTargetFilename(i));
+			if(file.copy(fileListmodel->getTargetFilename(i))) {
+				QItemSelection addToSelection(fileListmodel->index(i, 0),
+											  fileListmodel->index(i, fileListmodel->columnCount()-1));
+
+				QItemSelection newSelection = ui->filesToRenameTable->selectionModel()->selection();
+				newSelection.merge(addToSelection, QItemSelectionModel::Select);
+				ui->filesToRenameTable->selectionModel()->select(newSelection, QItemSelectionModel::Select);
+			}
 		}
+
+		ui->renameProgress->setValue(i);
 	}
+	ui->renameProgress->setValue(i);
 }
