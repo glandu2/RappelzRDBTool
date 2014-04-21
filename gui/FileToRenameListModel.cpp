@@ -122,7 +122,10 @@ QString FileToRenameListModel::convertFilename(FileInfo fileInfo) {
 			convertHashToName(hash.constData(), name.data());
 			name.resize(name.size()-1);
 
-			return targetFileInfo.absolutePath() + "/" + name;
+			QString result = targetFileInfo.absolutePath();
+			if(!result.endsWith('/') && !result.endsWith('\\'))
+				result += '/';
+			return result + name;
 		}
 	} else {
 		QByteArray name = targetFileInfo.fileName().toLatin1();
@@ -132,7 +135,10 @@ QString FileToRenameListModel::convertFilename(FileInfo fileInfo) {
 		convertNameToHash(name.constData(), hash.data(), LEGACY_SEED);
 		hash.resize(hash.size()-1);
 
-		return targetFileInfo.absolutePath() + "/" + hash;
+		QString result = targetFileInfo.absolutePath();
+		if(!result.endsWith('/') && !result.endsWith('\\'))
+			result += '/';
+		return result + hash;
 	}
 
 	return QString();
