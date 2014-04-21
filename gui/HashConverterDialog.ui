@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>496</width>
-    <height>278</height>
+    <width>431</width>
+    <height>254</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,16 +16,6 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">
     <widget class="QLineEdit" name="nameEdit"/>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QLabel" name="filesToRenameLabel">
-     <property name="text">
-      <string>Files to rename:</string>
-     </property>
-     <property name="buddy">
-      <cstring>filesToRenameTable</cstring>
-     </property>
-    </widget>
    </item>
    <item row="1" column="1">
     <widget class="QLineEdit" name="hashEdit"/>
@@ -213,6 +203,16 @@
      <attribute name="verticalHeaderStretchLastSection">
       <bool>false</bool>
      </attribute>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QLabel" name="filesToRenameLabel">
+     <property name="text">
+      <string>Files to rename: (Files will be copied to target name, original files are not removed)</string>
+     </property>
+     <property name="buddy">
+      <cstring>filesToRenameTable</cstring>
+     </property>
     </widget>
    </item>
   </layout>
