@@ -206,42 +206,63 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 
 		switch(row->getType(realColumnIndex)) {
 			case TYPE_INT8:
-			case TYPE_BIT:
-				*(char*)buffer = value.toInt(&result);
-				break;
-
-			case TYPE_INT16:
-				*(short*)buffer = value.toInt(&result);
-				break;
-
-			case TYPE_INT32:
-				*(int*)buffer = value.toInt(&result);
-				break;
-
-			case TYPE_DECIMAL: {
-				float decimalTemp;
-				decimalTemp = value.toFloat(&result);
-				if(result == false) break;
-				*(int*)buffer = (int)(decimalTemp*pow((float)10, row->getDataIndex(realColumnIndex)) + 0.5);
+			case TYPE_BIT: {
+				int val = value.toInt(&result);
+				if(val & 0xFFFFFF00)
+					result = false;
+				if(result)
+					*(char*)buffer = val;
 				break;
 			}
 
-			case TYPE_INT64:
-				*(long long int*)buffer = value.toLongLong(&result);
+			case TYPE_INT16: {
+				int val = value.toInt(&result);
+				if(val & 0xFFFF0000)
+					result = false;
+				if(result)
+					*(short*)buffer = val;
 				break;
+			}
+
+			case TYPE_INT32: {
+				int val = value.toInt(&result);
+				if(result)
+					*(int*)buffer = val;
+				break;
+			}
+
+			case TYPE_DECIMAL: {
+				float decimalTemp = value.toFloat(&result);
+				if(result)
+					*(int*)buffer = (int)(decimalTemp*pow((float)10, row->getDataIndex(realColumnIndex)) + 0.5);
+				break;
+			}
+
+			case TYPE_INT64: {
+				long long int val = value.toLongLong(&result);
+				if(result)
+					*(long long int*)buffer = val;
+				break;
+			}
 
 			case TYPE_CHAR:
 				result = true;
 				qstrncpy((char*)buffer, converted.constData(), row->getDataCount(realColumnIndex)+1);
 				break;
 
-			case TYPE_FLOAT32:
-				*(float*)buffer = value.toFloat(&result);
+			case TYPE_FLOAT32: {
+				float val = value.toFloat(&result);
+				if(result)
+					*(float*)buffer = val;
 				break;
+			}
 
-			case TYPE_FLOAT64:
-				*(double*)buffer = value.toDouble(&result);
+			case TYPE_FLOAT64: {
+				double val = value.toDouble(&result);
+				if(result)
+					*(double*)buffer = val;
 				break;
+			}
 
 			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
