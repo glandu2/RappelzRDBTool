@@ -153,13 +153,13 @@ void Maingui::onDbStructHighlighted(int index) {
 	else statusBar()->showMessage(QString(dbDescriptionModel->getDbDescription(index)->getFilename()), 5000);
 }
 
-void Maingui::onLoadDbStructDLL() {
+bool Maingui::onLoadDbStructDLL() {
 	DatabaseView *currentView = databaseViews.value(ui->databaseTab->currentIndex(), 0);
 
 	if(currentView == 0)
-		return;
+		return false;
 
-	currentView->loadCloseDbDescriptionFile(true);
+	return currentView->loadCloseDbDescriptionFile(true);
 }
 
 void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
@@ -177,7 +177,8 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 		return;
 
 	//Load the current select db structure if not already done
-	onLoadDbStructDLL();
+	if(!onLoadDbStructDLL())
+		return;
 
 	if(srcType == ST_SqlDatabase && sqlConfigDialog->getServerName().isEmpty()) {
 		sqlConfigDialog->exec();

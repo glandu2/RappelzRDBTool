@@ -39,7 +39,7 @@ class Maingui : public QMainWindow
 		~Maingui();
 
 	public slots:
-		void onLoadDbStructDLL();
+		bool onLoadDbStructDLL();
 
 		void onLoadFile();
 		void onLoadRDB();
