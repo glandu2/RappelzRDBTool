@@ -368,7 +368,21 @@ int SQLSource::prepareReadQuery() {
 
 	p = appendColumnNames(p);
 
-	sprintf(p, " FROM %s;", tableName);
+	sprintf(p, " FROM %s", tableName);
+	p += strlen(p);
+
+	size_t i;
+	IRowManipulator *row = getRowManipulator();
+
+	for(i = 0; i < columnsToProcess.size(); i++) {
+		if(row->getFlags(columnsToProcess[i]) & TYPE_FLAG_SORT) {
+			sprintf(p, " ORDER BY \"%s\" ASC", row->getColumnName(columnsToProcess[i]));
+			p += strlen(p);
+			break;
+		}
+	}
+
+	sprintf(p, ";");
 
 	return 0;
 }

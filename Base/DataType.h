@@ -20,6 +20,7 @@
 #define TYPE_GUIIGNORE  0x00000800
 
 #define TYPE_FLAG_KEY	0x00010000		//primary key flag
+#define TYPE_FLAG_SORT  0x00020000		//sort by this column
 
 #define TYPE_TYPEMASK	0x000000FF
 #define TYPE_IGNOREMASK 0x0000FF00

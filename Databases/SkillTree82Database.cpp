@@ -11,7 +11,7 @@ extern "C" {
 //Fixme: special behavior for this (double for)
 
 static FieldDescriptor df[] =
-	{{1, TYPE_INT32, "job_id"},
+	{{1, TYPE_INT32 | TYPE_FLAG_SORT, "job_id"},
 	 {1, TYPE_INT32, "skill_id"},
 	 {1, TYPE_INT32, "unknown"},
 	 {1, TYPE_INT32, "min_skill_lv"},
