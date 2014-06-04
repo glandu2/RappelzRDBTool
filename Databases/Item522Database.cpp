@@ -9,10 +9,6 @@
 extern "C" {
 #endif
 
-//Row size = 5976
-//82 row size = 6256
-// -280 bytes = -256 - 4 - 4 - 2 - 3 - 16 + 1 + 4
-
 static FieldDescriptor df[] =
 	{{1, TYPE_INT32, "id"},
 	 {1, TYPE_INT32, "name_id"},
@@ -58,37 +54,30 @@ static FieldDescriptor df[] =
 	 {1, TYPE_BIT, "flag_storage"},
 	 {1, TYPE_BIT, "flag_enhance"},
 	 {1, TYPE_BIT, "flag_use"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_card"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_socket"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv10"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv11"},
 	 {1, TYPE_BIT, "flag_duplicate"},  //7
 	 {1, TYPE_BIT, "flag_target_use"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_warp"},
+	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv12"},
 	 {1, TYPE_BIT, "flag_trade"},
 	 {1, TYPE_BIT, "flag_sell"},
 	 {1, TYPE_BIT, "flag_quest"},
 	 {1, TYPE_BIT, "flag_overweight"},
-	 {1, TYPE_BIT, "flag_riding"},
-	 {1, TYPE_BIT, "flag_drop"},
+	 {1, TYPE_BIT, "flag_riding"}, //not ok, always 0
+	 {1, TYPE_BIT, "flag_drop"}, //ok
 	 {1, TYPE_BIT, "flag_move"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_quest_distribute"},
 	 {1, TYPE_BIT, "flag_sit"},
 	 {1, TYPE_BIT, "flag_raid"},
 	 {1, TYPE_BIT, "flag_secroute"},
 	 {1, TYPE_BIT, "flag_eventmap"},
 	 {1, TYPE_BIT, "flag_huntaholic"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_huntaholic_useable_only"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_deathmatch"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE, "flag_deathmatch_useable_only"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv10"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv11"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv12"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv13"},
 	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv14"},
-	 {1, TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv15"},
+	 {1, TYPE_INT8 | TYPE_SQLIGNORE | TYPE_CSVIGNORE, "nv15"},
 	 {1, TYPE_INT32, "material"},
 	 {1, TYPE_INT32, "summon_id"},
 	 {1, TYPE_INT32, "throw_range"},
-	 {1, TYPE_CHAR,  "distribute_type"},
+	 {1, TYPE_BIT,  "distribute_type"},
 	 {1, TYPE_INT16, "base_type_0"},
 	 {1, TYPE_INT16, "base_type_1"},
 	 {1, TYPE_INT16, "base_type_2"},
@@ -302,6 +291,159 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"script_text\0";
 }
 
+struct SetIds {
+	int id;
+	int set_id;
+};
+
+static SetIds setIds[] = {
+	{ 105701, 1111 },
+	{ 107703, 1113 },
+	{ 107723, 1113 },
+	{ 110701, 1111 },
+	{ 110721, 1111 },
+	{ 110702, 1112 },
+	{ 110722, 1112 },
+	{ 110703, 1113 },
+	{ 110723, 1113 },
+	{ 111701, 1111 },
+	{ 271722, 1112 },
+	{ 271703, 1113 },
+	{ 271723, 1113 },
+	{ 105721, 1111 },
+	{ 111721, 1111 },
+	{ 272701, 1111 },
+	{ 272721, 1111 },
+	{ 272702, 1112 },
+	{ 272722, 1112 },
+	{ 103701, 1111 },
+	{ 103721, 1111 },
+	{ 105702, 1112 },
+	{ 105722, 1112 },
+	{ 105703, 1113 },
+	{ 105723, 1113 },
+	{ 111702, 1112 },
+	{ 111722, 1112 },
+	{ 111703, 1113 },
+	{ 111723, 1113 },
+	{ 103702, 1112 },
+	{ 272703, 1113 },
+	{ 700257, 1 },
+	{ 272723, 1113 },
+	{ 101701, 1111 },
+	{ 101721, 1111 },
+	{ 103722, 1112 },
+	{ 103703, 1113 },
+	{ 103723, 1113 },
+	{ 108701, 1111 },
+	{ 108721, 1111 },
+	{ 108702, 1112 },
+	{ 101702, 1112 },
+	{ 108722, 1112 },
+	{ 302730, 1112 },
+	{ 101722, 1112 },
+	{ 101703, 1113 },
+	{ 101723, 1113 },
+	{ 108703, 1113 },
+	{ 108723, 1113 },
+	{ 112701, 1111 },
+	{ 112721, 1111 },
+	{ 273701, 1111 },
+	{ 273721, 1111 },
+	{ 273702, 1112 },
+	{ 273722, 1112 },
+	{ 273703, 1113 },
+	{ 273723, 1113 },
+	{ 302731, 1112 },
+	{ 302732, 1112 },
+	{ 302733, 1113 },
+	{ 302734, 1113 },
+	{ 302735, 1113 },
+	{ 302736, 1113 },
+	{ 302737, 1113 },
+	{ 112702, 1112 },
+	{ 302738, 1113 },
+	{ 106701, 1111 },
+	{ 106721, 1111 },
+	{ 106702, 1112 },
+	{ 106722, 1112 },
+	{ 106703, 1113 },
+	{ 106723, 1113 },
+	{ 112722, 1112 },
+	{ 112703, 1113 },
+	{ 112723, 1113 },
+	{ 274701, 1111 },
+	{ 302701, 1111 },
+	{ 302702, 1111 },
+	{ 302703, 1111 },
+	{ 302704, 1111 },
+	{ 302705, 1111 },
+	{ 302706, 1111 },
+	{ 302739, 1113 },
+	{ 302740, 1113 },
+	{ 302741, 1113 },
+	{ 302742, 1113 },
+	{ 302743, 1113 },
+	{ 302744, 1113 },
+	{ 302745, 1113 },
+	{ 274721, 1111 },
+	{ 302707, 1111 },
+	{ 302746, 1113 },
+	{ 302747, 1113 },
+	{ 302748, 1113 },
+	{ 104701, 1111 },
+	{ 104721, 1111 },
+	{ 104702, 1112 },
+	{ 104722, 1112 },
+	{ 109701, 1111 },
+	{ 109721, 1111 },
+	{ 109702, 1112 },
+	{ 109722, 1112 },
+	{ 109703, 1113 },
+	{ 109723, 1113 },
+	{ 274702, 1112 },
+	{ 274722, 1112 },
+	{ 274703, 1113 },
+	{ 274723, 1113 },
+	{ 302708, 1111 },
+	{ 302709, 1111 },
+	{ 302710, 1111 },
+	{ 302711, 1111 },
+	{ 302712, 1111 },
+	{ 302713, 1111 },
+	{ 104703, 1113 },
+	{ 302714, 1111 },
+	{ 102701, 1111 },
+	{ 102721, 1111 },
+	{ 102702, 1112 },
+	{ 102722, 1112 },
+	{ 102703, 1113 },
+	{ 102723, 1113 },
+	{ 104723, 1113 },
+	{ 302715, 1111 },
+	{ 302716, 1111 },
+	{ 302717, 1112 },
+	{ 302718, 1112 },
+	{ 302719, 1112 },
+	{ 302720, 1112 },
+	{ 302721, 1112 },
+	{ 302722, 1112 },
+	{ 107701, 1111 },
+	{ 107721, 1111 },
+	{ 107702, 1112 },
+	{ 107722, 1112 },
+	{ 271701, 1111 },
+	{ 271721, 1111 },
+	{ 271702, 1112 },
+	{ 302723, 1112 },
+	{ 302724, 1112 },
+	{ 302725, 1112 },
+	{ 302726, 1112 },
+	{ 302727, 1112 },
+	{ 302728, 1112 },
+	{ 302729, 1112 }
+};
+
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
@@ -316,18 +458,55 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		int i;
 		for(i=0; i<16; i++) {
 			sprintf(nvValues, "nv%d", i);
-			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
+			if(i != 9)
+				*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
+			else
+				*static_cast<short*>(row->getValuePtr(nvValues)) = 0;
+		}
+	}
+
+	if(dst == DF_RDB) {
+		if(mode == DCT_Read) {
+			*static_cast<int*>(row->getValuePtr("set_part_flag")) /= 2;
+
+			char* script_text = static_cast<char*>(row->getValuePtr("script_text"));
+			if(script_text[0] == '\0') {
+				script_text[0] = '0';
+				script_text[1] = '\0';
+			}
+
+			int id = *static_cast<int*>(row->getValuePtr("id"));
+			int* set_id_colummn = static_cast<int*>(row->getValuePtr("set_id"));
+			int i;
+			*set_id_colummn = 0;
+			for(i = 0; i < sizeof(setIds) / sizeof(SetIds); i++) {
+				if(setIds[i].id == id) {
+					*set_id_colummn = setIds[i].set_id;
+					break;
+				}
+			}
+		} else {
+			char* script_text = static_cast<char*>(row->getValuePtr("script_text"));
+			if(script_text[0] == '0' && script_text[1] == '\0') {
+				script_text[0] = '\0';
+			}
 		}
 	}
 
 	if(mode == DCT_Read && dst == DF_SQL) {
-		*static_cast<char*>(row->getValuePtr("flag_card")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_socket")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_warp")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_quest_distribute")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_huntaholic_useable_only")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_deathmatch")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_deathmatch_useable_only")) = 0;
+		int* model_type_dem = static_cast<int*>(row->getValuePtr("model_type_dem"));
+		int* model_type_def = static_cast<int*>(row->getValuePtr("model_type_def"));
+		int* model_type_asm = static_cast<int*>(row->getValuePtr("model_type_asm"));
+		int* model_type_asf = static_cast<int*>(row->getValuePtr("model_type_asf"));
+		int* model_type_gam = static_cast<int*>(row->getValuePtr("model_type_gam"));
+		int* model_type_gaf = static_cast<int*>(row->getValuePtr("model_type_gaf"));
+
+		*model_type_dem = *model_type_dem != 0;
+		*model_type_def = *model_type_def != 0;
+		*model_type_asm = *model_type_asm != 0;
+		*model_type_asf = *model_type_asf != 0;
+		*model_type_gam = *model_type_gam != 0;
+		*model_type_gaf = *model_type_gaf != 0;
 	}
 }
 
