@@ -585,7 +585,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 
 		switch(row->getType(curCol)) {
 			case TYPE_BIT:
-				SQLGetData(hstmt, columnIndex, SQL_C_DEFAULT, buffer, sizeof(char), &isDataNull);
+				SQLGetData(hstmt, columnIndex, SQL_C_BIT, buffer, sizeof(char), &isDataNull);
 				if(isDataNull == SQL_NULL_DATA) *static_cast<char*>(buffer) = 0;
 				break;
 

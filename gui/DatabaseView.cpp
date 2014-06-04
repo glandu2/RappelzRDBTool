@@ -191,11 +191,13 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 	result = db->readData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr, options.constData());
 	savedData = true;
 
-	if(result != 0) {
+	if(result != 0)
+		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't load the database file: %1 (error code %2)", "Load error global message in messagebox").arg(errorToString(type, result, false)).arg(result));
+
+	if(result != 0 && db->getRowCount() <= 0) {
 		closeDb();
 		setStatus(TS_NoDbLoaded);
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't load the database file: %1 (error code %2)", "Load error global message in messagebox").arg(errorToString(type, result, false)).arg(result));
 	} else {
 		loadedDatabaseName = filename;
 		setWindowTitle(loadedDatabaseName);
