@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 static FieldDescriptor df[] =
-	{{1, TYPE_INT32 | TYPE_RDBIGNORE, "level"},
+	{{1, TYPE_INT32 | TYPE_RDBIGNORE | TYPE_FLAG_SORT, "level"},
 	 {1, TYPE_INT64, "normal_exp"},
 	 {1, TYPE_INT64, "growth_exp"},
 	 {1, TYPE_INT64, "evolve_exp"}};
