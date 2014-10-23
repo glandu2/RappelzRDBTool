@@ -375,7 +375,11 @@ QString DatabaseView::errorToString(eDataSourceType type, int error, bool save) 
 				return tr("Can\'t load the file, I/O error", "Load/Save file error messagebox, not related to the existence of the file");
 
 		case EINVAL:
-			return tr("Can\'t read the file, invalid format", "Load/Save file error messagebox, the file has not the expected file format");
+			if(IS_DST_FILESOURCE(type))
+				return tr("Can\'t read the file, invalid format", "Load/Save file error messagebox, the file has not the expected file format");
+			else
+				return tr("Can't run SQL query, check that columns names exist.", "Load/Save SQL table error messagebox");
+			break;
 
 		case ENOMEM:
 			return tr("No enough memory", "Load/Save error messagebox, memory allocation failed, will probably cause a crash later");

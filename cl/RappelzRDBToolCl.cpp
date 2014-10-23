@@ -35,7 +35,7 @@ enum eDF { mDF_None, mDF_CSV, mDF_RDB, mDF_SQLServer, mDF_SQLPostgres };
 #endif
 
 #ifndef APPNAME
-#define APPNAME "RappelzDBTool"
+#define APPNAME "RappelzRDBToolCl"
 #endif
 
 //used to hide percentage info when printing csv
