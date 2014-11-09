@@ -240,6 +240,11 @@ int Database::writeData(eDataSourceType type, const char* source, void (DLLCALLC
 
 	delete ds;
 
+	for(i=0, it = dataList->begin(); it != dataList->end(); ++it, ++i) {
+		rowManipulator->setCurrentRow(*it);
+		databaseDescription->convertData(destFormat, DCT_Read, rowManipulator, i);
+	}
+
 	return result;
 }
 
