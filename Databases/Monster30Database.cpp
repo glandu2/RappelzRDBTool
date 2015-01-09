@@ -127,10 +127,10 @@ static FieldDescriptor df[] =
 	 {1, TYPE_FLOAT32, "trigger_00_value_1"},
 	 {1, TYPE_FLOAT32, "trigger_00_value_2"},
 	 {255, TYPE_CHAR, "trigger_00"},
-	 {1, TYPE_INT32, "trigger_00_type"},
-	 {1, TYPE_FLOAT32, "trigger_00_value_1"},
-	 {1, TYPE_FLOAT32, "trigger_00_value_2"},
-	 {255, TYPE_CHAR, "trigger_00"}};
+	 {1, TYPE_INT32, "trigger_01_type"},
+	 {1, TYPE_FLOAT32, "trigger_01_value_1"},
+	 {1, TYPE_FLOAT32, "trigger_01_value_2"},
+	 {255, TYPE_CHAR, "trigger_01"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
