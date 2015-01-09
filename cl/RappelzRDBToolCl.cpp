@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <errno.h>
+#include "stdlib.h"
 
 #ifdef __unix__
 #	include <sys/ioctl.h>
@@ -101,7 +102,7 @@ void help(const char *arg) {
 			   "dst_type   \tDestination type, one of: --dst-csv, --dst-rdb <rdb file name>,\n"
 			   "           \t --dst-<sqltype> <table name>\n"
 			   "\n"
-			   "sql_options\tSQL Options, one of: --sql-server <odbc sql source>,\n"
+			   "sql_options\tSQL Options, one of: --sql-server <server ip>, --sql-port <port>\n"
 			   "           \t --sql-user <username>, --sql-pwd <password>\n"
 			   "\n"
 			   "Notes:\n"
@@ -164,7 +165,8 @@ int main(int argc, char *argv[])
 	const char *dest = NULL;
 	const char *sqlUser = "sa";
 	const char *sqlPassword = "";
-	const char *sqlServer = "SQLEXPRESS";
+	const char *sqlServer = "127.0.0.1";
+	int sqlPort = 0;
 #if !defined(NDEBUG) && !defined(__unix__)
 	LARGE_INTEGER beginTime, endTime, freq;
 #endif
@@ -288,6 +290,9 @@ int main(int argc, char *argv[])
 			i++;
 		} else if(!strcmp(argv[i], "--sql-server") && (i+1) < argc) {
 			sqlServer = argv[i+1];
+			i++;
+		} else if(!strcmp(argv[i], "--sql-port") && (i+1) < argc) {
+			sqlPort = atoi(argv[i+1]);
 			i++;
 		} else {
 			fprintf(stderr, "Unknown switch \"%s\"\n", argv[i]);

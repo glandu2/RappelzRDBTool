@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>314</width>
-    <height>252</height>
+    <width>321</width>
+    <height>288</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -27,9 +27,9 @@
      </property>
      <layout class="QFormLayout" name="formLayout_2">
       <item row="1" column="0">
-       <widget class="QLabel" name="serverNameLabel">
+       <widget class="QLabel" name="serverIpLabel">
         <property name="text">
-         <string comment="Label">Data source name</string>
+         <string comment="Label">Server ip</string>
         </property>
        </widget>
       </item>
@@ -60,18 +60,22 @@
         </item>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="serverNameCombo">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
+      <item row="2" column="0">
+       <widget class="QLabel" name="serverPortLabel">
+        <property name="text">
+         <string>Server port</string>
         </property>
        </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="serverPortEdit">
+        <property name="placeholderText">
+         <string>default port</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="serverIpEdit"/>
       </item>
      </layout>
     </widget>
@@ -117,13 +121,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="configureOdbcButton">
-     <property name="text">
-      <string comment="Button to open ODBC data source manager">Configure ODBC</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QDialogButtonBox" name="confirmationButtons">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -136,13 +133,12 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>serverIpEdit</tabstop>
+  <tabstop>serverPortEdit</tabstop>
   <tabstop>usernameEdit</tabstop>
   <tabstop>passwordEdit</tabstop>
   <tabstop>passwordSaveCheck</tabstop>
-  <tabstop>configureOdbcButton</tabstop>
-  <tabstop>confirmationButtons</tabstop>
   <tabstop>serverTypeCombo</tabstop>
-  <tabstop>serverNameCombo</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -153,8 +149,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>257</x>
+     <y>278</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -169,8 +165,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>311</x>
+     <y>278</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

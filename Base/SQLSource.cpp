@@ -55,32 +55,26 @@ int SQLSource::checkSqlResult(int result, const char* functionName) {
     return 0;
 }
 
-int SQLSource::open(const char* source, eOpenMode openMode,  const char* location, const char* user, const char* password, const char* options) {
-	IDataSource::open(source, openMode, location, user, password);
+int SQLSource::open(const char* source, eOpenMode openMode, const char *location, const char* options) {
+	IDataSource::open(source, openMode, location, options);
 
 	SQLRETURN result;
+	const char* connectionString = location;
 
 	if(options) {
-		const char *p = strstr(options, "charset=");
-		if(p) {
-			char targetCharset[32] = {0};
-			p += 8;
-			const char *end = strchr(p, ';');
-			if(!end || end - p > 31) {
-				strncpy(targetCharset, p, 31);
-			} else {
-				strncpy(targetCharset, p, end - p);
-			}
-			targetCharset[31] = 0;
+		char key[20];
+		char value[80];
+		const char* p = options;
 
-			fprintf(stderr, "Using target charset \"%s\"\n", targetCharset);
-			utf16To8bits = createCharsetConverter(targetCharset);
+		while((p = getNextOption(p, key, value))) {
+			if(!strcmp(key, "charset")) {
+				fprintf(stderr, "Using target charset \"%s\"\n", value);
+				utf16To8bits = createCharsetConverter(value);
+			} else if(!strcmp(key, "reusetable")) {
+				reuseTableSchema = true;
+			}
 		}
-		if(strstr(options, "reusetable;"))
-			reuseTableSchema = true;
 	}
-	if(utf16To8bits == 0)
-		utf16To8bits = createCharsetConverter("");
 	if(utf16To8bits == 0)
 		utf16To8bits = createCharsetConverter("CP1252");
 
@@ -95,10 +89,10 @@ int SQLSource::open(const char* source, eOpenMode openMode,  const char* locatio
 	}
 
 	SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
-	result = SQLConnect(hdbc, (UCHAR*)location, SQL_NTS, (UCHAR*)user, SQL_NTS, (UCHAR*)password, SQL_NTS);
+	result = SQLDriverConnect(hdbc, 0, (UCHAR*)connectionString, SQL_NTS, 0, 0, 0, 0);
 	if(!SQL_SUCCEEDED(result)) {
 		printOdbcStatus(SQL_HANDLE_DBC, hdbc);
-		fprintf(stderr, "result was: %d\n", result);
+		fprintf(stderr, "SQLDriverConnect result was: %d\n", result);
 		SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, henv);
 		hdbc = 0;

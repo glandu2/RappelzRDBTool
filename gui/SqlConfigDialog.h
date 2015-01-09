@@ -17,13 +17,10 @@ class SqlConfigDialog : public QDialog
 		~SqlConfigDialog();
 
 		eDataSourceType getServerType();
-		QString getServerName();
+		QString getServerIp();
+		int getServerPort();
 		QString getUsername();
 		QString getPassword();
-
-	protected slots:
-		void onConfigureOdbc();
-		void updateDsnList();
 		
 	private:
 		Ui::SqlConfigDialog *ui;

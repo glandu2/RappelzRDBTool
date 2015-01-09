@@ -52,8 +52,8 @@ SQLFileSource::~SQLFileSource() {
 	delete sqlLanguage;
 }
 
-int SQLFileSource::open(const char* source, eOpenMode openMode,  const char* location, const char* user, const char* password, const char* options) {
-	IDataSource::open(source, openMode, location, user, password);
+int SQLFileSource::open(const char* source, eOpenMode openMode, const char *location, const char* options) {
+	IDataSource::open(source, openMode, location, options);
 
 	if(openMode != OM_Write)	//only write sql file supported
 		return ENOSYS;

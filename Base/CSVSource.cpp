@@ -61,8 +61,8 @@ static void fputi(int64_t value, bool isHex, FILE *file) {
 
 namespace RappelzRDBBase {
 
-int CSVSource::open(const char* source, eOpenMode openMode,  const char* location, const char* user, const char* password, const char* options) {
-	IDataSource::open(source, openMode, location, user, password, options);
+int CSVSource::open(const char* source, eOpenMode openMode, const char *location, const char* options) {
+	IDataSource::open(source, openMode, location, options);
 	if(!strcmp(source, "con") && openMode == OM_Read) {
 		csvFile = stdin;
 	} else if(!strcmp(source, "con") && openMode == OM_Write) {

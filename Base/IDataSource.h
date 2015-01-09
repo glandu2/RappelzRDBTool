@@ -10,8 +10,10 @@ class IDataSource
 	public:
 		enum eOpenMode {OM_Read, OM_Write };
 
-		virtual int open(const char* source, eOpenMode openMode, const char* location = 0, const char* user = 0, const char* password = 0, const char* options = 0);
+		virtual int open(const char* source, eOpenMode openMode, const char* location = 0, const char* options = 0);
 		virtual void close() {}
+
+		const char* getNextOption(const char* options, char* key, char* value);
 
 		virtual unsigned long long int getDate() = 0;
 

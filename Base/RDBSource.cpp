@@ -14,8 +14,8 @@ RDBSource::RDBSource() {
 	date = 0;
 }
 
-int RDBSource::open(const char* source, eOpenMode openMode,  const char* location, const char* user, const char* password, const char* options) {
-	IDataSource::open(source, openMode, location, user, password, options);
+int RDBSource::open(const char* source, eOpenMode openMode, const char *location, const char* options) {
+	IDataSource::open(source, openMode, location, options);
 
 	const char* fopenOpenMode;
 	if(!source) return EINVAL;

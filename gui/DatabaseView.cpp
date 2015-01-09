@@ -4,6 +4,7 @@
 #include "../Base/IDatabase.h"
 #include "../Base/ICharsetConverter.h"
 #include "Settings.h"
+#include "SqlConfigDialog.h"
 
 #include <QMessageBox>
 #include <QFileInfo>
@@ -153,11 +154,9 @@ void DatabaseView::progressBarUpdate(int itemProceeded, int totalItem) {
 	}
 }
 
-int DatabaseView::loadDb(eDataSourceType type, QString filename, QString location, QString username, QString password, QByteArray options) {
+int DatabaseView::loadDb(eDataSourceType type, QString filename, QString location, QByteArray options) {
 	int result;
 	QByteArray locationStr;
-	QByteArray usernameStr;
-	QByteArray passwordStr;
 
 	options += QByteArray("charset=") + ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray() + ";";
 
@@ -182,13 +181,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 	if(!location.isEmpty())
 		locationStr = location.toLocal8Bit();
 
-	if(!username.isEmpty())
-		usernameStr = username.toLocal8Bit();
-
-	if(!password.isEmpty())
-		passwordStr = password.toLocal8Bit();
-
-	result = db->readData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr, usernameStr, passwordStr, options.constData());
+	result = db->readData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr, options.constData());
 	savedData = true;
 
 	if(result != 0)
@@ -220,11 +213,9 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 	return result;
 }
 
-int DatabaseView::saveDb(eDataSourceType type, QString filename, QString location, QString username, QString password, QByteArray options) {
+int DatabaseView::saveDb(eDataSourceType type, QString filename, QString location, QByteArray options) {
 	int result;
 	QByteArray locationStr;
-	QByteArray usernameStr;
-	QByteArray passwordStr;
 
 	options += QByteArray("charset=") + ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray() + ";";
 
@@ -236,14 +227,7 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 	if(!location.isEmpty())
 		locationStr = location.toLocal8Bit();
 
-	if(!username.isEmpty())
-		usernameStr = username.toLocal8Bit();
-
-	if(!password.isEmpty())
-		passwordStr = password.toLocal8Bit();
-
-
-	result = db->writeData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr.constData(), usernameStr.constData(), passwordStr.constData(), options.constData());
+	result = db->writeData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr.constData(), options.constData());
 
 	setStatus(TS_DbLoaded);
 

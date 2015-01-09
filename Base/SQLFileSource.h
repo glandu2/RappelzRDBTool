@@ -18,7 +18,7 @@ class SQLFileSource : public IDataSource
 		SQLFileSource(SQLLanguage *language);
 		~SQLFileSource();
 
-		virtual int open(const char* source, eOpenMode openMode,  const char* location = 0, const char* user = 0, const char* password = 0, const char* options = 0);
+		virtual int open(const char* source, eOpenMode openMode, const char *location = 0, const char* options = 0);
 		virtual void close();
 
 		virtual unsigned long long int getDate() { return 0; }
