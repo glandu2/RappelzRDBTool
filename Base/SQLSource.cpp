@@ -76,6 +76,8 @@ int SQLSource::open(const char* source, eOpenMode openMode, const char *location
 		}
 	}
 	if(utf16To8bits == 0)
+		utf16To8bits = createCharsetConverter("");
+	if(utf16To8bits == 0)
 		utf16To8bits = createCharsetConverter("CP1252");
 
 	result = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &henv);
