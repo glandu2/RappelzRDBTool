@@ -583,12 +583,6 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 				if(isDataNull == SQL_NULL_DATA) *static_cast<char*>(buffer) = 0;
 				break;
 
-			case TYPE_CHAR:
-				SQLGetData(hstmt, columnIndex, SQL_C_CHAR, buffer, sizeof(char)*row->getDataCount(curCol), &isDataNull);
-				if(isDataNull == SQL_NULL_DATA)
-					*static_cast<char*>(buffer) = '\0';
-				break;
-
 			case TYPE_INT8:
 				SQLGetData(hstmt, columnIndex, SQL_C_TINYINT, buffer, sizeof(char), &isDataNull);
 				if(isDataNull == SQL_NULL_DATA) *static_cast<char*>(buffer) = 0;
@@ -643,6 +637,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 			case TYPE_VARCHAR_SIZE:
 				break;
 
+			case TYPE_CHAR:
 			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR: {
 				char *unicodeBuffer;
@@ -669,20 +664,27 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 					bytesRead += isDataNull;
 
 				if(isDataNull == SQL_NULL_DATA || bytesRead == 0) {
-					row->initData(curCol, 1);
+					if(row->getType(curCol) != TYPE_CHAR)
+						row->initData(curCol, 1);
 					*static_cast<char*>(row->getValuePtr(curCol)) = 0;
 				} else {
-
+					char *outBuffer;
 					ICharsetConverter::ConvertedString in, out;
 					in.data = unicodeBuffer;
 					in.size = bytesRead;
 					utf16To8bits->convertFromUtf16(in, &out);
 
-					if(out.size > 0 && out.data[out.size-1] == 0)
-						row->initData(curCol, out.size);
-					else
-						row->initData(curCol, out.size+1);
-					char *outBuffer = static_cast<char*>(row->getValuePtr(curCol));
+					if(row->getType(curCol) == TYPE_CHAR) {
+						//Cap max size
+						if(out.size > row->getDataCount(curCol))
+							out.size = row->getDataCount(curCol);
+					} else { //Varchar is autosized
+						if(out.size > 0 && out.data[out.size-1] == 0)
+							row->initData(curCol, out.size);
+						else
+							row->initData(curCol, out.size+1);
+					}
+					outBuffer = static_cast<char*>(row->getValuePtr(curCol));
 					memcpy(outBuffer, out.data, out.size);
 					free(out.data);
 				}

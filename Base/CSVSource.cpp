@@ -177,10 +177,6 @@ int CSVSource::readRow() {
 				sscanf(readptr, "%I64d", (long long int*)buffer);
 				break;
 
-			case TYPE_CHAR:
-				strcpy((char*)buffer, readptr);
-				break;
-
 			case TYPE_FLOAT32:
 				sscanf(readptr, "%e", (float*)buffer);
 				break;
@@ -189,6 +185,7 @@ int CSVSource::readRow() {
 				sscanf(readptr, "%le", (double*)buffer);
 				break;
 
+			case TYPE_CHAR:
 			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
 				strcpy((char*)buffer, readptr);
