@@ -17,12 +17,20 @@ class SqlConfigDialog : public QDialog
 		~SqlConfigDialog();
 
 		eDataSourceType getServerType();
+
+		QString getConnectionString(int tabIndex = -1);
+
+		bool isConfigSet();
+
+	protected slots:
+		void onTabChanged(int newIndex);
+
+	private:
 		QString getServerIp();
 		int getServerPort();
 		QString getUsername();
 		QString getPassword();
-		
-	private:
+
 		Ui::SqlConfigDialog *ui;
 };
 

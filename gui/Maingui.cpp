@@ -180,9 +180,9 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 	if(!onLoadDbStructDLL())
 		return;
 
-	if(srcType == ST_SqlDatabase && sqlConfigDialog->getServerIp().isEmpty()) {
+	if(srcType == ST_SqlDatabase && !sqlConfigDialog->isConfigSet()) {
 		sqlConfigDialog->exec();
-		if(sqlConfigDialog->getServerIp().isEmpty())
+		if(!sqlConfigDialog->isConfigSet())
 			return;
 	}
 
@@ -247,37 +247,11 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 	delete openSaveSource;
 
 	if(ok) {
-		QString connectionString;
-
 		if(!save) currentView->closeDb(true);
 
-		if(sourceType == DST_SQLServer || sourceType == DST_SQLPostgres) {
-			int sqlPort = sqlConfigDialog->getServerPort();
-
-			if(sourceType == DST_SQLServer) {
-				if(!sqlPort)
-					sqlPort = 1433;
-#ifdef _WIN32
-				connectionString = "driver=SQL Server;Server=%0,%1;UID=%2;PWD=%3;";
-#else
-				connectionString = "driver=FreeTDS;TDS_Version=7.2;ClientCharset=UTF-8;Server=%0,%1;UID=%2;PWD=%3;";
-#endif
-			} else if(sourceType == DST_SQLPostgres) {
-				if(!sqlPort)
-					sqlPort = 5432;
-#ifdef _WIN64
-				connectionString = "driver={PostgreSQL Unicode(x64)};Server=%0;Port=%1;UID=%2;PWD=%3;";
-#else
-				connectionString = "driver={PostgreSQL Unicode};Server=%0;Port=%1;UID=%2;PWD=%3;";
-#endif
-			}
-
-			connectionString = connectionString.arg(sqlConfigDialog->getServerIp(), QString::number(sqlPort), sqlConfigDialog->getUsername(), sqlConfigDialog->getPassword());
-		}
-
 		if(!save)
-			currentView->loadDb(sourceType, sourceName, connectionString.toLocal8Bit().constData(), options);
-		else currentView->saveDb(sourceType, sourceName, connectionString.toLocal8Bit().constData(), options);
+			currentView->loadDb(sourceType, sourceName, sqlConfigDialog->getConnectionString().toLocal8Bit().constData(), options);
+		else currentView->saveDb(sourceType, sourceName, sqlConfigDialog->getConnectionString().toLocal8Bit().constData(), options);
 	}
 }
 

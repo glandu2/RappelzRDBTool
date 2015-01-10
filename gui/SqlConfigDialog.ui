@@ -6,33 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>321</width>
-    <height>288</height>
+    <width>335</width>
+    <height>305</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string comment="Dialogbox title">SQL Configuration</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
     <widget class="QGroupBox" name="serverInfoGroup">
      <property name="title">
       <string comment="Groupbox title">Server Informations</string>
      </property>
-     <layout class="QFormLayout" name="formLayout_2">
-      <item row="1" column="0">
-       <widget class="QLabel" name="serverIpLabel">
-        <property name="text">
-         <string comment="Label">Server ip</string>
-        </property>
-       </widget>
-      </item>
+     <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QLabel" name="serverTypeLabel">
         <property name="text">
@@ -60,27 +47,71 @@
         </item>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="serverPortLabel">
-        <property name="text">
-         <string>Server port</string>
+      <item row="1" column="0" colspan="2">
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="currentIndex">
+         <number>0</number>
         </property>
+        <widget class="QWidget" name="simpleTab">
+         <attribute name="title">
+          <string>Simple</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_3">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="serverIpLabel">
+            <property name="text">
+             <string comment="Label">Server ip</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="serverIpEdit"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="serverPortLabel">
+            <property name="text">
+             <string>Server port</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="serverPortEdit">
+            <property name="placeholderText">
+             <string>default port</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="advancedTab">
+         <attribute name="title">
+          <string>Advanced</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout_2">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="connectionStringLabel">
+            <property name="text">
+             <string>Connection string</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QLineEdit" name="connectionStringEdit"/>
+          </item>
+         </layout>
+        </widget>
        </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="serverPortEdit">
-        <property name="placeholderText">
-         <string>default port</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="serverIpEdit"/>
       </item>
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <widget class="QGroupBox" name="accountGroup">
      <property name="title">
       <string comment="Groupbox title">Account</string>
@@ -120,7 +151,7 @@
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="2" column="0">
     <widget class="QDialogButtonBox" name="confirmationButtons">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -139,6 +170,8 @@
   <tabstop>passwordEdit</tabstop>
   <tabstop>passwordSaveCheck</tabstop>
   <tabstop>serverTypeCombo</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>connectionStringEdit</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -149,8 +182,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>278</y>
+     <x>266</x>
+     <y>332</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -165,8 +198,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>311</x>
-     <y>278</y>
+     <x>320</x>
+     <y>332</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

@@ -56,7 +56,7 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 		*sourceName = sqlDialog.getTableName();
 		*sourceType = source;
 		if(sqlDialog.useExistingTableSchema())
-			options->append("reusetable;");
+			options->append("reusetable=;");
 		return ok;
 	}
 

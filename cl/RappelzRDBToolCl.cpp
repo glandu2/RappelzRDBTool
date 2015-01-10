@@ -331,9 +331,9 @@ int main(int argc, char *argv[])
 			char location[512];
 			sprintf(buffer, "Arcadia.dbo.%s", database->getDatabaseDescription()->getDefaultTableName());
 #ifdef _WIN32
-			sprintf(location, "driver=SQL Server;Server=%s,%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 1433, sqlUser, sqlPassword);
+			sprintf(location, "Driver={SQL Server};Server=%s,%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 1433, sqlUser, sqlPassword);
 #else
-			sprintf(location, "driver=FreeTDS;TDS_Version=7.2;ClientCharset=UTF-8;Server=%s,%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 1433, sqlUser, sqlPassword);
+			sprintf(location, "Driver=FreeTDS;TDS_Version=7.2;ClientCharset=UTF-8;Server=%s,%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 1433, sqlUser, sqlPassword);
 #endif
 			result = database->readData(DST_SQLServer, source, progressPercentage, NULL, location);
 			break;
@@ -343,9 +343,9 @@ int main(int argc, char *argv[])
 			char location[512];
 			sprintf(buffer, "Arcadia.%s", database->getDatabaseDescription()->getDefaultTableName());
 #ifdef _WIN64
-			sprintf(location, "driver={PostgreSQL Unicode(x64)};Server=%s;Port=%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 5432, sqlUser, sqlPassword);
+			sprintf(location, "Driver={PostgreSQL Unicode(x64)};Server=%s;Port=%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 5432, sqlUser, sqlPassword);
 #else
-			sprintf(location, "driver={PostgreSQL Unicode};Server=%s;Port=%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 5432, sqlUser, sqlPassword);
+			sprintf(location, "Driver={PostgreSQL Unicode};Server=%s;Port=%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 5432, sqlUser, sqlPassword);
 #endif
 			result = database->readData(DST_SQLPostgres, source, progressPercentage, NULL, location);
 			break;
@@ -369,26 +369,26 @@ int main(int argc, char *argv[])
 			break;
 
 		case mDF_SQLServer: {
-			char options[512];
+			char location[512];
 			sprintf(buffer, "Arcadia.dbo.%s", database->getDatabaseDescription()->getDefaultTableName());
 #ifdef _WIN32
-			sprintf(options, "connectionstring\0driver=SQL Server;Server=%s,%d;UID=%s;PWD=%s;\0", sqlServer, sqlPort ? sqlPort : 1433, sqlUser, sqlPassword);
+			sprintf(location, "Driver={SQL Server};Server=%s,%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 1433, sqlUser, sqlPassword);
 #else
-			sprintf(options, "connectionstring\0driver=FreeTDS;Server=%s,%d;UID=%s;PWD=%s;\0", sqlServer, sqlPort ? sqlPort : 1433, sqlUser, sqlPassword);
+			sprintf(location, "Driver=FreeTDS;TDS_Version=7.2;ClientCharset=UTF-8;Server=%s,%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 1433, sqlUser, sqlPassword);
 #endif
-			result = database->writeData(DST_SQLServer, source, progressPercentage, NULL, options);
+			result = database->writeData(DST_SQLServer, source, progressPercentage, NULL, location);
 			break;
 		}
 
 		case mDF_SQLPostgres: {
-			char options[512];
+			char location[512];
 			sprintf(buffer, "Arcadia.%s", database->getDatabaseDescription()->getDefaultTableName());
 #ifdef _WIN64
-			sprintf(options, "connectionstring\0driver={PostgreSQL Unicode(x64)};Server=%s;Port=%d;UID=%s;PWD=%s;\0", sqlServer, sqlPort ? sqlPort : 5432, sqlUser, sqlPassword);
+			sprintf(location, "Driver={PostgreSQL Unicode(x64)};Server=%s;Port=%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 5432, sqlUser, sqlPassword);
 #else
-			sprintf(options, "connectionstring\0driver={PostgreSQL Unicode};Server=%s;Port=%d;UID=%s;PWD=%s;\0", sqlServer, sqlPort ? sqlPort : 5432, sqlUser, sqlPassword);
+			sprintf(location, "Driver={PostgreSQL Unicode};Server=%s;Port=%d;UID=%s;PWD=%s;", sqlServer, sqlPort ? sqlPort : 5432, sqlUser, sqlPassword);
 #endif
-			result = database->writeData(DST_SQLPostgres, source, progressPercentage, NULL, options);
+			result = database->writeData(DST_SQLPostgres, source, progressPercentage, NULL, location);
 			break;
 		}
 	}
