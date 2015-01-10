@@ -189,6 +189,9 @@ QVariant DatabaseTableModel::headerData(int section, Qt::Orientation orientation
 
 bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value, int role) {
 	if(db && index.isValid() && index.column() < columnCount() && index.row() < rowCount() && role == Qt::EditRole) {
+		if(value.toString() == data(index, role))
+			return true;
+
 		row->setCurrentRow(db->getRowAt(index.row()));
 		int realColumnIndex = columnBinding.at(index.column());
 
