@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdint.h>
+#include "Log.h"
 
 //Fast conversion
 //From http://code.google.com/p/stringencoders/source/browse/trunk/src/modp_numtoa.c
@@ -140,7 +141,7 @@ int CSVSource::readRow() {
 
 		tabpos = strpbrk(readptr, "\t\n\r");
 		if(!tabpos) {
-			fprintf(stderr, "Can't find a field separator for next CSV column (\\t, \\r or \\n) at line %d, column missing ?\n", getRowNumber());
+			getLogger()->log(ILog::LL_Trace, "CSVSource: Can't find a field separator for next CSV column (\\t, \\r or \\n) at line %d, column missing ?\n", getRowNumber());
 			break;
 		}
 		*tabpos = 0;

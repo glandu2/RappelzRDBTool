@@ -52,7 +52,7 @@ class SQLSource : public IDataSource
 		int prepareWriteQuery();
 		char *strreplace(const char *input, char c, const char *rep);
 		char *appendColumnNames(char *p);
-		int checkSqlResult(int result, const char *functionName);
+		int checkSqlResult(int result, const char *functionName, bool ignoreError = false);
 
 		void clearBoundParameters(int newCount);
 		ParameterInfo* initParameter(int index, SQLLEN dataSizeOrInd);

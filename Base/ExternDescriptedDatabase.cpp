@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <string.h>
 #include <algorithm>
+#include "Log.h"
 
 #ifdef __linux__
 #  include <dlfcn.h>
@@ -26,14 +27,14 @@ int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
 	libHinst = (unsigned long long)dlopen(databaseName, RTLD_NOW);
 	if(!libHinst) {
 		*systemError = errno;
-		fprintf(stderr, "Unable to load Database description DLL, last error: %s\n", dlerror());
+		getLogger()->log(ILog::LL_Error, "Unable to load Database description DLL %s, last error: %s\n", databaseName, dlerror());
 		return ENOENT;
 	}
 #else
 	libHinst = (unsigned long long)LoadLibrary(databaseName);
 	if(!libHinst) {
 		*systemError = GetLastError();
-		fprintf(stderr, "Unable to load Database description DLL, last error: 0x%08x\n", *systemError);
+		getLogger()->log(ILog::LL_Error, "Unable to load Database description DLL %s, last error: 0x%08x\n", databaseName, *systemError);
 		return ENOENT;
 	}
 #endif

@@ -6,7 +6,6 @@
 #include "ExportDLL.h"
 
 class IRowManipulator;
-class IDataSource;
 class IDatabaseDescription;
 
 class IDatabase : public IObject

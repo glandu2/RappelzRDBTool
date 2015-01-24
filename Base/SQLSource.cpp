@@ -8,22 +8,43 @@
 #include <math.h>
 #include <locale.h>
 #include "ICharsetConverter.h"
+#include "ILog.h"
 
-static void printOdbcStatus(SQLSMALLINT type, HSTMT hstmt) {
-	SQLCHAR     buffer[SQL_MAX_MESSAGE_LENGTH + 1];
-	SQLCHAR     sqlstate[SQL_SQLSTATE_SIZE + 1];
-	SQLINTEGER  sqlcode;
-	SQLSMALLINT length;
-	int i=1;
-	while ( SQLGetDiagRec( type, hstmt, i, sqlstate, &sqlcode, buffer, SQL_MAX_MESSAGE_LENGTH + 1, &length) == SQL_SUCCESS ) {
-		fprintf(stderr, "SQLSTATE: %s\n", sqlstate);
-		fprintf(stderr, "Native Error Code: %ld\n", sqlcode);
-		fprintf(stderr, "buffer: %s \n\n", buffer);
-		i++;
-	}
+static void printOdbcStatus(ILog::Level errorLevel, SQLSMALLINT type, SQLHANDLE handle) {
+	SQLSMALLINT i = 0, len;
+	SQLINTEGER native;
+	SQLCHAR state[7];
+	SQLCHAR text[256];
+	SQLRETURN ret;
+
+	do {
+		ret = SQLGetDiagRec(type, handle, ++i, state, &native, text, sizeof(text), &len);
+		if (SQL_SUCCEEDED(ret))
+			getLogger()->log(errorLevel, "SQL: %s:%d:%ld:%s\n", state, i, (long)native, text);
+	} while(ret == SQL_SUCCESS);
 }
 
+
 namespace RappelzRDBBase {
+
+int SQLSource::checkSqlResult(int result, const char* functionName, bool ignoreError) {
+	if(result != SQL_SUCCESS && result != SQL_NO_DATA && result != SQL_NEED_DATA) {
+		ILog::Level level = result == SQL_SUCCESS_WITH_INFO? ILog::LL_Info : ILog::LL_Error;
+
+		getLogger()->log(level, "SQL: %s %s(%d):\n", functionName, result == SQL_SUCCESS_WITH_INFO? "additional info" : "error", result);
+		getLogger()->log(level, "SQL: query: %s\n", query);
+		printOdbcStatus(level, SQL_HANDLE_STMT, hstmt);
+		printOdbcStatus(level, SQL_HANDLE_DBC, hdbc);
+		printOdbcStatus(level, SQL_HANDLE_ENV, henv);
+		if(!SQL_SUCCEEDED(result)) {
+			if(!ignoreError)
+				commitTransaction = false;
+			return ENOEXEC;
+		}
+	}
+
+	return 0;
+}
 
 SQLSource::SQLSource(SQLLanguage *language) {
 	henv = 0;
@@ -33,26 +54,13 @@ SQLSource::SQLSource(SQLLanguage *language) {
 	sqlLanguage = language;
 	utf16To8bits = 0;
 	reuseTableSchema = false;
+	query[0] = 0;
 }
 
 SQLSource::~SQLSource() {
 	close();
 	if(tableName) free(tableName);
 	delete sqlLanguage;
-}
-
-int SQLSource::checkSqlResult(int result, const char* functionName) {
-	if(!SQL_SUCCEEDED(result) && result != SQL_NO_DATA && result != SQL_NEED_DATA) {
-		fprintf(stderr, "%s: SQL Error %d\n", functionName, result);
-		fprintf(stderr, "SQL Query: %s\n", query);
-		printOdbcStatus(SQL_HANDLE_STMT, hstmt);
-		printOdbcStatus(SQL_HANDLE_DBC, hdbc);
-		printOdbcStatus(SQL_HANDLE_ENV, henv);
-		commitTransaction = false;
-		return ENOEXEC;
-	}
-
-    return 0;
 }
 
 int SQLSource::open(const char* source, eOpenMode openMode, const char *location, const char* options) {
@@ -68,7 +76,7 @@ int SQLSource::open(const char* source, eOpenMode openMode, const char *location
 
 		while((p = getNextOption(p, key, value))) {
 			if(!strcmp(key, "charset")) {
-				fprintf(stderr, "Using target charset \"%s\"\n", value);
+				getLogger()->log(ILog::LL_Debug, "SQLSource: Using target charset \"%s\"\n", value);
 				utf16To8bits = createCharsetConverter(value);
 			} else if(!strcmp(key, "reusetable")) {
 				reuseTableSchema = true;
@@ -91,10 +99,8 @@ int SQLSource::open(const char* source, eOpenMode openMode, const char *location
 	}
 
 	SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
-	result = SQLDriverConnect(hdbc, 0, (UCHAR*)connectionString, SQL_NTS, 0, 0, 0, 0);
-	if(!SQL_SUCCEEDED(result)) {
-		printOdbcStatus(SQL_HANDLE_DBC, hdbc);
-		fprintf(stderr, "SQLDriverConnect result was: %d\n", result);
+	if(checkSqlResult(SQLDriverConnect(hdbc, 0, (UCHAR*)connectionString, SQL_NTS, 0, 0, 0, 0), "SQLDriverConnect")) {
+		getLogger()->log(ILog::LL_Error, "Connection string: \"%s\"\n", connectionString);
 		SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, henv);
 		hdbc = 0;
@@ -142,11 +148,11 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 
 	//retreive row count
 	sprintf(query, "SELECT COUNT(*) FROM %s;", tableName);
-	SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-	if(checkSqlResult(SQLFetch(hstmt), "prepareRead.SQLFetch"))
+	if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "SQLExecDirect"))
 		return ENOENT;
 
-	SQLGetData(hstmt, 1, SQL_C_LONG, &rowCount, sizeof(int), NULL);
+	if(checkSqlResult(SQLGetData(hstmt, 1, SQL_C_LONG, &rowCount, sizeof(int), NULL), "SQLGetData"))
+		return ENOENT;
 	setRowNumber(rowCount);
 
 	SQLCloseCursor(hstmt);
@@ -161,10 +167,10 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 
 	prepareReadQuery();
 
-	if(checkSqlResult(SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS), "prepareRead.SQLPrepare"))
+	if(checkSqlResult(SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS), "SQLPrepare"))
 		return ENOEXEC;
 
-	if(checkSqlResult(SQLExecute(hstmt), "prepareRead.SQLExecute"))
+	if(checkSqlResult(SQLExecute(hstmt), "SQLExecute"))
 		return EINVAL;
 
 
@@ -183,7 +189,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 		SQLRETURN result;
 
 		sprintf(query, "DELETE FROM %s;", tableName);
-		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "prepareWrite.Delete")) {
+		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "SQLExecDirect")) {
 			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 			return ENOENT;
 		}
@@ -215,7 +221,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 			endOfDatabasePart = tableName;
 
 		sprintf(query, "SELECT COLUMN_NAME FROM %.*sINFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = \'%s\' ORDER BY ORDINAL_POSITION ASC;", endOfDatabasePart - tableName, tableName, tableNamePart);
-		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "prepareWrite.SQLExecDirect2")) {
+		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "SQLExecDirect")) {
 			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 			return ENOEXEC;
 		}
@@ -228,7 +234,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 				if(index >= 0) {
 					columnsToProcess.push_back(index);
 				} else {
-					fprintf(stderr, "Unknown column name: %s\n", columnName);
+					getLogger()->log(ILog::LL_Error, "Unknown column name: %s\n", columnName);
 					SQLBindCol(hstmt, 1, SQL_C_CHAR, NULL, 0, NULL);
 					SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 					return ESPIPE;
@@ -238,7 +244,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 		SQLBindCol(hstmt, 1, SQL_C_CHAR, NULL, 0, NULL);
 
 		if(columnsToProcess.size() == 0) {
-			fprintf(stderr, "No columns ! Query: %s\n", query);
+			getLogger()->log(ILog::LL_Error, "No columns ! Query: %s\n", query);
 			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 			return ENOEXEC;
 		}
@@ -267,7 +273,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 	prepareWriteQuery();
 
 	int result = SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS);
-	if(checkSqlResult(result, "writeRow.SQLExecute"))
+	if(checkSqlResult(result, "SQLPrepare"))
 		return ENOEXEC;
 
 	return 0;
@@ -310,7 +316,7 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 	strcpy(p, ");");
 
 	int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
-	if(checkSqlResult(result, "createSQLTable.SQLExecDirect"))
+	if(checkSqlResult(result, "SQLExecDirect"))
 		return ENOENT;
 
 	return 0;
@@ -332,8 +338,9 @@ int SQLSource::writeRow() {
 	prepareWriteRowQuery();
 
 	result = SQLExecute(hstmt);
-	if(checkSqlResult(result, "writeRow.SQLExecute"))
+	if(checkSqlResult(result, "SQLExecute")) {
 		return EILSEQ;
+	}
 
 	return 0;
 }
@@ -485,8 +492,10 @@ int SQLSource::prepareWriteQuery() {
 		}
 		ParameterInfo* paramInfo = initParameter(curCol, bufferSize);
 		int result = SQLBindParameter(hstmt, i+1, SQL_PARAM_INPUT, columnType, dbType, columnSize, precision, paramInfo->data, 0, &paramInfo->dataSizeOrInd);
-		if(checkSqlResult(result, "prepareWriteQuery.SQLBindParameter"))
+		if(checkSqlResult(result, "SQLBindParameter")) {
+			getLogger()->log(ILog::LL_Error, "Error while binding column \"%s\"\n", row->getColumnName(curCol));
 			return ENOEXEC;
+		}
 	}
 
 	strcpy(p, ");");

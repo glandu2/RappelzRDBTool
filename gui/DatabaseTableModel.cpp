@@ -4,6 +4,7 @@
 #include "../Base/ICharsetConverter.h"
 #include <errno.h>
 #include "Settings.h"
+#include "../Base/ILog.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -159,7 +160,7 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 			break;
 
 		case TYPE_VARCHAR_SIZE:
-			fprintf(stderr, "Warning ! Attempting to print varchar size\n");
+			getLogger()->log(ILog::LL_Trace, "Warning ! Attempting to print varchar size\n");
 			break;
 
 		case TYPE_INT32:

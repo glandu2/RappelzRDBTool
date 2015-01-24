@@ -23,5 +23,11 @@
 #	define DLLCALLCONV __stdcall
 #endif
 
+#ifdef __GNUC__
+#define PRINTFCHECK(formatidx, argsidx) __attribute__((format (printf, formatidx, argsidx)))
+#else
+#define PRINTFCHECK(formatidx, argsidx)
+#endif
+
 
 #endif // EXPORTDLL_H_INCLUDED

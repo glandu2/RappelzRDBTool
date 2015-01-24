@@ -2,6 +2,7 @@
 
 #include "IDatabaseDescription.h"
 #include "SpecialDatabaseRules.h"
+#include "Log.h"
 
 #include "RDBSource.h"
 #include "RDBSkillTreeSource.h"
@@ -148,7 +149,7 @@ int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCO
 	getDataSourceInfo(type, &ds, &order, &destFormat);
 	getRowManipulator()->setFieldOrder(order);
 
-	fprintf(stderr, "Reading %s\n", source);
+	getLogger()->log(ILog::LL_Info, "Reading %s\n", source);
 
 	rowManipulator->setFieldOrder(order);
 
@@ -173,7 +174,7 @@ int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCO
 			result = ds->processRow();
 			if(result != 0) {
 				rowManipulator->freeRow();
-				fprintf(stderr, "\nError while reading (%d), aborting\n", result);
+				getLogger()->log(ILog::LL_Error, "\nError while reading (%d), aborting\n", result);
 				break;
 			}
 			result = rowManipulator->completeRowInit();
@@ -209,7 +210,7 @@ int Database::writeData(eDataSourceType type, const char* source, void (DLLCALLC
 	getDataSourceInfo(type, &ds, &order, &destFormat);
 	getRowManipulator()->setFieldOrder(order);
 
-	fprintf(stderr, "Writing %s\n", source);
+	getLogger()->log(ILog::LL_Info, "Writing %s\n", source);
 
 	rowManipulator->setFieldOrder(order);
 
@@ -228,7 +229,7 @@ int Database::writeData(eDataSourceType type, const char* source, void (DLLCALLC
 
 		result = ds->processRow();
 		if(result != 0) {
-			fprintf(stderr, "\nError while writing (%d), aborting\n", result);
+			getLogger()->log(ILog::LL_Error, "\nError while writing (%d), aborting\n", result);
 			break;
 		}
 
