@@ -19,3 +19,8 @@ cp bin/RappelzRDBToolQt.exe bin/RpzRdbBase.dll bin/*Database.dll gui/RappelzRDBT
 pushd $dir_dev && zip ../../$dir_dev.zip * && popd
 pushd $dir_dbsrc && zip ../../$dir_dbsrc.zip * && popd
 pushd $dir_guibin && zip ../../$dir_guibin.zip * && popd
+
+code_version=`grep setApplicationVersion gui/main.cpp | sed -r 's/.*setApplicationVersion\("(.*)"\).*/\1/g'`
+if [ "$code_version" != "$version" ]; then
+	echo Version mismatch: main.cpp contains $code_version, deploying for version $version
+fi
