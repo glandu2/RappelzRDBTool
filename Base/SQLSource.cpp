@@ -151,6 +151,8 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 	if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "SQLExecDirect"))
 		return ENOENT;
 
+	if(checkSqlResult(SQLFetch(hstmt), "prepareRead.SQLFetch"))
+		return ENOENT;
 	if(checkSqlResult(SQLGetData(hstmt, 1, SQL_C_LONG, &rowCount, sizeof(int), NULL), "SQLGetData"))
 		return ENOENT;
 	setRowNumber(rowCount);
