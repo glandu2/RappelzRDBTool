@@ -47,7 +47,7 @@ void RDBSource::close() {
 	io_buffer = 0;
 }
 
-void copyWithNOT(char *buffer, const char *src) {
+static void copyWithNOT(char *buffer, const char *src) {
 	while(*src) {
 		*buffer = ~*src;
 		buffer++;
