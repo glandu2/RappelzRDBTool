@@ -136,6 +136,7 @@ int SQLFileSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 	ptr += strlen(ptr);
 
 	endOfHeader = ptr;
+	currentRow = 0;
 
 	return 0;
 }
@@ -167,7 +168,7 @@ int SQLFileSource::createSQLTable() {
 			fputs(" PRIMARY KEY", outputFile);
 		}
 	}
-	fputs("\n);\n", outputFile);
+	fputs("\n);\nGO\n", outputFile);
 
 	return ferror(outputFile);
 }
@@ -247,6 +248,10 @@ int SQLFileSource::writeRow() {
 	strcpy(ptr, ");\n");
 
 	fputs(query, outputFile);
+
+	currentRow++;
+	if(currentRow % 100 == 0)
+		fputs("GO\n", outputFile);
 
 	return 0;
 }

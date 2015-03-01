@@ -45,6 +45,7 @@ class SQLFileSource : public IDataSource
 		SQLLanguage *sqlLanguage;
 		char query[256*1024];
 		char *endOfHeader;
+		int currentRow;
 };
 
 } //namespace
