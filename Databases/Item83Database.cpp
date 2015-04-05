@@ -331,28 +331,24 @@ static ArenaPoints arenaPoints[] =
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
-		char *catValue = static_cast<char*>(row->getValuePtr("unkCatValue"));
-		catValue[0] = 'C';
-		catValue[1] = 'a';
-		catValue[2] = 't';
-		*static_cast<int*>(row->getValuePtr("item_use_flag2")) = *static_cast<int*>(row->getValuePtr("item_use_flag"));
-		*static_cast<short*>(row->getValuePtr("unknownValue1")) = 49;
+		row->setDataString("unkCatValue", "Cat");
+		row->setDataInt32("item_use_flag2", row->getDataInt32("item_use_flag"));
+		row->setDataInt16("unknownValue1", 49);
 
 		char nvValues[4];
 		int i;
 		for(i=0; i<9; i++) {
 			sprintf(nvValues, "nv%d", i);
-			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
+			row->setDataBit(nvValues, 0);
 		}
-		*static_cast<short*>(row->getValuePtr("nv9")) = 0;
+		row->setDataInt16("nv9", 0);
 	} else if(mode == DCT_Read && dst == DF_RDB) {
-		int id = *static_cast<int*>(row->getValuePtr("id"));
-		int* arena_point_column = static_cast<int*>(row->getValuePtr("arena_point"));
+		int id = row->getDataInt32("id");
 		int i;
-		*arena_point_column = 0;
+		row->setDataInt32("arena_point", 0);
 		for(i = 0; i < sizeof(arenaPoints) / sizeof(ArenaPoints); i++) {
 			if(arenaPoints[i].id == id) {
-				*arena_point_column = arenaPoints[i].arena_point;
+				row->setDataInt32("arena_point", arenaPoints[i].arena_point);
 				break;
 			}
 		}

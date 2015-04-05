@@ -111,31 +111,31 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && (dst == DF_SQL || dst == DF_CSV)) {
-		*static_cast<char*>(row->getValuePtr("nv")) = 0;
-		*static_cast<char*>(row->getValuePtr("padding0")) = 0;
-		*static_cast<short*>(row->getValuePtr("padding1")) = 0;
-		*static_cast<char*>(row->getValuePtr("unknown1")) = 0;
-		*static_cast<short*>(row->getValuePtr("unknown2")) = 0;
-		*static_cast<char*>(row->getValuePtr("unknown4")) = 55;
-		*static_cast<char*>(row->getValuePtr("unknown5")) = 0;
-		*static_cast<short*>(row->getValuePtr("unknown6")) = 0;
-		*static_cast<char*>(row->getValuePtr("unknownPadding")) = 0;
+		row->setDataBit("nv", 0);
+		row->setDataInt8("padding0", 0);
+		row->setDataInt16("padding1", 0);
+		row->setDataInt8("unknown1", 0);
+		row->setDataInt16("unknown2", 0);
+		row->setDataInt8("unknown4", 55);
+		row->setDataInt8("unknown5", 0);
+		row->setDataInt16("unknown6", 0);
+		row->setDataInt8("unknownPadding", 0);
 	} else if(mode == DCT_Read && dst == DF_RDB) {
-		int questId = *static_cast<short*>(row->getValuePtr("id"));
+		int questId = row->getDataInt16("id");
 
 		if(questId >= 3600 && questId <= 3611 && questId != 3610)
-			*static_cast<int*>(row->getValuePtr("hate_group_id")) = 1;
+			row->setDataInt32("hate_group_id", 1);
 		else
-			*static_cast<int*>(row->getValuePtr("hate_group_id")) = 0;
+			row->setDataInt32("hate_group_id", 0);
 
-		*static_cast<int*>(row->getValuePtr("favor_group_id")) = 999;
-		*static_cast<int*>(row->getValuePtr("limit_favor_group_id")) = 0;
+		row->setDataInt32("favor_group_id", 999);
+		row->setDataInt32("limit_favor_group_id", 0);
 
-		*static_cast<char*>(row->getValuePtr("or_flag")) *= -1;
+		row->setDataInt8("or_flag", row->getDataInt8("or_flag") * -1);
 
-		strcpy(static_cast<char*>(row->getValuePtr("script_start_text")), "0");
-		strcpy(static_cast<char*>(row->getValuePtr("script_end_text")), "0");
-		strcpy(static_cast<char*>(row->getValuePtr("script_drop_text")), "0");
+		row->setDataString("script_start_text", "0");
+		row->setDataString("script_end_text", "0");
+		row->setDataString("script_drop_text", "0");
 	}
 }
 

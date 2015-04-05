@@ -315,45 +315,42 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Write && dst == DF_RDB) {
-		char *catValue = static_cast<char*>(row->getValuePtr("unkCatValue"));
-		catValue[0] = 'C';
-		catValue[1] = 'a';
-		catValue[2] = 't';
-		*static_cast<int*>(row->getValuePtr("item_use_flag2")) = 
-			 *static_cast<char*>(row->getValuePtr("flag_wear")) |
-			(*static_cast<char*>(row->getValuePtr("flag_storage")) << 1) |
-			(*static_cast<char*>(row->getValuePtr("flag_enhance")) << 2) |
-			(*static_cast<char*>(row->getValuePtr("flag_use")) << 3) |
-			(*static_cast<char*>(row->getValuePtr("flag_card")) << 4) |
-			(*static_cast<char*>(row->getValuePtr("flag_socket")) << 5) |
-			(*static_cast<char*>(row->getValuePtr("flag_duplicate")) << 6) |
-			(*static_cast<char*>(row->getValuePtr("flag_target_use")) << 7) |
-			(*static_cast<char*>(row->getValuePtr("flag_warp")) << 8) |
-			(*static_cast<char*>(row->getValuePtr("flag_trade")) << 9) |
-			(*static_cast<char*>(row->getValuePtr("flag_sell")) << 10) |
-			(*static_cast<char*>(row->getValuePtr("flag_quest")) << 11) |
-			(*static_cast<char*>(row->getValuePtr("flag_overweight")) << 12) |
-			(*static_cast<char*>(row->getValuePtr("flag_cashitem")) << 13) |
-			(*static_cast<char*>(row->getValuePtr("flag_riding")) << 14) |
-			(*static_cast<char*>(row->getValuePtr("flag_drop")) << 15) |
-			(*static_cast<char*>(row->getValuePtr("flag_move")) << 16) |
-			(*static_cast<char*>(row->getValuePtr("flag_quest_distribute")) << 17) |
-			(*static_cast<char*>(row->getValuePtr("flag_sit")) << 18) |
-			(*static_cast<char*>(row->getValuePtr("flag_raid")) << 19) |
-			(*static_cast<char*>(row->getValuePtr("flag_secroute")) << 20) |
-			(*static_cast<char*>(row->getValuePtr("flag_eventmap")) << 21) |
-			(*static_cast<char*>(row->getValuePtr("flag_huntaholic")) << 22) |
-			(*static_cast<char*>(row->getValuePtr("flag_huntaholic_useable_only")) << 23) |
-			(*static_cast<char*>(row->getValuePtr("flag_deathmatch")) << 24) |
-			(*static_cast<char*>(row->getValuePtr("flag_deathmatch_useable_only")) << 25);
-		*static_cast<short*>(row->getValuePtr("unknownValue0")) = 0;
-		*static_cast<short*>(row->getValuePtr("unknownValue1")) = 49;
+		row->setDataString("unkCatValue", "Cat");
+		row->setDataInt32("item_use_flag2",
+			 row->getDataBit("flag_wear") |
+			(row->getDataBit("flag_storage") << 1) |
+			(row->getDataBit("flag_enhance") << 2) |
+			(row->getDataBit("flag_use") << 3) |
+			(row->getDataBit("flag_card") << 4) |
+			(row->getDataBit("flag_socket") << 5) |
+			(row->getDataBit("flag_duplicate") << 6) |
+			(row->getDataBit("flag_target_use") << 7) |
+			(row->getDataBit("flag_warp") << 8) |
+			(row->getDataBit("flag_trade") << 9) |
+			(row->getDataBit("flag_sell") << 10) |
+			(row->getDataBit("flag_quest") << 11) |
+			(row->getDataBit("flag_overweight") << 12) |
+			(row->getDataBit("flag_cashitem") << 13) |
+			(row->getDataBit("flag_riding") << 14) |
+			(row->getDataBit("flag_drop") << 15) |
+			(row->getDataBit("flag_move") << 16) |
+			(row->getDataBit("flag_quest_distribute") << 17) |
+			(row->getDataBit("flag_sit") << 18) |
+			(row->getDataBit("flag_raid") << 19) |
+			(row->getDataBit("flag_secroute") << 20) |
+			(row->getDataBit("flag_eventmap") << 21) |
+			(row->getDataBit("flag_huntaholic") << 22) |
+			(row->getDataBit("flag_huntaholic_useable_only") << 23) |
+			(row->getDataBit("flag_deathmatch") << 24) |
+			(row->getDataBit("flag_deathmatch_useable_only") << 25));
+		row->setDataInt16("unknownValue0", 0);
+		row->setDataInt16("unknownValue1", 49);
 
 		char nvValues[5];
 		int i;
 		for(i=0; i<15; i++) {
 			sprintf(nvValues, "nv%d", i);
-			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
+			row->setDataBit(nvValues, 0);
 		}
 	}
 }

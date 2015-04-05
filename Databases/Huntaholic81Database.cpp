@@ -31,13 +31,13 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_RDB) {
-		*static_cast<int*>(row->getValuePtr("max_point")) = 6000;
-		*static_cast<int*>(row->getValuePtr("lobby_channel_id")) = 300011;
-		*static_cast<int*>(row->getValuePtr("lobby_x")) = 83719;
-		*static_cast<int*>(row->getValuePtr("lobby_y")) = 2544;
-		*static_cast<int*>(row->getValuePtr("dungeon_channel_id")) = 300000;
-		*static_cast<int*>(row->getValuePtr("dungeon_x")) = 88935;
-		*static_cast<int*>(row->getValuePtr("dungeon_y")) = 8622;
+		row->setDataInt32("max_point", 6000);
+		row->setDataInt32("lobby_channel_id", 300011);
+		row->setDataInt32("lobby_x", 83719);
+		row->setDataInt32("lobby_y", 2544);
+		row->setDataInt32("dungeon_channel_id", 300000);
+		row->setDataInt32("dungeon_x", 88935);
+		row->setDataInt32("dungeon_y", 8622);
 	}
 }
 

@@ -63,8 +63,8 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && (dst == DF_CSV || dst == DF_SQL)) {
-		*static_cast<short*>(row->getValuePtr("padding0")) = 103;
-		*static_cast<char*>(row->getValuePtr("padding1")) = 0;
+		row->setDataInt16("padding0", 103);
+		row->setDataInt8("padding1", 0);
 	}
 }
 

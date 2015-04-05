@@ -447,66 +447,52 @@ static SetIds setIds[] = {
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
-		char *catValue = static_cast<char*>(row->getValuePtr("unkCatValue"));
-		catValue[0] = 'y';
-		catValue[1] = ' ';
-		catValue[2] = 'I';
-		*static_cast<char*>(row->getValuePtr("unknown3")) = 0;
-		*static_cast<short*>(row->getValuePtr("unknown4")) = 0;
+		row->setDataString("unkCatValue", "y I");
+		row->setDataInt8("unknown3", 0);
+		row->setDataInt16("unknown4", 0);
 
 		char nvValues[4];
 		int i;
 		for(i=0; i<16; i++) {
 			sprintf(nvValues, "nv%d", i);
 			if(i != 9)
-				*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
+				row->setDataBit(nvValues, 0);
 			else
-				*static_cast<short*>(row->getValuePtr(nvValues)) = 0;
+				row->setDataInt16(nvValues, 0);
 		}
 	}
 
 	if(dst == DF_RDB) {
 		if(mode == DCT_Read) {
-			*static_cast<int*>(row->getValuePtr("set_part_flag")) /= 2;
+			row->setDataInt32("set_part_flag", row->getDataInt32("set_part_flag")/2);
 
-			char* script_text = static_cast<char*>(row->getValuePtr("script_text"));
-			if(script_text[0] == '\0') {
-				script_text[0] = '0';
-				script_text[1] = '\0';
+			if(strcmp(row->getDataString("script_text"), "") == 0) { //if they are equals
+				row->setDataString("script_text", "0");
 			}
 
-			int id = *static_cast<int*>(row->getValuePtr("id"));
-			int* set_id_colummn = static_cast<int*>(row->getValuePtr("set_id"));
+			int id = row->getDataInt32("id");
 			int i;
-			*set_id_colummn = 0;
+			row->setDataInt32("set_id", 0);
 			for(i = 0; i < sizeof(setIds) / sizeof(SetIds); i++) {
 				if(setIds[i].id == id) {
-					*set_id_colummn = setIds[i].set_id;
+					row->setDataInt32("set_id", setIds[i].set_id);
 					break;
 				}
 			}
 		} else {
-			char* script_text = static_cast<char*>(row->getValuePtr("script_text"));
-			if(script_text[0] == '0' && script_text[1] == '\0') {
-				script_text[0] = '\0';
+			if(strcmp(row->getDataString("script_text"), "0") == 0) { //if they are equals
+				row->setDataString("script_text", "");
 			}
 		}
 	}
 
 	if(mode == DCT_Read && dst == DF_SQL) {
-		int* model_type_dem = static_cast<int*>(row->getValuePtr("model_type_dem"));
-		int* model_type_def = static_cast<int*>(row->getValuePtr("model_type_def"));
-		int* model_type_asm = static_cast<int*>(row->getValuePtr("model_type_asm"));
-		int* model_type_asf = static_cast<int*>(row->getValuePtr("model_type_asf"));
-		int* model_type_gam = static_cast<int*>(row->getValuePtr("model_type_gam"));
-		int* model_type_gaf = static_cast<int*>(row->getValuePtr("model_type_gaf"));
-
-		*model_type_dem = *model_type_dem != 0;
-		*model_type_def = *model_type_def != 0;
-		*model_type_asm = *model_type_asm != 0;
-		*model_type_asf = *model_type_asf != 0;
-		*model_type_gam = *model_type_gam != 0;
-		*model_type_gaf = *model_type_gaf != 0;
+		row->setDataInt32("model_type_dem", row->getDataInt32("model_type_dem") != 0);
+		row->setDataInt32("model_type_def", row->getDataInt32("model_type_def") != 0);
+		row->setDataInt32("model_type_asm", row->getDataInt32("model_type_asm") != 0);
+		row->setDataInt32("model_type_asf", row->getDataInt32("model_type_asf") != 0);
+		row->setDataInt32("model_type_gam", row->getDataInt32("model_type_gam") != 0);
+		row->setDataInt32("model_type_gaf", row->getDataInt32("model_type_gaf") != 0);
 	}
 }
 

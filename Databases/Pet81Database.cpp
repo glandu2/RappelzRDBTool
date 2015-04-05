@@ -39,11 +39,11 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_SQL) {
-		int id = *static_cast<int*>(row->getValuePtr("id"));
+		int id = row->getDataInt32("id");
 		if(id >= 500 && id < 600)
-			*static_cast<int*>(row->getValuePtr("rate")) = 21;
+			row->setDataInt32("rate", 21);
 		else
-			*static_cast<int*>(row->getValuePtr("rate")) = 5;
+			row->setDataInt32("rate", 5);
 	}
 }
 

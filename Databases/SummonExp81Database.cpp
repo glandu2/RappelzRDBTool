@@ -23,7 +23,7 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_RDB) {
-		*static_cast<int*>(row->getValuePtr("level")) = rowNum + 1;
+		row->setDataInt32("level", rowNum + 1);
 	}
 }
 

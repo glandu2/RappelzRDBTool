@@ -114,26 +114,26 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	int *value, result, i;
+	int value, result, i;
 	if(mode == DCT_Read && dst == DF_RDB) {
-		value = static_cast<int*>(row->getValuePtr("id"));
+		value = row->getDataInt32("id");
 		for(i=0, result=0; i<32; i++) {
-			if((1<<i) & *value)
+			if((1<<i) & value)
 				result |= 1 << decodeMap[i];
 		}
-		*value = result;
-		*static_cast<char*>(row->getValuePtr("script_on_dead")) = 0;
+		row->setDataInt32("id", result);
+		row->setDataInt8("script_on_dead", 0);
 	} else if(mode == DCT_Write && dst == DF_RDB) {
-		value = static_cast<int*>(row->getValuePtr("id"));
+		value = row->getDataInt32("id");
 		for(i=0, result=0; i<32; i++) {
-			if((1<<i) & *value)
+			if((1<<i) & value)
 				result |= 1 << encodeMap[i];
 		}
-		*value = result;
-		*static_cast<char*>(row->getValuePtr("padding0")) = 0;
-		*static_cast<short*>(row->getValuePtr("padding1")) = 0;
+		row->setDataInt32("id", result);
+		row->setDataInt8("padding0", 0);
+		row->setDataInt16("padding1", 0);
 	} else if(mode == DCT_Read && DF_SQL) {
-		*static_cast<int*>(row->getValuePtr("attack_speed_type")) = 15;
+		row->setDataInt32("attack_speed_type", 15);
 	}
 }
 

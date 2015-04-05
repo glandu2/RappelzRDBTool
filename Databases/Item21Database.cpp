@@ -281,18 +281,11 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	/*if(mode == DCT_Read && dst != DF_RDB) {
-		char *catValue = static_cast<char*>(row->getValuePtr("unkCatValue"));
-		catValue[0] = 'f';
-		catValue[1] = 'o';
-		catValue[2] = '=';
-		*static_cast<char*>(row->getValuePtr("unknown3")) = 0;
-		*static_cast<short*>(row->getValuePtr("unknown4")) = 0;
-
 		char nvValues[4];
 		int i;
 		for(i=0; i<16; i++) {
 			sprintf(nvValues, "nv%d", i);
-			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
+			row->setDataBit(nvValues, 0);
 		}
 	}*/
 }

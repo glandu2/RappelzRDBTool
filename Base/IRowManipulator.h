@@ -28,8 +28,8 @@ class IRowManipulator : public IObject
 		//must be called before getValuePtr()
 		virtual int DLLCALLCONV initData(int colPos, unsigned int dataCount = 0) = 0;
 
+		virtual void * DLLCALLCONV getValuePtrByName(const char* columnName) = 0;
 		virtual void * DLLCALLCONV getValuePtr(int colPos) = 0;
-		virtual void * DLLCALLCONV getValuePtr(const char* columnName) = 0;
 
 		virtual int DLLCALLCONV getDataCount(int colPos) = 0;	//use the value saved in TYPE_VARCHAR_SIZE to get TYPE_VARCHAR_STR size else return the same as getMaxDataCount()
 		virtual void DLLCALLCONV setDataCount(int colPos, int dataCount) = 0;
@@ -52,6 +52,50 @@ class IRowManipulator : public IObject
 		virtual const char * DLLCALLCONV getColumnName(int colPos) = 0;
 		virtual int DLLCALLCONV getColumnOriginalIndex(int i) = 0;
 		virtual int DLLCALLCONV getColumnIndex(const char* columnName) = 0;
+
+		// Set a column value
+		virtual void DLLCALLCONV setDataBit(const char* columnName, char value) = 0;
+		virtual void DLLCALLCONV setDataInt8(const char* columnName, char value) = 0;
+		virtual void DLLCALLCONV setDataInt16(const char* columnName, short value) = 0;
+		virtual void DLLCALLCONV setDataInt32(const char* columnName, int value) = 0;
+		virtual void DLLCALLCONV setDataInt64(const char* columnName, long long int value) = 0;
+		virtual void DLLCALLCONV setDataFloat32(const char* columnName, float value) = 0;
+		virtual void DLLCALLCONV setDataFloat64(const char* columnName, double value) = 0;
+		virtual void DLLCALLCONV setDataDecimal(const char* columnName, float value) = 0;
+
+		// Set a column array data (size is number of element in the input array)
+		virtual void DLLCALLCONV setDataBitArray(const char* columnName, char* array, int size) = 0;
+		virtual void DLLCALLCONV setDataInt8Array(const char* columnName, char* array, int size) = 0;
+		virtual void DLLCALLCONV setDataInt16Array(const char* columnName, short* array, int size) = 0;
+		virtual void DLLCALLCONV setDataInt32Array(const char* columnName, int* array, int size) = 0;
+		virtual void DLLCALLCONV setDataInt64Array(const char* columnName, long long int* array, int size) = 0;
+		virtual void DLLCALLCONV setDataFloat32Array(const char* columnName, float* array, int size) = 0;
+		virtual void DLLCALLCONV setDataFloat64Array(const char* columnName, double* array, int size) = 0;
+		virtual void DLLCALLCONV setDataDecimalArray(const char* columnName, float* array, int size) = 0;
+
+		virtual void DLLCALLCONV setDataString(const char* columnName, const char* value) = 0;
+
+		// get a column value
+		virtual char DLLCALLCONV getDataBit(const char* columnName) = 0;
+		virtual char DLLCALLCONV getDataInt8(const char* columnName) = 0;
+		virtual short DLLCALLCONV getDataInt16(const char* columnName) = 0;
+		virtual int DLLCALLCONV getDataInt32(const char* columnName) = 0;
+		virtual long long int DLLCALLCONV getDataInt64(const char* columnName) = 0;
+		virtual float DLLCALLCONV getDataFloat32(const char* columnName) = 0;
+		virtual double DLLCALLCONV getDataFloat64(const char* columnName) = 0;
+		virtual float DLLCALLCONV getDataDecimal(const char* columnName) = 0;
+
+		// get a column array value
+		virtual char DLLCALLCONV getDataBitArray(const char* columnName, int index) = 0;
+		virtual char DLLCALLCONV getDataInt8Array(const char* columnName, int index) = 0;
+		virtual short DLLCALLCONV getDataInt16Array(const char* columnName, int index) = 0;
+		virtual int DLLCALLCONV getDataInt32Array(const char* columnName, int index) = 0;
+		virtual long long int DLLCALLCONV getDataInt64Array(const char* columnName, int index) = 0;
+		virtual float DLLCALLCONV getDataFloat32Array(const char* columnName, int index) = 0;
+		virtual double DLLCALLCONV getDataFloat64Array(const char* columnName, int index) = 0;
+		virtual float DLLCALLCONV getDataDecimalArray(const char* columnName, int index) = 0;
+
+		virtual const char* DLLCALLCONV getDataString(const char* columnName) = 0;
 };
 
 #endif // IROWMANIPULATOR_H

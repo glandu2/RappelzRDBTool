@@ -56,8 +56,8 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Write && dst == DF_RDB) {
-		int *nulValues = static_cast<int*>(row->getValuePtr("nulValues"));
-		memset(nulValues, 0, sizeof(int)*30);
+		int nulValues[32] = {0};
+		row->setDataInt32Array("nulValues", nulValues, 30);
 	}
 }
 

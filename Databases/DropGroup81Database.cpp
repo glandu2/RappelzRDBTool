@@ -66,15 +66,17 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 
 		for(i=0; i<10; i++) {
 			sprintf(columnName, "drop_item_id_%02d", i);
-			value = *static_cast<int*>(row->getValuePtr(columnName));
+			value = row->getDataInt32(columnName);
 			sprintf(columnName, "drop_min_count_%02d", i);
-			if(value != 0) {
-				*static_cast<int*>(row->getValuePtr(columnName)) = 1;
-			} else *static_cast<int*>(row->getValuePtr(columnName)) = 0;
+			if(value != 0)
+				row->setDataInt32(columnName, 1);
+			else
+				row->setDataInt32(columnName, 0);
 			sprintf(columnName, "drop_max_count_%02d", i);
-			if(value != 0) {
-				*static_cast<int*>(row->getValuePtr(columnName)) = 1;
-			} else *static_cast<int*>(row->getValuePtr(columnName)) = 0;
+			if(value != 0)
+				row->setDataInt32(columnName, 1);
+			else
+				row->setDataInt32(columnName, 0);
 		}
 	}
 }

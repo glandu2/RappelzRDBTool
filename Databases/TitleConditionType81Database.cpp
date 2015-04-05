@@ -26,8 +26,8 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_RDB) {
-		*static_cast<char*>(row->getValuePtr("is_set")) = 0;
-		*static_cast<char*>(row->getValuePtr("skip_db_update")) = 0;
+		row->setDataBit("is_set", 0);
+		row->setDataBit("skip_db_update", 0);
 	}
 }
 

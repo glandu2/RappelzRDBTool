@@ -305,33 +305,30 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
-		char *catValue = static_cast<char*>(row->getValuePtr("unkCatValue"));
-		catValue[0] = 'f';
-		catValue[1] = 'o';
-		catValue[2] = '=';
-		*static_cast<char*>(row->getValuePtr("unknown3")) = 0;
-		*static_cast<short*>(row->getValuePtr("unknown4")) = 0;
+		row->setDataString("unkCatValue", "fo=");
+		row->setDataInt8("unknown3", 0);
+		row->setDataInt16("unknown4", 0);
 
 		char nvValues[4];
 		int i;
 		for(i=0; i<16; i++) {
 			sprintf(nvValues, "nv%d", i);
-			*static_cast<char*>(row->getValuePtr(nvValues)) = 0;
+			row->setDataBit(nvValues, 0);
 		}
 	} else if(mode == DCT_Read && dst == DF_RDB) {
-		*static_cast<int*>(row->getValuePtr("huntaholic_point")) = 0;
-		*static_cast<int*>(row->getValuePtr("set_id")) = 0;
-		*static_cast<int*>(row->getValuePtr("set_part_flag")) = 0;
+		row->setDataInt32("huntaholic_point", 0);
+		row->setDataInt32("set_id", 0);
+		row->setDataInt32("set_part_flag", 0);
 	}
 
 	if(mode == DCT_Read && dst == DF_SQL) {
-		*static_cast<char*>(row->getValuePtr("flag_card")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_socket")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_warp")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_quest_distribute")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_huntaholic_useable_only")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_deathmatch")) = 0;
-		*static_cast<char*>(row->getValuePtr("flag_deathmatch_useable_only")) = 0;
+		row->setDataBit("flag_card", 0);
+		row->setDataBit("flag_socket", 0);
+		row->setDataBit("flag_warp", 0);
+		row->setDataBit("flag_quest_distribute", 0);
+		row->setDataBit("flag_huntaholic_useable_only", 0);
+		row->setDataBit("flag_deathmatch", 0);
+		row->setDataBit("flag_deathmatch_useable_only", 0);
 	}
 }
 

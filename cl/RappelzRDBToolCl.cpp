@@ -124,16 +124,16 @@ void tempFunction(IDatabase *database) {
 	for(i=0; i<rowCount; i++) {
 		str = vit = agi = dex = intel = wis = lck = 0;
 		row->setCurrentRow(database->getRowAt(i));
-		printf("%d\t", *static_cast<int*>(row->getValuePtr("id")));
+		printf("%d\t", row->getDataInt32("id"));
 		for(j=1; j<9; j++) {
 			sprintf(buffer, "stat_%d_present", j);
-			if(*static_cast<short*>(row->getValuePtr(buffer)) == 96) {
+			if(row->getDataInt16(buffer) == 96) {
 				int flag;
 				int data;
 				sprintf(buffer, "stat_flag_%d", j);
-				flag = (int)(*static_cast<float*>(row->getValuePtr(buffer)));
+				flag = (int)(row->getDataFloat32(buffer));
 				sprintf(buffer, "stat_%d", j);
-				data = (int)(*static_cast<float*>(row->getValuePtr(buffer)));
+				data = (int)(row->getDataFloat32(buffer));
 				if(flag & 0x01)
 					str = data;
 				if(flag & 0x02)

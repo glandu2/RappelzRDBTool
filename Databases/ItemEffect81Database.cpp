@@ -48,10 +48,10 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_RDB) {
-		*static_cast<int*>(row->getValuePtr("min_level")) = 0;
-		*static_cast<int*>(row->getValuePtr("max_level")) = 0;
+		row->setDataInt32("min_level", 0);
+		row->setDataInt32("max_level", 0);
 	} else if(mode == DCT_Read && dst == DF_SQL) {
-		*static_cast<int*>(row->getValuePtr("unknown")) = 0;
+		row->setDataInt32("unknown", 0);
 	}
 }
 

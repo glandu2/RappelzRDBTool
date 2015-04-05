@@ -33,7 +33,7 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_SQL) {
-		*static_cast<short*>(row->getValuePtr("unknown_value")) = 163;
+		row->setDataInt16("unknown_value", 163);
 	}
 }
 

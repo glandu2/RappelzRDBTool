@@ -7,6 +7,8 @@
 
 #include <assert.h>
 #include <vector>
+#include <unordered_map>
+#include <string>
 
 namespace RappelzRDBBase {
 
@@ -24,8 +26,8 @@ class RowManipulator : public CImplement<IRowManipulator>
 		//must be called before getValuePtr()
 		int DLLCALLCONV initData(int colPos, unsigned int dataCount = 0);
 
+		inline void * DLLCALLCONV getValuePtrByName(const char* columnName) { return getValuePtr(getColumnIndex(columnName)); }
 		void * DLLCALLCONV getValuePtr(int colPos);
-		inline void * DLLCALLCONV getValuePtr(const char* columnName) { return getValuePtr(getColumnIndex(columnName)); }
 
 		int DLLCALLCONV getDataCount(int colPos);	//use the value saved in TYPE_VARCHAR_SIZE to get TYPE_VARCHAR_STR size else return the same as getMaxDataCount()
 		void DLLCALLCONV setDataCount(int colPos, int dataCount);
@@ -53,6 +55,53 @@ class RowManipulator : public CImplement<IRowManipulator>
 #endif
 		int DLLCALLCONV getColumnIndex(const char* columnName);
 
+		// Set a column value
+		void DLLCALLCONV setDataBit(const char* columnName, char value); //value must be 1 for true or 0 for false
+		void DLLCALLCONV setDataInt8(const char* columnName, char value);
+		void DLLCALLCONV setDataInt16(const char* columnName, short value);
+		void DLLCALLCONV setDataInt32(const char* columnName, int value);
+		void DLLCALLCONV setDataInt64(const char* columnName, long long int value);
+		void DLLCALLCONV setDataFloat32(const char* columnName, float value);
+		void DLLCALLCONV setDataFloat64(const char* columnName, double value);
+		void DLLCALLCONV setDataDecimal(const char* columnName, float value);
+
+		// Set a column array data (size is number of element in the input array)
+		void DLLCALLCONV setDataBitArray(const char* columnName, char* array, int size); //value can contains at most 8 bits (more is not supported atm)
+		void DLLCALLCONV setDataInt8Array(const char* columnName, char* array, int size);
+		void DLLCALLCONV setDataInt16Array(const char* columnName, short* array, int size);
+		void DLLCALLCONV setDataInt32Array(const char* columnName, int* array, int size);
+		void DLLCALLCONV setDataInt64Array(const char* columnName, long long int* array, int size);
+		void DLLCALLCONV setDataFloat32Array(const char* columnName, float* array, int size);
+		void DLLCALLCONV setDataFloat64Array(const char* columnName, double* array, int size);
+		void DLLCALLCONV setDataDecimalArray(const char* columnName, float* array, int size);
+
+		void DLLCALLCONV setDataString(const char* columnName, const char* value);
+
+		// get a column value
+		char DLLCALLCONV getDataBit(const char* columnName);
+		char DLLCALLCONV getDataInt8(const char* columnName);
+		short DLLCALLCONV getDataInt16(const char* columnName);
+		int DLLCALLCONV getDataInt32(const char* columnName);
+		long long int DLLCALLCONV getDataInt64(const char* columnName);
+		float DLLCALLCONV getDataFloat32(const char* columnName);
+		double DLLCALLCONV getDataFloat64(const char* columnName);
+		float DLLCALLCONV getDataDecimal(const char* columnName);
+
+		// get a column array value
+		char DLLCALLCONV getDataBitArray(const char* columnName, int index);
+		char DLLCALLCONV getDataInt8Array(const char* columnName, int index);
+		short DLLCALLCONV getDataInt16Array(const char* columnName, int index);
+		int DLLCALLCONV getDataInt32Array(const char* columnName, int index);
+		long long int DLLCALLCONV getDataInt64Array(const char* columnName, int index);
+		float DLLCALLCONV getDataFloat32Array(const char* columnName, int index);
+		double DLLCALLCONV getDataFloat64Array(const char* columnName, int index);
+		float DLLCALLCONV getDataDecimalArray(const char* columnName, int index);
+
+		const char* DLLCALLCONV getDataString(const char* columnName);
+
+	protected:
+		void* checkAndGetColumnValuePtr(const char* columnName, int expectedType, int size = 1, int* columnIndex = 0);
+
 	private:
 		FieldOrder *savedOrder;
 		std::vector<int*> indexedSizePtrs;
@@ -63,6 +112,7 @@ class RowManipulator : public CImplement<IRowManipulator>
 		DataDescriptor columnsTypeOrdered;
 		DataDescriptor savedColumnsTypeOrdered;
 		FieldOrder *order;
+		std::unordered_map<std::string, int> columnIndexByName;
 
 		void initRow(bool initializedFields);
 

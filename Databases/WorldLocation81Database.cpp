@@ -220,7 +220,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
-		*static_cast<char*>(row->getValuePtr("unknownvalue0")) = 0;
+		row->setDataInt8("unknownvalue0", 0);
 	}
 }
 

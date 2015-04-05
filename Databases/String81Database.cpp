@@ -44,24 +44,11 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	static bool initialized = false;
-	static int unknownValue0Idx;
-	static int unknownValue1Idx;
-	static int unknownValue2Idx;
-	static int unknownValue3Idx;
-
 	if(mode == DCT_Read && (dst == DF_SQL || dst == DF_CSV)) {
-		if(initialized == false) {
-			unknownValue0Idx = row->getColumnIndex("unknownValue0");
-			unknownValue1Idx = row->getColumnIndex("unknownValue1");
-			unknownValue2Idx = row->getColumnIndex("unknownValue2");
-			unknownValue3Idx = row->getColumnIndex("unknownValue3");
-			initialized = true;
-		}
-		*static_cast<int*>(row->getValuePtr(unknownValue0Idx)) = 0;
-		*static_cast<int*>(row->getValuePtr(unknownValue1Idx)) = 0;
-		*static_cast<int*>(row->getValuePtr(unknownValue2Idx)) = 0;
-		*static_cast<int*>(row->getValuePtr(unknownValue3Idx)) = 0;
+		row->setDataInt32("unknownValue0", 0);
+		row->setDataInt32("unknownValue1", 0);
+		row->setDataInt32("unknownValue2", 0);
+		row->setDataInt32("unknownValue3", 0);
 	}
 	
 }
