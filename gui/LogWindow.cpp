@@ -13,10 +13,13 @@ LogWindow::LogWindow(QWidget *parent) :
 	instance = this;
 	getLogger()->setCallback(&onLogMessage);
 
+	int level = Settings::getSettings()->value("LogWindow/logLevel", 3).toInt();
+	ui->logLevelCombo->setCurrentIndex(level);
+	onLogLevelChange(level);
+
 	connect(ui->clearButton, SIGNAL(clicked()), this, SLOT(onClear()));
 	connect(ui->logLevelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onLogLevelChange(int)));
 
-	ui->logLevelCombo->setCurrentIndex(Settings::getSettings()->value("LogWindow/logLevel", 3).toInt());
 }
 
 LogWindow::~LogWindow()
