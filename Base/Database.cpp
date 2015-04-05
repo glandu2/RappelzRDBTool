@@ -163,8 +163,10 @@ int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCO
 	date = ds->getDate();
 
 	try {
-		if(ds->getRowNumber() > 500000000) //si plus de 500 millions de ligne, alors c'est trop douteux on considere que ce n'est pas un vrai RDB
+		if(ds->getRowNumber() > 500000000) { //si plus de 500 millions de ligne, alors c'est trop douteux on considere que ce n'est pas un vrai RDB
+			getLogger()->log(ILog::LL_Error, "Database: Too many lines in file %s, is the file format correct ? (got %d lines)\n", source, ds->getRowNumber());
 			return EINVAL;
+		}
 		dataList->reserve(ds->getRowNumber());
 
 		while(ds->hasNext()) {
@@ -189,6 +191,7 @@ int Database::readData(eDataSourceType type, const char* source, void (DLLCALLCO
 		}
 		if(result == 0 && progressCallBack) progressCallBack(arg, ds->getRowNumber(), ds->getRowNumber());
 	} catch(...) {
+		getLogger()->log(ILog::LL_Error, "Database: Got exception while reading %s at line %d\n", source, rowProceed+1);
 		return EINVAL;
 	}
 

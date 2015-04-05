@@ -75,6 +75,7 @@ int CSVSource::open(const char* source, eOpenMode openMode, const char *location
 	}
 
 	if(!csvFile) {
+		getLogger()->log(ILog::LL_Error, "CSVSource: Can't open file \"%s\": %s\n", source, strerror(errno));
 		if(errno == ENOENT)
 			return ENOENT;
 		else

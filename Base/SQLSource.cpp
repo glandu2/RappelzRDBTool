@@ -80,6 +80,7 @@ int SQLSource::open(const char* source, eOpenMode openMode, const char *location
 				utf16To8bits = createCharsetConverter(value);
 			} else if(!strcmp(key, "reusetable")) {
 				reuseTableSchema = true;
+				getLogger()->log(ILog::LL_Debug, "SQLSource: Reusing target table\n", value);
 			}
 		}
 	}
@@ -89,10 +90,14 @@ int SQLSource::open(const char* source, eOpenMode openMode, const char *location
 		utf16To8bits = createCharsetConverter("CP1252");
 
 	result = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &henv);
-	if(!SQL_SUCCEEDED(result)) return ENOSYS;
+	if(!SQL_SUCCEEDED(result)) {
+		getLogger()->log(ILog::LL_Error, "SQLSource: Couldn\'t allocate env handle\n");
+		return ENOSYS;
+	}
 
 	result = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, SQL_IS_INTEGER);
 	if(!SQL_SUCCEEDED(result)) {
+		getLogger()->log(ILog::LL_Error, "SQLSource: Couldn\'t set ODBC3 mode\n");
 		SQLFreeHandle(SQL_HANDLE_ENV, henv);
 		henv = 0;
 		return ENOSYS;
@@ -100,7 +105,7 @@ int SQLSource::open(const char* source, eOpenMode openMode, const char *location
 
 	SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 	if(checkSqlResult(SQLDriverConnect(hdbc, 0, (UCHAR*)connectionString, SQL_NTS, 0, 0, 0, 0), "SQLDriverConnect")) {
-		getLogger()->log(ILog::LL_Error, "Connection string: \"%s\"\n", connectionString);
+		getLogger()->log(ILog::LL_Error, "SQLSource: Failed to connect to connection string: \"%s\"\n", connectionString);
 		SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, henv);
 		hdbc = 0;
@@ -124,7 +129,8 @@ void SQLSource::close() {
 	if(getOpenMode() == OM_Write && hdbc) {
 		if(commitTransaction)
 			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
-		else SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
+		else
+			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 	}
 
 	if(hstmt) SQLFreeHandle(SQL_HANDLE_STMT, hstmt);

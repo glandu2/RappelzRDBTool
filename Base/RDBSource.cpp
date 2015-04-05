@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <float.h>
+#include "ILog.h"
 
 namespace RappelzRDBBase {
 
@@ -28,6 +29,7 @@ int RDBSource::open(const char* source, eOpenMode openMode, const char *location
 	rowRead = 0;
 
 	if(!rdbFile) {
+		getLogger()->log(ILog::LL_Error, "RDBSource: Can't open file \"%s\": %s\n", source, strerror(errno));
 		if(errno == ENOENT)
 			return ENOENT;
 		else
@@ -113,6 +115,7 @@ int RDBSource::readRow() {
 				for(; count > 0; count--) {
 					if(bitAvailable == 0) {
 						if(fread(&currentByte, 1, 1, rdbFile) != 1) {
+							getLogger()->log(ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
 							if(errno) return EIO;
 							else return EINVAL;
 						}
@@ -135,6 +138,7 @@ int RDBSource::readRow() {
 			case TYPE_CHAR:
 			case TYPE_INT8:
 				if(fread(buffer, 1, count, rdbFile) != count) {
+					getLogger()->log(ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
 					if(errno) return EIO;
 					else return EINVAL;
 				}
@@ -142,6 +146,7 @@ int RDBSource::readRow() {
 
 			case TYPE_INT16:
 				if(fread(buffer, 2, count, rdbFile) != count) {
+					getLogger()->log(ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
 					if(errno) return EIO;
 					else return EINVAL;
 				}
@@ -152,6 +157,7 @@ int RDBSource::readRow() {
 			case TYPE_DECIMAL:
 			case TYPE_INT32:
 				if(fread(buffer, 4, count, rdbFile) != count) {
+					getLogger()->log(ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
 					if(errno) return EIO;
 					else return EINVAL;
 				}
@@ -160,6 +166,7 @@ int RDBSource::readRow() {
 			case TYPE_FLOAT64:
 			case TYPE_INT64:
 				if(fread(buffer, 8, count, rdbFile) != count) {
+					getLogger()->log(ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
 					if(errno) return EIO;
 					else return EINVAL;
 				}
@@ -270,6 +277,7 @@ int RDBSource::writeRow() {
 		if(row->getType(curCol) != TYPE_BIT) {
 			if(bitAvailable != 8)
 				if(fwrite(&currentByte, 1, 1, rdbFile) != 1) {
+					getLogger()->log(ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
 					return EIO;
 				}
 			bitAvailable = 8;
@@ -282,6 +290,7 @@ int RDBSource::writeRow() {
 				for(; count > 0; count--) {
 					if(bitAvailable == 0) {
 						if(fwrite(&currentByte, 1, 1, rdbFile) != 1) {
+							getLogger()->log(ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
 							return EIO;
 						}
 						bitAvailable = 8;
@@ -302,12 +311,14 @@ int RDBSource::writeRow() {
 			case TYPE_CHAR:
 			case TYPE_INT8:
 				if(fwrite(buffer, 1, count, rdbFile) != count) {
+					getLogger()->log(ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
 					return EIO;
 				}
 				break;
 
 			case TYPE_INT16:
 				if(fwrite(buffer, 2, count, rdbFile) != count) {
+					getLogger()->log(ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
 					return EIO;
 				}
 				break;
@@ -317,6 +328,7 @@ int RDBSource::writeRow() {
 			case TYPE_DECIMAL:
 			case TYPE_INT32:
 				if(fwrite(buffer, 4, count, rdbFile) != count) {
+					getLogger()->log(ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
 					return EIO;
 				}
 				break;
@@ -324,6 +336,7 @@ int RDBSource::writeRow() {
 			case TYPE_FLOAT64:
 			case TYPE_INT64:
 				if(fwrite(buffer, 8, count, rdbFile) != count) {
+					getLogger()->log(ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
 					return EIO;
 				}
 				break;

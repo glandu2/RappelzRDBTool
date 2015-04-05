@@ -8,6 +8,7 @@
 #include <math.h>
 #include <locale.h>
 #include "ICharsetConverter.h"
+#include "ILog.h"
 
 namespace RappelzRDBBase {
 
@@ -55,12 +56,15 @@ SQLFileSource::~SQLFileSource() {
 int SQLFileSource::open(const char* source, eOpenMode openMode, const char *location, const char* options) {
 	IDataSource::open(source, openMode, location, options);
 
-	if(openMode != OM_Write)	//only write sql file supported
+	if(openMode != OM_Write) {	//only write sql file supported
+		getLogger()->log(ILog::LL_Error, "SQLFileSource: Reading from SQL script file is not supported\n");
 		return ENOSYS;
+	}
 
 	outputFile = fopen(source, "w");
 
 	if(!outputFile) {
+		getLogger()->log(ILog::LL_Error, "SQLFileSource: Cannot open output file \"%s\": %s\n", source, strerror(errno));
 		if(errno == ENOENT)
 			return ENOENT;
 		else
@@ -97,6 +101,7 @@ void SQLFileSource::close() {
 }
 
 int SQLFileSource::prepareRead(IRowManipulator *row) {
+	getLogger()->log(ILog::LL_Error, "SQLFileSource: prepareRead: not supported\n");
 	return ENOSYS;
 }
 
@@ -107,8 +112,10 @@ int SQLFileSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 
 	fprintf(outputFile, "DROP TABLE %s;\n", tableName);
 
-	if(createSQLTable())
+	if(createSQLTable()) {
+		getLogger()->log(ILog::LL_Error, "SQLFileSource: Couldn't write SQL create table query to file\n");
 		return ENOENT;
+	}
 
 	fputc('\n', outputFile);
 
@@ -174,6 +181,7 @@ int SQLFileSource::createSQLTable() {
 }
 
 int SQLFileSource::readRow() {
+	getLogger()->log(ILog::LL_Error, "SQLFileSource: readRow: no supported\n");
 	return ENOSYS;
 }
 

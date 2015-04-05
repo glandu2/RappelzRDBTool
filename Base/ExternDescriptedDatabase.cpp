@@ -54,7 +54,7 @@ int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
 #else
 		FreeLibrary((HINSTANCE)libHinst);
 #endif
-		fputs("Not a database description DLL\n", stderr);
+		getLogger()->log(ILog::LL_Error, "ExternDescriptedDatabase: %s is not a database description DLL (no function registerDBStructure found in DLL)\n", databaseName, strerror(errno));
 		return EINVAL;
 	}
 

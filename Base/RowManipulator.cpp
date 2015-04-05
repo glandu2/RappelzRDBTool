@@ -393,11 +393,11 @@ void* RowManipulator::checkAndGetColumnValuePtr(const char *columnName, int type
 			(type == TYPE_VARCHAR_STR || type == TYPE_NVARCHAR_STR || type == TYPE_CHAR)) ||
 			(getType(columnIndex) == TYPE_CHAR && type == TYPE_INT8);
 	if(!isTypeOk) {
-		getLogger()->log(ILog::LL_Error, "RowManipulator: Attempt to set a wrong type value into column %s, column is of type %s but value is of type %s\n", columnName, getTypeName(getType(columnIndex)), getTypeName(type));
+		getLogger()->log(ILog::LL_Error, "RowManipulator: Attempt to get or set a wrong type value into column %s, column is of type %s but input value is of type %s\n", columnName, getTypeName(getType(columnIndex)), getTypeName(type));
 		return 0;
 	}
 	if(getMaxDataCount(columnIndex) < size) {
-		getLogger()->log(ILog::LL_Error, "RowManipulator: Attempt to set a too long value into column %s, column has length of %d but value has length of %d\n", columnName, getMaxDataCount(columnIndex), size);
+		getLogger()->log(ILog::LL_Error, "RowManipulator: Attempt to get or set a too long value into column %s, column has length of %d but input value has length of %d\n", columnName, getMaxDataCount(columnIndex), size);
 		return 0;
 	}
 	if(columnIdx)
