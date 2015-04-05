@@ -44,7 +44,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
-	if(mode == DCT_Read && (dst == DF_SQL || dst == DF_CSV)) {
+	if(mode == DCT_Read && dst != DF_RDB) {
 		row->setDataInt32("unknownValue0", 0);
 		row->setDataInt32("unknownValue1", 0);
 		row->setDataInt32("unknownValue2", 0);

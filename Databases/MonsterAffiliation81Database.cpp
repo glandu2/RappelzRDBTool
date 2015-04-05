@@ -8,9 +8,9 @@ extern "C" {
 #endif
 
 static FieldDescriptor df[] =
-	{{1, TYPE_INT32, "index"},
-	 {1, TYPE_INT32, "value1"},
-	 {1, TYPE_INT32, "name_id"}};
+	{{1, TYPE_INT32, "sid"},
+	 {1, TYPE_INT32, "type_id"},
+	 {1, TYPE_INT32, "string_id"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {

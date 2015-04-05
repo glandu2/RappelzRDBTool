@@ -121,7 +121,7 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		row->setDataInt16("unknown6", 0);
 		row->setDataInt8("unknownPadding", 0);
 	} else if(mode == DCT_Read && dst == DF_RDB) {
-		int questId = row->getDataInt16("id");
+		int questId = row->getDataInt32("id");
 
 		if(questId >= 3600 && questId <= 3611 && questId != 3610)
 			row->setDataInt32("hate_group_id", 1);

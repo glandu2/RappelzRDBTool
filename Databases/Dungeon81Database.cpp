@@ -1,3 +1,4 @@
+#include "IRowManipulator.h"
 #include "DataType.h"
 #include "ExportDLL.h"
 #include <stdlib.h>
@@ -10,6 +11,7 @@ extern "C" {
 static FieldDescriptor df[] =
 	{{1, TYPE_INT32, "id"},
 	 {1, TYPE_INT32, "local_flag"},
+	 {1, TYPE_INT32 | TYPE_SQLIGNORE, "unknown1"},
 	 {1, TYPE_INT32, "dungeon_level"},
 	 {1, TYPE_INT32, "raid_start_pos_x"},
 	 {1, TYPE_INT32, "raid_start_pos_y"},
@@ -43,12 +45,21 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "seamless_y"},
 	 {1, TYPE_INT32, "num_party_guild"},
 	 {1, TYPE_INT32, "num_party_mercenary"},
-	 {1, TYPE_INT32, "num_party_raid"}};
+	 {1, TYPE_INT32 | TYPE_RDBIGNORE, "num_party_raid"}};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
+}
+
+#pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
+	if(dst == DF_SQL && mode == DCT_Read) {
+		row->setDataInt32("unknown1", row->getDataInt32("connector_id") == 0);
+	} else if(dst == DF_RDB && mode == DCT_Read) {
+		row->setDataInt32("num_party_raid", row->getDataInt32("num_party_guild") / 2);
+	}
 }
 
 #pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")

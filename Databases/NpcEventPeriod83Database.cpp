@@ -9,7 +9,7 @@ extern "C" {
 
 static FieldDescriptor df[] =
 	{{1, TYPE_INT32, "id"},
-	 {1, TYPE_INT32, "duration"},
+	 {1, TYPE_INT32, "local_flag"},
 	 {1, TYPE_INT32, "begin_of_period"},
 	 {1, TYPE_INT32, "end_of_period"}};
 

@@ -46,17 +46,17 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
-		row->setDataInt32("unknown0", 1);
+		row->setDataInt8("unknown0", 1);
 		row->setDataString("kagValue", "kag");
 
 		if(dst == DF_SQL) {
-			row->setDataBit("is_effect0", row->getDataInt32("graphic_effect_start_file_ID") != 0);
-			row->setDataBit("is_effect1", row->getDataInt32("graphic_effect_middle_file_ID") != 0);
-			row->setDataBit("is_effect2", row->getDataInt32("graphic_effect_end_file_ID") != 0);
+			row->setDataInt8("is_effect0", row->getDataInt32("graphic_effect_start_file_ID") != 0);
+			row->setDataInt8("is_effect1", row->getDataInt32("graphic_effect_middle_file_ID") != 0);
+			row->setDataInt8("is_effect2", row->getDataInt32("graphic_effect_end_file_ID") != 0);
 
-			row->setDataBit("is_sound0", row->getDataInt32("sound_start_file_ID") != 0);
-			row->setDataBit("is_sound1", row->getDataInt32("sound_middle_file_ID") != 0);
-			row->setDataBit("is_sound2", row->getDataInt32("sound_end_file_ID") != 0);
+			row->setDataInt8("is_sound0", row->getDataInt32("sound_start_file_ID") != 0);
+			row->setDataInt8("is_sound1", row->getDataInt32("sound_middle_file_ID") != 0);
+			row->setDataInt8("is_sound2", row->getDataInt32("sound_end_file_ID") != 0);
 
 			row->setDataInt8("sound_option0", 0);
 			row->setDataInt8("sound_option1", 0);

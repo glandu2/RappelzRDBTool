@@ -100,7 +100,7 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
-		int questId = row->getDataInt16("id");
+		int questId = row->getDataInt32("id");
 		row->setDataBit("nv", 0);
 		row->setDataInt8("unknown0", 0);
 		row->setDataInt8("unknown1", 0);

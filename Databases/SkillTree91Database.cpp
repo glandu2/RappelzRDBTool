@@ -11,7 +11,7 @@ extern "C" {
 //Fixme: special behavior for this (double for)
 
 static FieldDescriptor df[] =
-	{{1, TYPE_INT32 | TYPE_FLAG_SORT, "job_id"},
+	{{1, TYPE_INT32 | TYPE_FLAG_SORT, "skill_tree_id"},
 	 {1, TYPE_INT32, "skill_id"},
 	 {1, TYPE_INT32, "skill_group_id"},
 	 {1, TYPE_INT32, "min_skill_lv"},
@@ -36,7 +36,7 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
-	return  "job_id\0"
+	return  "skill_tree_id\0"
 			"skill_id\0"
 			"skill_group_id\0"
 			"min_skill_lv\0"
