@@ -9,7 +9,7 @@ extern "C" {
 
 static FieldDescriptor df[] =
 	{{1, TYPE_INT32, "id"},
-	 {1, TYPE_INT32, "unknown0"},
+	 {1, TYPE_INT32, "species_id"},
 	 {1, TYPE_INT32, "type"},
 	 {1, TYPE_INT32, "model_id"},
 	 {1, TYPE_INT32, "name_id"},

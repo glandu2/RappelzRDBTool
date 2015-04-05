@@ -134,7 +134,7 @@ static FieldDescriptor df[] =
 	{ 256, TYPE_CHAR, "icon_file_name" },
 	{ 512, TYPE_CHAR, "script_text" },
 	{ 1, TYPE_INT32, "tooltip_id" },
-	{ 1, TYPE_INT32, "unknownValue2" }};
+	{ 1, TYPE_INT32, "group_bit_set" }};
 
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {

@@ -25,7 +25,7 @@ static FieldDescriptor df[] =
 	{ 1, TYPE_FLOAT32, "target_fx_size" },
 	{ 1, TYPE_INT32, "level" },
 	{ 1, TYPE_INT32, "grp" },
-	{ 1, TYPE_INT32, "unknown0" },
+	{ 1, TYPE_INT32, "affiliation" },
 	{ 1, TYPE_BIT, "f_fisrt_attack" },
 	{ 1, TYPE_BIT, "f_group_first_attack" },
 	{ 1, TYPE_BIT, "f_response_casting" },
@@ -61,7 +61,7 @@ static FieldDescriptor df[] =
 	{ 1, TYPE_INT32, "magic_accuracy" },
 	{ 1, TYPE_INT32, "magic_avoid" },
 	{ 1, TYPE_INT32, "taming_id" },
-	{ 1, TYPE_INT32, "unknown2" },
+	{ 1, TYPE_INT32, "creature_taming_code" },
 	{ 1, TYPE_FLOAT32, "taming_percentage" },
 	{ 1, TYPE_FLOAT32, "taming_exp_mod" },
 	{ 1, TYPE_INT32, "exp" },
@@ -81,7 +81,7 @@ static FieldDescriptor df[] =
 	{ 1, TYPE_INT32, "drop_table_link_id" },
 	{ 1, TYPE_INT32, "texture_group" },
 	{ 1, TYPE_INT32, "local_flag" },
-	{ 1, TYPE_INT32, "unknown3" },
+	{ 1, TYPE_INT32, "species_id" },
 	{ 256, TYPE_CHAR, "model" },
 	{ 1, TYPE_INT32, "motion_file_id" },
 	{ 1, TYPE_INT32, "camera_x" },
@@ -351,6 +351,7 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"magic_accuracy\0"
 			"magic_avoid\0"
 			"taming_id\0"
+			"creature_taming_code\0"
 			"taming_percentage\0"
 			"taming_exp_mod\0"
 			"exp\0"
