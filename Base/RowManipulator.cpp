@@ -313,23 +313,13 @@ void RowManipulator::setDataCount(int colPos, int dataCount) {
 //ordered
 //should be recoded to be more efficient, this version is somewhat slow
 int RowManipulator::getColumnIndex(const char* columnName) {
-	int index = -1;
-
-	if(columnIndexByName.empty()) {
-		for(int i=0; i < getColumnCount(); i++) {
-			if(!strcmp(getColumnName(i), columnName))
-				index = i;
-			columnIndexByName.insert(make_pair(std::string(getColumnName(i)), i));
-		}
-	} else {
-		auto it = columnIndexByName.find(std::string(columnName));
-		if(it != columnIndexByName.end())
-			index = it->second;
+	for(int i=0; i < getColumnCount(); i++) {
+		if(!strcmp(getColumnName(i), columnName))
+			return i;
 	}
 
-	if(index == -1)
-		getLogger()->log(ILog::LL_Error, "RowManipulator: Column named \"%s\" not found\n", columnName);
-	return index;
+	getLogger()->log(ILog::LL_Error, "RowManipulator: Column named \"%s\" not found\n", columnName);
+	return -1;
 }
 
 void RowManipulator::setFieldOrder(FieldOrder *newOrder) {

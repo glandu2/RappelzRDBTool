@@ -7,8 +7,6 @@
 
 #include <assert.h>
 #include <vector>
-#include <unordered_map>
-#include <string>
 
 namespace RappelzRDBBase {
 
@@ -112,7 +110,6 @@ class RowManipulator : public CImplement<IRowManipulator>
 		DataDescriptor columnsTypeOrdered;
 		DataDescriptor savedColumnsTypeOrdered;
 		FieldOrder *order;
-		std::unordered_map<std::string, int> columnIndexByName;
 
 		void initRow(bool initializedFields);
 
