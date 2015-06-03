@@ -153,12 +153,12 @@ bool FileToRenameListModel::isHashedName(QString filename) {
 		"m4v", "max", "naf", "nfa",
 		"nfc", "nfe", "nfk", "nfl",
 		"nfm", "nfp", "nfs", "nfw",
-		"nui", "nx3", "obj", "otf",
-		"png", "pvs", "qpf", "rdb",
-		"rdu", "sdb", "spr", "spt",
-		"tga", "tif", "tml", "ttf",
-		"txt", "wav", "xml", "fx",
-		"db"
+		"nui", "nx3", "obj", "ogg",
+		"otf", "png", "pvs", "qpf",
+		"rdb", "rdu", "sdb", "spr",
+		"spt", "tga", "tif", "tml",
+		"ttf", "txt", "wav", "xml",
+		"fx", "db"
 	};
 
 	if(filename.size() < 2)
@@ -166,7 +166,7 @@ bool FileToRenameListModel::isHashedName(QString filename) {
 
 	if(!filename.contains(invalidCharsForName)) { //contains no invalid chars
 		for(unsigned int i = 0; i < sizeof(knownExtension)/sizeof(const char*); i++) {
-			if(filename.endsWith(QString(".") + knownExtension[i])) {
+			if(filename.toLower().endsWith(QString(".") + knownExtension[i])) {
 				return false; // has a known extension => it's a name
 			}
 		}
