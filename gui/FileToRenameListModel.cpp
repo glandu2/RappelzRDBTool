@@ -145,7 +145,6 @@ QString FileToRenameListModel::convertFilename(FileInfo fileInfo) {
 }
 
 bool FileToRenameListModel::isHashedName(QString filename) {
-	static QRegExp invalidCharsForName("[^ _\\-\\!\\.\\(\\)@&0-9a-zA-Z]");
 	static const char* knownExtension[] = {
 		"bmp", "cfg", "cob", "dds",
 		"dmp", "gc2", "gci", "ini",
@@ -164,11 +163,9 @@ bool FileToRenameListModel::isHashedName(QString filename) {
 	if(filename.size() < 2)
 		return false;
 
-	if(!filename.contains(invalidCharsForName)) { //contains no invalid chars
-		for(unsigned int i = 0; i < sizeof(knownExtension)/sizeof(const char*); i++) {
-			if(filename.toLower().endsWith(QString(".") + knownExtension[i])) {
-				return false; // has a known extension => it's a name
-			}
+	for(unsigned int i = 0; i < sizeof(knownExtension)/sizeof(const char*); i++) {
+		if(filename.toLower().endsWith(QString(".") + knownExtension[i])) {
+			return false; // has a known extension => it's a name
 		}
 	}
 
