@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	a.installTranslator(&translationFile);
 
 	a.setApplicationName("RappelzRDBTool ~ Glandu2");
-	a.setApplicationVersion("2.8.1");
+	a.setApplicationVersion("3.0.0");
 
 	Maingui mainGui;
 
