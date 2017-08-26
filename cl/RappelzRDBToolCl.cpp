@@ -15,12 +15,6 @@
 #endif
 
 /*
- * TODO:
- * - Continuer changement mode d'exportation + nouvelle utilisation de Database avec ExternDescriptedDatabase
- * - Faire un acces public pour les donnees (RowManipulator + choix colonne)
- */
-
-/*
  * Tests fait:
  * - RDB -> RDB	OK
  * - RDB -> CSV	OK

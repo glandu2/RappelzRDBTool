@@ -115,13 +115,9 @@ QString FileToRenameListModel::convertFilename(FileInfo fileInfo) {
 
 	if(fileInfo.isHashed) {
 		QByteArray hash = targetFileInfo.fileName().toLatin1();
-		QByteArray name;
+		QByteArray name = convertHashToName(hash);
 
-		if(hash.size() >= 2) {
-			name.resize(hash.size()-1);
-			convertHashToName(hash.constData(), name.data());
-			name.resize(name.size()-1);
-
+		if(!name.isEmpty()) {
 			QString result = targetFileInfo.absolutePath();
 			if(!result.endsWith('/') && !result.endsWith('\\'))
 				result += '/';
@@ -129,11 +125,7 @@ QString FileToRenameListModel::convertFilename(FileInfo fileInfo) {
 		}
 	} else {
 		QByteArray name = targetFileInfo.fileName().toLatin1();
-		QByteArray hash;
-
-		hash.resize(name.size()+3);
-		convertNameToHash(name.constData(), hash.data(), LEGACY_SEED);
-		hash.resize(hash.size()-1);
+		QByteArray hash = convertNameToHash(name);
 
 		QString result = targetFileInfo.absolutePath();
 		if(!result.endsWith('/') && !result.endsWith('\\'))
@@ -144,30 +136,32 @@ QString FileToRenameListModel::convertFilename(FileInfo fileInfo) {
 	return QString();
 }
 
-bool FileToRenameListModel::isHashedName(QString filename) {
-	static const char* knownExtension[] = {
-		"bmp", "cfg", "cob", "dds",
-		"dmp", "gc2", "gci", "ini",
-		"jpg", "jtv", "lst", "lua",
-		"m4v", "max", "naf", "nfa",
-		"nfc", "nfe", "nfk", "nfl",
-		"nfm", "nfp", "nfs", "nfw",
-		"nui", "nx3", "obj", "ogg",
-		"otf", "png", "pvs", "qpf",
-		"rdb", "rdu", "sdb", "spr",
-		"spt", "tga", "tif", "tml",
-		"ttf", "txt", "wav", "xml",
-		"fx", "db"
-	};
+QByteArray FileToRenameListModel::convertHashToName(QByteArray hash) {
+	QByteArray name;
 
-	if(filename.size() < 2)
-		return false;
+	if(hash.size() >= 2) {
+		name.resize(hash.size()-1);
+		::convertHashToName(hash.constData(), name.data());
+		name.resize(name.size()-1);
 
-	for(unsigned int i = 0; i < sizeof(knownExtension)/sizeof(const char*); i++) {
-		if(filename.toLower().endsWith(QString(".") + knownExtension[i])) {
-			return false; // has a known extension => it's a name
-		}
+		return name;
 	}
 
-	return true;
+	return QByteArray();
+}
+
+QByteArray FileToRenameListModel::convertNameToHash(QByteArray name) {
+	QByteArray hash;
+
+	hash.resize(name.size()+3);
+	::convertNameToHash(name.constData(), hash.data(), LEGACY_SEED);
+	hash.resize(hash.size()-1);
+
+	return hash;
+}
+
+bool FileToRenameListModel::isHashedName(QString filename) {
+	QByteArray hash = filename.toLatin1();
+
+	return convertNameToHash(convertHashToName(hash)) == hash;
 }

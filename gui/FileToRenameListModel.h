@@ -16,7 +16,6 @@ public:
 	QString getTargetFilename(int index);
 	int getCount() { return fileList.size(); }
 
-
 	virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
 	virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -29,6 +28,8 @@ protected:
 	};
 
 	static QString convertFilename(FileInfo fileInfo);
+	static QByteArray convertHashToName(QByteArray hash);
+	static QByteArray convertNameToHash(QByteArray name);
 	static bool isHashedName(QString filename);
 
 private:
