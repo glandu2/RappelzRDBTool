@@ -1,0 +1,101 @@
+rdb.fields = {
+	{"id", TYPE_INT32},
+	{"drop_item_id_00", TYPE_INT32},
+	{"drop_item_id_01", TYPE_INT32},
+	{"drop_item_id_02", TYPE_INT32},
+	{"drop_item_id_03", TYPE_INT32},
+	{"drop_item_id_04", TYPE_INT32},
+	{"drop_item_id_05", TYPE_INT32},
+	{"drop_item_id_06", TYPE_INT32},
+	{"drop_item_id_07", TYPE_INT32},
+	{"drop_item_id_08", TYPE_INT32},
+	{"drop_item_id_09", TYPE_INT32},
+	{"drop_percentage_00", TYPE_FLOAT32},
+	{"drop_percentage_01", TYPE_FLOAT32},
+	{"drop_percentage_02", TYPE_FLOAT32},
+	{"drop_percentage_03", TYPE_FLOAT32},
+	{"drop_percentage_04", TYPE_FLOAT32},
+	{"drop_percentage_05", TYPE_FLOAT32},
+	{"drop_percentage_06", TYPE_FLOAT32},
+	{"drop_percentage_07", TYPE_FLOAT32},
+	{"drop_percentage_08", TYPE_FLOAT32},
+	{"drop_percentage_09", TYPE_FLOAT32},
+	{"drop_min_count_00", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_min_count_01", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_min_count_02", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_min_count_03", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_min_count_04", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_min_count_05", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_min_count_06", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_min_count_07", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_min_count_08", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_min_count_09", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_00", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_01", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_02", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_03", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_04", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_05", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_06", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_07", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_08", TYPE_INT32 | TYPE_RDBIGNORE},
+	{"drop_max_count_09", TYPE_INT32 | TYPE_RDBIGNORE},
+}
+
+rdb.sqlColumnOrder = table.concat({
+	"id\0",
+	"drop_item_id_00\0",
+	"drop_min_count_00\0",
+	"drop_max_count_00\0",
+	"drop_percentage_00\0",
+	"drop_item_id_01\0",
+	"drop_min_count_01\0",
+	"drop_max_count_01\0",
+	"drop_percentage_01\0",
+	"drop_item_id_02\0",
+	"drop_min_count_02\0",
+	"drop_max_count_02\0",
+	"drop_percentage_02\0",
+	"drop_item_id_03\0",
+	"drop_min_count_03\0",
+	"drop_max_count_03\0",
+	"drop_percentage_03\0",
+	"drop_item_id_04\0",
+	"drop_min_count_04\0",
+	"drop_max_count_04\0",
+	"drop_percentage_04\0",
+	"drop_item_id_05\0",
+	"drop_min_count_05\0",
+	"drop_max_count_05\0",
+	"drop_percentage_05\0",
+	"drop_item_id_06\0",
+	"drop_min_count_06\0",
+	"drop_max_count_06\0",
+	"drop_percentage_06\0",
+	"drop_item_id_07\0",
+	"drop_min_count_07\0",
+	"drop_max_count_07\0",
+	"drop_percentage_07\0",
+	"drop_item_id_08\0",
+	"drop_min_count_08\0",
+	"drop_max_count_08\0",
+	"drop_percentage_08\0",
+	"drop_item_id_09\0",
+	"drop_min_count_09\0",
+	"drop_max_count_09\0",
+	"drop_percentage_09\0",
+})
+
+rdb.convertData = function (dst, mode, row, rowNum)
+	if dst == DF_RDB and mode == DCT_Read then
+		for i = 0, 9 do
+			if row[string.format("drop_item_id_%02d", i)] ~= 0 then
+				row[string.format("drop_min_count_%02d", i)] = 1
+				row[string.format("drop_max_count_%02d", i)] = 1
+			else
+				row[string.format("drop_min_count_%02d", i)] = 0
+				row[string.format("drop_max_count_%02d", i)] = 0
+			end
+		end
+	end
+end

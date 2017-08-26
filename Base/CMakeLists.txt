@@ -13,8 +13,10 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/libiconv/include)
 #SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--kill-at -Wl,--output-def,${LIBRARY_OUTPUT_PATH}/${TARGET_NAME}.def" )
 #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--kill-at -Wl,--output-def,${LIBRARY_OUTPUT_PATH}/${TARGET_NAME}.def" )
 
+subdirs(${CMAKE_CURRENT_LIST_DIR}/lua)
 
 add_library(${TARGET_NAME} SHARED ${RappelzRDBTool_basedll_src})
+target_link_libraries(${TARGET_NAME} lua)
 if(WIN32)
         target_link_libraries(${TARGET_NAME} odbc32)
 else(WIN32)

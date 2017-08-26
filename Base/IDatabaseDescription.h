@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 EBASEDLL IDatabaseDescription * DLLCALLCONV createExternDescriptedDatabase();
+EBASEDLL IDatabaseDescription * DLLCALLCONV createLuaDescriptedDatabase();
 
 #ifdef __cplusplus
 }

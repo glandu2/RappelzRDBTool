@@ -31,14 +31,19 @@ DatabaseDescManageDialog::~DatabaseDescManageDialog()
 
 
 void DatabaseDescManageDialog::onAdd() {
-	QStringList fileToAdd = QFileDialog::getOpenFileNames(this, QCoreApplication::applicationName(), QString(), tr("Database DLL (*Database.dll *Database.so)", "File dialogbox filter for database description DLL"));
+	QStringList fileToAdd = QFileDialog::getOpenFileNames(this, QCoreApplication::applicationName(), QString(), tr("Database DLL (*Database.dll *Database.so *Database.lua)", "File dialogbox filter for database description DLL"));
 
 	for(int i = 0; i < fileToAdd.size(); i++) {
 		const QString& fileName = fileToAdd.at(i);
 		const QByteArray fileName8bits = fileName.toLocal8Bit();
 		int result, sysError;
 
-		IDatabaseDescription* dbDesc = createExternDescriptedDatabase();
+		IDatabaseDescription* dbDesc;
+
+		if(fileName8bits.endsWith(".lua"))
+			dbDesc = createLuaDescriptedDatabase();
+		else
+			dbDesc = createExternDescriptedDatabase();
 
 		result = dbDesc->open(fileName8bits.constData(), &sysError);
 		if(result == 0) {

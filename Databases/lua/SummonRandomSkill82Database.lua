@@ -1,0 +1,20 @@
+rdb.fields = {
+	{"sid", TYPE_INT32},
+	{"use_code", TYPE_INT32},
+	{"skill_id_1", TYPE_INT32},
+	{"skill_id_2", TYPE_INT32},
+	{"skill_id_3", TYPE_INT32},
+	{"skill_id_4", TYPE_INT32},
+	{"skill_id_5", TYPE_INT32},
+	{"skill_id_6", TYPE_INT32},
+	{"skill_id_7", TYPE_INT32},
+	{"skill_id_8", TYPE_INT32},
+	{"skill_id_9", TYPE_INT32},
+	{"skill_id_10", TYPE_INT32},
+	{"skill_id_11", TYPE_INT32},
+	{"skill_id_12", TYPE_INT32},
+	{"skill_id_13", TYPE_INT32},
+	{"skill_id_14", TYPE_INT32},
+	{"skill_id_15", TYPE_INT32},
+}
+

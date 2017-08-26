@@ -16,15 +16,24 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QObject *parent) :
 {
 	int i = 0;
 	QString value;
+	QString nativeDbDescriptionExtension;
 
 #ifdef __linux__
 	optionGroupName = "DbStructsLinux";
+	nativeDbDescriptionExtension = "Database.so";
 #else
 	optionGroupName = "DbStructsWindows";
+	nativeDbDescriptionExtension = "Database.dll";
 #endif
 
 	while((value = Settings::getSettings()->value((optionGroupName + "/filepath/%1").arg(i)).toString()).isNull() == false) {
-		IDatabaseDescription* dbDesc = createExternDescriptedDatabase();
+		IDatabaseDescription* dbDesc;
+
+		if(value.endsWith(nativeDbDescriptionExtension))
+			dbDesc = createExternDescriptedDatabase();
+		else
+			dbDesc = createLuaDescriptedDatabase();
+
 		if(dbDesc->open(value.toLocal8Bit().constData(), 0) == 0) {
 			dbDescriptions.append(dbDesc);
 		} else {
@@ -37,13 +46,17 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QObject *parent) :
 	QFileInfoList subFiles = currentDir.entryInfoList(QDir::Files, QDir::Name);
 	for(i = 0; i < subFiles.size(); i++) {
 		const QFileInfo& fileInfo = subFiles.at(i);
-#ifdef __linux__
-		if(fileInfo.fileName().endsWith("Database.so"))
-#else
-		if(fileInfo.fileName().endsWith("Database.dll"))
-#endif
+
+		if(fileInfo.fileName().endsWith(nativeDbDescriptionExtension))
 		{
 			IDatabaseDescription* dbDesc = createExternDescriptedDatabase();
+			if(dbDesc->open(fileInfo.absoluteFilePath().toLocal8Bit().constData(), 0) == 0) {
+				append(dbDesc);
+			} else {
+				dbDesc->destroy();
+			}
+		} else if(fileInfo.fileName().endsWith("Database.lua")) {
+			IDatabaseDescription* dbDesc = createLuaDescriptedDatabase();
 			if(dbDesc->open(fileInfo.absoluteFilePath().toLocal8Bit().constData(), 0) == 0) {
 				append(dbDesc);
 			} else {

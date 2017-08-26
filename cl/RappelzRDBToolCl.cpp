@@ -185,7 +185,12 @@ int main(int argc, char *argv[])
 			return 0;
 		} else if(!strcmp(argv[i], "--dbtype") && i+1 < argc) {
 			try {
-				dbDescription = createExternDescriptedDatabase();
+				const char *ext = strrchr(argv[i+1], '.');
+				if (ext && !strcmp(ext, ".lua")) {
+					dbDescription = createLuaDescriptedDatabase();
+				} else {
+					dbDescription = createExternDescriptedDatabase();
+				}
 				switch(dbDescription->open(argv[i+1], 0)) {
 					case 0:
 						break;

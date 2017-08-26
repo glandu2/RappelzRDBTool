@@ -1,0 +1,22 @@
+rdb.fields = {
+	{"id", TYPE_INT32},
+	{"decompose_type", TYPE_INT32},
+	{"needed_price", TYPE_INT32},
+	{"type_value_01", TYPE_INT32},
+	{"type_value_02", TYPE_INT32},
+	{"type_value_03", TYPE_INT32},
+	{"type_value_04", TYPE_INT32},
+	{"type_value_05", TYPE_INT32},
+	{"type_value_06", TYPE_INT32},
+	{"material_type_01", TYPE_INT32},
+	{"material_value_01", TYPE_INT32},
+	{"material_type_02", TYPE_INT32},
+	{"material_value_02", TYPE_INT32},
+	{"material_type_03", TYPE_INT32},
+	{"material_value_03", TYPE_INT32},
+	{"material_type_04", TYPE_INT32},
+	{"material_value_04", TYPE_INT32},
+	{"material_type_05", TYPE_INT32},
+	{"material_value_05", TYPE_INT32},
+}
+
