@@ -55,20 +55,20 @@ void DatabaseDescManageDialog::onAdd() {
 			switch(result) {
 				case ENOENT:
 					QMessageBox::warning(this, QCoreApplication::applicationName(),
-										 tr("Can\'t load %1, are you sure the file exist and has the same bits (32 or 64) as this gui ?\nAdditional error code: %2", "Error while loading a database description DLL")
+					                     tr("Can\'t load %1, are you sure the file exist and has the same bits (32 or 64) as this gui ?\nAdditional error code: %2\nSee logs in menu Options -> Show log.", "Error while loading a database description DLL")
 										 .arg(QString::fromLocal8Bit(fileName8bits.constData()))
 										 .arg(sysError));
 					break;
 
 				case EINVAL:
 					QMessageBox::warning(this, QCoreApplication::applicationName(),
-										 tr("Can\'t use %1, this is not a database description file", "Error while loading a database description DLL")
+					                     tr("Can\'t use %1, this is not a database description file\nSee logs in menu Options -> Show log.", "Error while loading a database description DLL")
 										 .arg(QString::fromLocal8Bit(fileName8bits.constData())));
 					break;
 
 				default:
 					QMessageBox::warning(this, QCoreApplication::applicationName(),
-										 tr("Unknown error while loading %1.\nAdditional error code: %2", "Error while loading a database description DLL")
+					                     tr("Unknown error while loading %1.\nAdditional error code: %2\nSee logs in menu Options -> Show log.", "Error while loading a database description DLL")
 										 .arg(QString::fromLocal8Bit(fileName8bits.constData()))
 										 .arg(sysError));
 					break;
