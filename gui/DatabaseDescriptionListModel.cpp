@@ -1,5 +1,5 @@
 #include "DatabaseDescriptionListModel.h"
-#include "../Base/IDatabaseDescription.h"
+#include "IDatabaseDescription.h"
 #include "NameToHash.h"
 #include "Settings.h"
 

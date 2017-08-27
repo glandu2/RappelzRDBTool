@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 project(RappelzRDB)
 
-if(COMMAND cmake_policy)
-	cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+#if(COMMAND cmake_policy)
+#	cmake_policy(SET CMP0003 NEW)
+#endif(COMMAND cmake_policy)
 
 add_definitions(-DNDEBUG)
 
@@ -17,13 +17,7 @@ if(WIN32)
     SET(CMAKE_SHARED_LINKER_FLAGS "/MANIFEST:NO /INCREMENTAL:NO")
 endif()
 
-
-#SET(CMAKE_CXX_FLAGS "-march=pentium3 -mtune=generic -mfpmath=sse -msse -mmmx")
-
-#SET(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS}")
-
-include_directories(${CMAKE_CURRENT_LIST_DIR}/Base)
-
-SUBDIRS(${CMAKE_CURRENT_LIST_DIR}/Base)
-SUBDIRS(${CMAKE_CURRENT_LIST_DIR}/Databases)
-SUBDIRS(${CMAKE_CURRENT_LIST_DIR}/cl)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Base Base)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Databases Databases)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/cl cl)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/gui gui)

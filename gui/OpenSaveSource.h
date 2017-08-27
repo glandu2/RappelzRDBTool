@@ -2,7 +2,7 @@
 #define OPENSAVESOURCE_H
 
 #include <QObject>
-#include "../Base/DataType.h"
+#include "DataType.h"
 #include "PersistentData.h"
 
 class OpenSaveSource : public QObject

@@ -1,18 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
-include_directories(${PROJECT_SOURCE_DIR}/Base)
-link_directories(${LIBRARY_OUTPUT_PATH})
-
 file(GLOB RappelzRDBTool_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
-add_definitions(-DBUILDING_CLIENT)
 foreach(srcfile ${RappelzRDBTool_src})
     string(REPLACE ".cpp" "" exefile ${srcfile})
     add_executable(${exefile} ${srcfile})
     target_link_libraries(${exefile} RpzRdbBase)
-    if(UNIX)
-        target_link_libraries(${exefile} dl)
-    else(UNIX)
-        target_link_libraries(${exefile} kernel32.lib)
-    endif(UNIX)
     install(TARGETS ${exefile} DESTINATION ./)
 endforeach()

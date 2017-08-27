@@ -1,25 +1,24 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.1)
 set(TARGET_NAME RpzRdbBase)
 
-add_definitions(-DBUILDING_BASE)
+add_subdirectory(libiconv)
+add_subdirectory(lua)
+
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
-file(GLOB RappelzRDBTool_basedll_src *.cpp *.h)
-
-add_definitions(-DLIBDIR=\".\" -DICONV_CONST=const -DHAVE_WORKING_O_NOFOLLOW=1)
-set(RappelzRDBTool_basedll_src "${RappelzRDBTool_basedll_src};${CMAKE_CURRENT_LIST_DIR}/libiconv/include/iconv.h;${CMAKE_CURRENT_LIST_DIR}/libiconv/src/iconv.c;${CMAKE_CURRENT_LIST_DIR}/libiconv/src/localcharset.c")
-include_directories(${CMAKE_CURRENT_LIST_DIR}/libiconv/include)
-
-#SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--kill-at -Wl,--output-def,${LIBRARY_OUTPUT_PATH}/${TARGET_NAME}.def" )
-#SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--kill-at -Wl,--output-def,${LIBRARY_OUTPUT_PATH}/${TARGET_NAME}.def" )
-
-subdirs(${CMAKE_CURRENT_LIST_DIR}/lua)
+file(GLOB RappelzRDBTool_basedll_src
+	src/*.cpp
+	src/*.h
+	include/*.h
+)
 
 add_library(${TARGET_NAME} SHARED ${RappelzRDBTool_basedll_src})
-target_link_libraries(${TARGET_NAME} lua)
+target_include_directories(${TARGET_NAME} PUBLIC include)
+target_compile_definitions(${TARGET_NAME} PRIVATE BUILDING_BASE)
+target_link_libraries(${TARGET_NAME} lua iconv)
 if(WIN32)
         target_link_libraries(${TARGET_NAME} odbc32)
-else(WIN32)
+else()
         target_link_libraries(${TARGET_NAME} odbc)
-endif(WIN32)
+endif()
 install(TARGETS ${TARGET_NAME} DESTINATION ./)

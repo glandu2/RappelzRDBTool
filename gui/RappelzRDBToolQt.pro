@@ -26,6 +26,8 @@ unix {
 LIBS += ../bin/RpzRdbBase.so -Wl,-R,\'\$\$ORIGIN/\' -lodbc
 }
 
+INCLUDEPATH += ../Base/include
+
 FORMS += \
     Maingui.ui \
     SqlConfigDialog.ui \
@@ -57,13 +59,6 @@ SOURCES += \
 
 HEADERS += \
     Maingui.h \
-    ../Base/ExportDLL.h \
-    ../Base/DataType.h \
-    ../Base/IRowManipulator.h \
-    ../Base/IObject.h \
-    ../Base/IDatabaseDescription.h \
-    ../Base/IDatabase.h \
-    ../Base/Guid.h \
     DatabaseTableModel.h \
     SqlConfigDialog.h \
     DatabaseView.h \

@@ -2,7 +2,7 @@
 #include "ui_DatabaseDescManageDialog.h"
 
 #include "DatabaseDescriptionListModel.h"
-#include "../Base/IDatabaseDescription.h"
+#include "IDatabaseDescription.h"
 
 #include <QFileDialog>
 #include <QMessageBox>

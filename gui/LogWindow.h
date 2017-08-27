@@ -2,7 +2,7 @@
 #define LOGWINDOW_H
 
 #include <QDialog>
-#include "../Base/ILog.h"
+#include "ILog.h"
 
 namespace Ui {
 class LogWindow;

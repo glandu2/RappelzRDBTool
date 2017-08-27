@@ -2,7 +2,7 @@
 #define SQLCONFIGDIALOG_H
 
 #include <QDialog>
-#include "../Base/DataType.h"
+#include "DataType.h"
 
 namespace Ui {
 class SqlConfigDialog;

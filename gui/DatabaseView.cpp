@@ -1,8 +1,8 @@
 #include "DatabaseView.h"
 #include "ui_DatabaseView.h"
 #include "DatabaseTableModel.h"
-#include "../Base/IDatabase.h"
-#include "../Base/ICharsetConverter.h"
+#include "IDatabase.h"
+#include "ICharsetConverter.h"
 #include "Settings.h"
 #include "SqlConfigDialog.h"
 

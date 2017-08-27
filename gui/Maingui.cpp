@@ -1,8 +1,8 @@
 #include "Maingui.h"
 #include "ui_Maingui.h"
 
-#include "../Base/IDatabase.h"
-#include "../Base/IRowManipulator.h"
+#include "IDatabase.h"
+#include "IRowManipulator.h"
 #include "DatabaseDescriptionListModel.h"
 #include "DatabaseTableModel.h"
 #include "SqlConfigDialog.h"

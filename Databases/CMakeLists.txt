@@ -9,7 +9,6 @@ IF(MINGW)
 ENDIF()
 
 file(GLOB RappelzRDBTool_databasesdll_src RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
-add_definitions(-DBUILDING_DATABASE)
 foreach(srcfile ${RappelzRDBTool_databasesdll_src})
 	string(REPLACE ".cpp" "" dllfile ${srcfile})
 	add_library(${dllfile} MODULE ${srcfile})

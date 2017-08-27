@@ -1,10 +1,10 @@
 #include "DatabaseTableModel.h"
-#include "../Base/IDatabase.h"
-#include "../Base/IRowManipulator.h"
-#include "../Base/ICharsetConverter.h"
+#include "IDatabase.h"
+#include "IRowManipulator.h"
+#include "ICharsetConverter.h"
 #include <errno.h>
 #include "Settings.h"
-#include "../Base/ILog.h"
+#include "ILog.h"
 
 #include <math.h>
 #include <stdio.h>

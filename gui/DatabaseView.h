@@ -5,9 +5,9 @@
 #include <QModelIndex>
 #include <QTimer>
 
-#include "../Base/DataType.h"
-#include "../Base/IDatabase.h"
-#include "../Base/IDatabaseDescription.h"
+#include "DataType.h"
+#include "IDatabase.h"
+#include "IDatabaseDescription.h"
 
 #include "DatabaseDescriptionListModel.h"
 

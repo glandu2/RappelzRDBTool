@@ -76,7 +76,7 @@ QString FileDialog::getSaveFileName(QWidget* parent, const QString &caption, con
 		if(selectedFilter && ((int)ofn.nFilterIndex - 1) >= 0 && ((int)ofn.nFilterIndex - 1) < filters.size()) {
 			*selectedFilter = filters[ofn.nFilterIndex - 1];
 		}
-		return QDir::fromNativeSeparators(QString::fromUtf16(filename));
+		return QDir::fromNativeSeparators(QString::fromWCharArray(filename));
 	}
 
 	return QString();
@@ -141,7 +141,7 @@ QString FileDialog::getOpenFileName(QWidget *parent, const QString &caption, con
 		if(selectedFilter && ((int)ofn.nFilterIndex - 1) >= 0 && ((int)ofn.nFilterIndex - 1) < filters.size()) {
 			*selectedFilter = filters[ofn.nFilterIndex - 1];
 		}
-		return QDir::fromNativeSeparators(QString::fromUtf16(filename));
+		return QDir::fromNativeSeparators(QString::fromWCharArray(filename));
 	}
 
 	return QString();
