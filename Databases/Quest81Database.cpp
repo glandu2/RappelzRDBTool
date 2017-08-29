@@ -128,8 +128,8 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		else
 			row->setDataInt32("hate_group_id", 0);
 
-		row->setDataInt32("favor_group_id", 999);
 		row->setDataInt32("limit_favor_group_id", 0);
+		row->setDataInt32("favor_group_id", 999);
 
 		row->setDataInt8("or_flag", row->getDataInt8("or_flag") * -1);
 

@@ -455,10 +455,12 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		int i;
 		for(i=0; i<16; i++) {
 			sprintf(nvValues, "nv%d", i);
-			if(i != 9)
-				row->setDataBit(nvValues, 0);
-			else
+			if(i == 9)
 				row->setDataInt16(nvValues, 0);
+			else if(i == 15)
+				row->setDataInt8(nvValues, 0);
+			else
+				row->setDataBit(nvValues, 0);
 		}
 	}
 

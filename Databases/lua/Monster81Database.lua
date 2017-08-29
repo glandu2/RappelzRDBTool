@@ -273,7 +273,7 @@ rdb.convertData = function (dst, mode, row, rowNum)
 			end
 		end
 		row.id = result
-		row.script_on_dead = 0
+		row.script_on_dead = ""
 	elseif mode == DCT_Write and dst == DF_RDB then
 		local value = row.id
 		local result = 0

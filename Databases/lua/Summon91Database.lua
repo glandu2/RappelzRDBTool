@@ -18,7 +18,7 @@ rdb.fields = {
 	{"run_speed", TYPE_INT32},
 	{"is_riding_only", TYPE_INT8},
 	{"riding_motion_type", TYPE_INT32},
-	{"attack_range", TYPE_DECIMAL, 1},
+	{"attack_range", TYPE_DECIMAL, MAKEINDEXEDVAR(2, 1)},
 	{"walk_type", TYPE_INT32},
 	{"slant_type", TYPE_INT32},
 	{"material", TYPE_INT32},

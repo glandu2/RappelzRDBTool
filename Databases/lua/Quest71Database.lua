@@ -81,14 +81,8 @@ rdb.fields = {
 }
 
 rdb.convertData = function (dst, mode, row, rowNum)
-	if mode == DCT_Read and dst ~= DF_SQL then
+	if mode == DCT_Read and dst ~= DF_RDB then
 		local id = row.id;
-
-		if id >= 3600 and id <= 3611 and id ~= 3610 then
-			row.hate_group_id = 1
-		else
-			row.hate_group_id = 0
-		end
 
 		row.nv = 0
 		row.unknown0 = 0
@@ -97,5 +91,11 @@ rdb.convertData = function (dst, mode, row, rowNum)
 		row.unknownPadding = 0
 		row.limit_favor_group_id = 0
 		row.favor_group_id = 999
+
+		if id >= 3600 and id <= 3611 and id ~= 3610 then
+			row.hate_group_id = 1
+		else
+			row.hate_group_id = 0
+		end
 	end
 end

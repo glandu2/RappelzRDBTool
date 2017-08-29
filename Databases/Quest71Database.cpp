@@ -106,12 +106,12 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		row->setDataInt8("unknown1", 0);
 		row->setDataInt8("unknown2", 0);
 		row->setDataInt8("unknownPadding", 0);
-		row->setDataInt16("limit_favor_group_id", 0);
-		row->setDataInt16("favor_group_id", 999);
+		row->setDataInt32("limit_favor_group_id", 0);
+		row->setDataInt32("favor_group_id", 999);
 		if(questId >= 3600 && questId <= 3611 && questId != 3610)
-			row->setDataInt16("hate_group_id", 1);
+			row->setDataInt32("hate_group_id", 1);
 		else
-			row->setDataInt16("hate_group_id", 0);
+			row->setDataInt32("hate_group_id", 0);
 	}
 }
 

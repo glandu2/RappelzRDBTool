@@ -296,32 +296,32 @@ rdb.sqlColumnOrder = table.concat({
 rdb.convertData = function (dst, mode, row, rowNum)
 	if mode == DCT_Write and dst == DF_RDB then
 		row.unkCatValue = "Cat"
-		row.item_use_flag2 = row.flag_wear |
-			row.flag_storage << 1 |
-			row.flag_enhance << 2 |
-			row.flag_use << 3 |
-			row.flag_card << 4 |
-			row.flag_socket << 5 |
-			row.flag_duplicate << 6 |
-			row.flag_target_use << 7 |
-			row.flag_warp << 8 |
-			row.flag_trade << 9 |
-			row.flag_sell << 10 |
-			row.flag_quest << 11 |
-			row.flag_overweight << 12 |
-			row.flag_cashitem << 13 |
-			row.flag_riding << 14 |
-			row.flag_drop << 15 |
-			row.flag_move << 16 |
-			row.flag_quest_distribute << 17 |
-			row.flag_sit << 18 |
-			row.flag_raid << 19 |
-			row.flag_secroute << 20 |
-			row.flag_eventmap << 21 |
-			row.flag_huntaholic << 22 |
-			row.flag_huntaholic_useable_only << 23 |
+		row.item_use_flag2 = row.flag_deathmatch_useable_only << 25 |
 			row.flag_deathmatch << 24 |
-			row.flag_deathmatch_useable_only << 25
+			row.flag_huntaholic_useable_only << 23 |
+			row.flag_huntaholic << 22 |
+			row.flag_eventmap << 21 |
+			row.flag_secroute << 20 |
+			row.flag_raid << 19 |
+			row.flag_sit << 18 |
+			row.flag_quest_distribute << 17 |
+			row.flag_move << 16 |
+			row.flag_drop << 15 |
+			row.flag_riding << 14 |
+			row.flag_cashitem << 13 |
+			row.flag_overweight << 12 |
+			row.flag_quest << 11 |
+			row.flag_sell << 10 |
+			row.flag_trade << 9 |
+			row.flag_warp << 8 |
+			row.flag_target_use << 7 |
+			row.flag_duplicate << 6 |
+			row.flag_socket << 5 |
+			row.flag_card << 4 |
+			row.flag_use << 3 |
+			row.flag_enhance << 2 |
+			row.flag_storage << 1 |
+			row.flag_wear
 
 		row.unknownValue0 = 0
 		row.unknownValue1 = 49

@@ -122,7 +122,7 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 				result |= 1 << decodeMap[i];
 		}
 		row->setDataInt32("id", result);
-		row->setDataInt8("script_on_dead", 0);
+		row->setDataString("script_on_dead", "");
 	} else if(mode == DCT_Write && dst == DF_RDB) {
 		value = row->getDataInt32("id");
 		for(i=0, result=0; i<32; i++) {

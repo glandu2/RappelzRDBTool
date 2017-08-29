@@ -313,7 +313,10 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 		int i;
 		for(i=0; i<16; i++) {
 			sprintf(nvValues, "nv%d", i);
-			row->setDataBit(nvValues, 0);
+			if(i == 9)
+				row->setDataInt16(nvValues, 0);
+			else
+				row->setDataBit(nvValues, 0);
 		}
 	} else if(mode == DCT_Read && dst == DF_RDB) {
 		row->setDataInt32("huntaholic_point", 0);

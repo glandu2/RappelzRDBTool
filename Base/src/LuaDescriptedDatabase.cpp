@@ -121,7 +121,7 @@ static int lua_script_row_manipulator_index(lua_State* L) {
 	int columnType = row->getType(columnIndex);
 
 	switch(columnType) {
-		case TYPE_BIT:   lua_pushboolean(L, row->getDataBit(columnName)); break;
+		case TYPE_BIT:   lua_pushinteger(L, row->getDataBit(columnName)); break;
 		case TYPE_INT8:  lua_pushinteger(L, row->getDataInt8(columnName)); break;
 		case TYPE_INT16: lua_pushinteger(L, row->getDataInt16(columnName)); break;
 		case TYPE_INT32: lua_pushinteger(L, row->getDataInt32(columnName)); break;
@@ -164,93 +164,99 @@ static int lua_script_row_manipulator_newindex(lua_State* L) {
 
 	int columnType = row->getType(columnIndex);
 
+	int isBoolean = lua_isboolean(L, 3);
+	int booleanValue = lua_toboolean(L, 3);
+	int isInteger;
+	long long int integerValue = lua_tointegerx(L, 3, &isInteger);
+	int isNumber;
+	double numberValue = lua_tonumberx(L, 3, &isNumber);
+
 	switch(columnType) {
 		case TYPE_BIT: {
-			int value = lua_toboolean(L, 3);
-			row->setDataBit(columnName, value);
+			if(isInteger) {
+				row->setDataBit(columnName, integerValue != 0);
+			} else if(isNumber) {
+				row->setDataBit(columnName, numberValue != 0);
+			} else {
+				row->setDataBit(columnName, booleanValue);
+			}
 			break;
 		}
 
 		case TYPE_INT8: {
-			int isNum;
-			long long int value = lua_tointegerx(L, 3, &isNum);
-			if(!isNum) {
+			if(!isInteger && !isBoolean) {
 				getLogger()->log(ILog::LL_Error, "Lua RowManipulator: Attempt to set integer column %s with a non integer value with type %s\n",
 				                 columnName, lua_typename(L, lua_type(L, 3)));
+			} else if(isInteger) {
+				row->setDataInt8(columnName, static_cast<char>(integerValue));
 			} else {
-				row->setDataInt8(columnName, static_cast<char>(value));
+				row->setDataInt8(columnName, static_cast<char>(booleanValue));
 			}
 			break;
 		}
 
 		case TYPE_INT16: {
-			int isNum;
-			long long int value = lua_tointegerx(L, 3, &isNum);
-			if(!isNum) {
+			if(!isInteger && !isBoolean) {
 				getLogger()->log(ILog::LL_Error, "Lua RowManipulator: Attempt to set integer column %s with a non integer value with type %s\n",
 				                 columnName, lua_typename(L, lua_type(L, 3)));
+			} else if(isInteger) {
+				row->setDataInt16(columnName, static_cast<short>(integerValue));
 			} else {
-				row->setDataInt16(columnName, static_cast<short>(value));
+				row->setDataInt16(columnName, static_cast<short>(booleanValue));
 			}
 			break;
 		}
 
 		case TYPE_INT32: {
-			int isNum;
-			long long int value = lua_tointegerx(L, 3, &isNum);
-			if(!isNum) {
+			if(!isInteger && !isBoolean) {
 				getLogger()->log(ILog::LL_Error, "Lua RowManipulator: Attempt to set integer column %s with a non integer value with type %s\n",
 				                 columnName, lua_typename(L, lua_type(L, 3)));
+			} else if(isInteger) {
+				row->setDataInt32(columnName, static_cast<int>(integerValue));
 			} else {
-				row->setDataInt32(columnName, static_cast<int>(value));
+				row->setDataInt32(columnName, static_cast<int>(booleanValue));
 			}
 			break;
 		}
 
 		case TYPE_INT64: {
-			int isNum;
-			long long int value = lua_tointegerx(L, 3, &isNum);
-			if(!isNum) {
+			if(!isInteger && !isBoolean) {
 				getLogger()->log(ILog::LL_Error, "Lua RowManipulator: Attempt to set integer column %s with a non integer value with type %s\n",
 				                 columnName, lua_typename(L, lua_type(L, 3)));
+			} else if(isInteger) {
+				row->setDataInt64(columnName, static_cast<long long int>(integerValue));
 			} else {
-				row->setDataInt64(columnName, value);
+				row->setDataInt64(columnName, static_cast<long long int>(booleanValue));
 			}
 			break;
 		}
 
 		case TYPE_FLOAT32: {
-			int isNum;
-			double value = lua_tonumberx(L, 3, &isNum);
-			if(!isNum) {
+			if(!isNumber) {
 				getLogger()->log(ILog::LL_Error, "Lua RowManipulator: Attempt to set float column %s with a non number value with type %s\n",
 				                 columnName, lua_typename(L, lua_type(L, 3)));
 			} else {
-				row->setDataFloat32(columnName, static_cast<float>(value));
+				row->setDataFloat32(columnName, static_cast<float>(numberValue));
 			}
 			break;
 		}
 
 		case TYPE_FLOAT64: {
-			int isNum;
-			double value = lua_tonumberx(L, 3, &isNum);
-			if(!isNum) {
+			if(!isNumber) {
 				getLogger()->log(ILog::LL_Error, "Lua RowManipulator: Attempt to set float column %s with a non number value with type %s\n",
 				                 columnName, lua_typename(L, lua_type(L, 3)));
 			} else {
-				row->setDataFloat64(columnName, value);
+				row->setDataFloat64(columnName, numberValue);
 			}
 			break;
 		}
 
 		case TYPE_DECIMAL: {
-			int isNum;
-			double value = lua_tonumberx(L, 3, &isNum);
-			if(!isNum) {
+			if(!isNumber) {
 				getLogger()->log(ILog::LL_Error, "Lua RowManipulator: Attempt to set decimal column %s with a non number value with type %s\n",
 				                 columnName, lua_typename(L, lua_type(L, 3)));
 			} else {
-				row->setDataDecimal(columnName, static_cast<float>(value));
+				row->setDataDecimal(columnName, static_cast<float>(numberValue));
 			}
 			break;
 		}

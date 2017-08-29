@@ -439,7 +439,11 @@ rdb.convertData = function (dst, mode, row, rowNum)
 				row.script_text = "0"
 			end
 
-			row.set_id = set_id_table[row.id]
+			if set_id_table[row.id] then
+				row.set_id = set_id_table[row.id]
+			else
+				row.set_id = 0
+			end
 		else
 			if row.script_text == "0" then
 				row.script_text = ""
