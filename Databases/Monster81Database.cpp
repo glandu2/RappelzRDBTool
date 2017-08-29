@@ -93,7 +93,9 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "fight_type"},
 	 {1, TYPE_CHAR | TYPE_RDBIGNORE, "script_on_dead"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
@@ -112,7 +114,9 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 		decodeMap[encodeMap[i]] = i;
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+#endif
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	int value, result, i;
 	if(mode == DCT_Read && dst == DF_RDB) {
@@ -137,7 +141,9 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 	}
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
+#endif
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 	return  "id\0"
 			"monster_group\0"
@@ -217,7 +223,9 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"script_on_dead\0";
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getCSVColumnOrder=_getSQLColumnOrder@0")
+#endif
 EDATABASEDLL const char* DLLCALLCONV getCSVColumnOrder() {
 	return getSQLColumnOrder();
 }

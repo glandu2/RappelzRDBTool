@@ -1,5 +1,3 @@
-#include "FileDialog.h"
-
 #ifdef _WIN32
 #ifndef _UNICODE
 #define _UNICODE
@@ -7,11 +5,12 @@
 #ifndef UNICODE
 #define UNICODE
 #endif
-#define WINVER 0x0400
 #include <windows.h>
 #include <QDir>
 #include <QFileInfo>
 #endif
+
+#include "FileDialog.h"
 
 #ifdef _WIN32
 
@@ -57,7 +56,7 @@ QString FileDialog::getSaveFileName(QWidget* parent, const QString &caption, con
 
 	memset(&ofn, 0, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = parent ? parent->winId() : 0;
+	ofn.hwndOwner = parent ? (HWND)parent->winId() : 0;
 	ofn.lpstrFilter = (LPCWSTR) nullSeparatedFilter.utf16();
 	if(selectedFilter)
 		ofn.nFilterIndex = initialFilterIndex;
@@ -124,7 +123,7 @@ QString FileDialog::getOpenFileName(QWidget *parent, const QString &caption, con
 
 	memset(&ofn, 0, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = parent ? parent->winId() : 0;
+	ofn.hwndOwner = parent ? (HWND)parent->winId() : 0;
 	ofn.lpstrFilter = (LPCWSTR) nullSeparatedFilter.utf16();
 	if(selectedFilter)
 		ofn.nFilterIndex = initialFilterIndex;

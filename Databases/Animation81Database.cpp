@@ -42,13 +42,17 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "race_id"},
 	 {1, TYPE_INT32, "sex_id"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
+#endif
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 	return "race_id\0"
 			"sex_id\0"
@@ -85,7 +89,9 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"sound_script07\0";
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
+#endif
 EDATABASEDLL const char*  DLLCALLCONV getDefaultFileName() {
 	return "db_aniinfo";
 }

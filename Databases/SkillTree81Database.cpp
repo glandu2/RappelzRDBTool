@@ -27,13 +27,17 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "cenhance_min"},
 	 {1, TYPE_INT32, "cenhance_max"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
+#endif
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 	return  "job_id\0"
 			"skill_id\0"
@@ -52,7 +56,9 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"cenhance_max\0";
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getSpecialCaseID=_getSpecialCaseID@0")
+#endif
 int EDATABASEDLL DLLCALLCONV getSpecialCaseID() {
 	return SPECIALCASE_DOUBLEFORRDB;
 }

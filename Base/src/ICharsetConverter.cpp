@@ -1,7 +1,9 @@
 #include "ICharsetConverter.h"
 #include "CharsetConverter.h"
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:createCharsetConverter=_createCharsetConverter@4")
+#endif
 ICharsetConverter * DLLCALLCONV createCharsetConverter(const char* charset) {
 	try {
 		return new CharsetConverter(charset);
@@ -10,7 +12,9 @@ ICharsetConverter * DLLCALLCONV createCharsetConverter(const char* charset) {
 	}
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:availableCharsets=_availableCharsets@0")
+#endif
 const CharsetInfo * DLLCALLCONV availableCharsets() {
 	static const CharsetInfo charsets[] = {
 		{"CP1252", "Western Europe"},

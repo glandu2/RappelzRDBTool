@@ -56,13 +56,17 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "sub_fire_fx_set_id"},
 	 {1, TYPE_INT32, "sub_fire_fx_position"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+#endif
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_SQL) {
 		row->setDataInt16("unknown0", 163);
@@ -70,7 +74,9 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 	}
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
+#endif
 EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {
 	return "SkillStage";
 }

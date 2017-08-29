@@ -28,7 +28,7 @@ QString SqlOpenSaveDialog::getTableName() {
 }
 
 void SqlOpenSaveDialog::setUseExistingTableSchemaEnabled(bool enable) {
-	ui->useExistingTableCheckbox->setShown(enable);
+	ui->useExistingTableCheckbox->setVisible(enable);
 }
 
 bool SqlOpenSaveDialog::useExistingTableSchema() {

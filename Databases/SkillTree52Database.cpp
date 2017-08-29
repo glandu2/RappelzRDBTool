@@ -25,13 +25,17 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "need_skill_lv_2"},
 	 {1, TYPE_INT32, "need_skill_lv_3"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getSpecialCaseID=_getSpecialCaseID@0")
+#endif
 int EDATABASEDLL DLLCALLCONV getSpecialCaseID() {
 	return SPECIALCASE_DOUBLEFORRDB;
 }

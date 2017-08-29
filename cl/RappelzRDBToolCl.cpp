@@ -86,7 +86,7 @@ void help(const char *arg) {
 			   "To use a sql type type --src-<switch> or --dst-<switch>\n"
 			   "For Example, if you want to use a SQL Server source, use --src-sqlserver\n");
 	else
-		printf("Usage "APPNAME" [--help | (--dbtype <descdll> src_type dst_type [sql_options])]\n"
+		printf("Usage " APPNAME " [--help | (--dbtype <descdll> src_type dst_type [sql_options])]\n"
 			   "\n"
 			   "--help     \tShow this help screen\n"
 			   "<descdll>  \tDB type, <descdll> is the database description dll\n"
@@ -101,8 +101,8 @@ void help(const char *arg) {
 			   "\n"
 			   "Notes:\n"
 			   " -CSV is read on standard input and written on standard output (screen), use pipes to redirect.\n"
-			   " - For more information about --src-<sqltype> and --dst-<sqltype>, type \""APPNAME" --help sql_opt\"\n"
-			   " -SQL ODBC Server are configurable with odbcad32, type \""APPNAME" --help  sql_opt\" to show all recognized sql servers\n"
+			   " - For more information about --src-<sqltype> and --dst-<sqltype>, type \"" APPNAME " --help sql_opt\"\n"
+			   " -SQL ODBC Server are configurable with odbcad32, type \"" APPNAME " --help  sql_opt\" to show all recognized sql servers\n"
 			   " -If the file name or table name after --src-<type> or --dst-<type> is omitted, the default name is used\n");
 }
 

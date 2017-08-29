@@ -47,13 +47,17 @@ static FieldDescriptor df[] =
 	 {256, TYPE_CHAR, "texture_name_30"},
      {4*30, TYPE_CHAR | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE, "nulValues"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getDefaultTableName=_getDefaultTableName@0")
+#endif
 EDATABASEDLL const char*  DLLCALLCONV getDefaultTableName() {
 	return "LowQualityWater";
 }

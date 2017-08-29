@@ -135,13 +135,17 @@ static FieldDescriptor df[] =
 	 {512, TYPE_CHAR, "script_text"},
 	 {1, TYPE_INT32, "tooltip_id"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
+#endif
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 	return  "id\0"
 			"name_id\0"
@@ -326,7 +330,9 @@ static ArenaPoints arenaPoints[] =
 	 {3800263, 289720},
 	 {3800101, 1136160}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+#endif
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
 		row->setDataString("unkCatValue", "Cat");

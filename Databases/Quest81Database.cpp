@@ -102,13 +102,17 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "cool_time"},
 	 {1, TYPE_INT32, "accept_cool_time"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+#endif
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && (dst == DF_SQL || dst == DF_CSV)) {
 		row->setDataBit("nv", 0);
@@ -139,7 +143,9 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 	}
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
+#endif
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 	return "id\0"
 			"text_id_quest\0"

@@ -72,13 +72,17 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "state_fx_id"},
 	 {1, TYPE_INT32, "state_fx_pos_id"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+#endif
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_SQL) {
 		row->setDataInt8("unknown0", 0);
@@ -88,7 +92,9 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 	}
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getSQLColumnOrder=_getSQLColumnOrder@0")
+#endif
 EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 	return  "state_id\0"
 			"text_id\0"
@@ -148,7 +154,9 @@ EDATABASEDLL const char* DLLCALLCONV getSQLColumnOrder() {
 			"state_fx_pos_id\0";
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
+#endif
 EDATABASEDLL const char*  DLLCALLCONV getDefaultFileName() {
 	return "db_tenacity";
 }

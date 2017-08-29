@@ -91,13 +91,17 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT16 | TYPE_SQLIGNORE, "unknownFlag"},
 	 {1, TYPE_INT8 | TYPE_SQLIGNORE, "unknownPadding"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+#endif
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst != DF_RDB) {
 		int questId = row->getDataInt32("id");

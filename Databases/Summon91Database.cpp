@@ -59,13 +59,17 @@ static FieldDescriptor df[] =
 	 {1, TYPE_INT32, "texture_group"},
 	 {1, TYPE_INT32, "local_flag"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 EDATABASEDLL void DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
+#endif
 void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_RDB) {
 		int id = row->getDataInt32("id");
@@ -76,7 +80,9 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 	}
 }
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
+#endif
 EDATABASEDLL const char*  DLLCALLCONV getDefaultFileName() {
 	return "db_creature";
 }

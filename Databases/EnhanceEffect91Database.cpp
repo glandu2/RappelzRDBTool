@@ -39,7 +39,9 @@ static FieldDescriptor df[] =
 	{1, TYPE_FLOAT64, "value_24"},
 	{1, TYPE_FLOAT64, "value_25"}};
 
+#ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
+#endif
 void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
