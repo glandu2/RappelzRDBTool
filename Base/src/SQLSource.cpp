@@ -1,14 +1,14 @@
 #include "SQLSource.h"
+#include "ICharsetConverter.h"
+#include "ILog.h"
 #include "RowManipulator.h"
 #include "SQLLanguage.h"
 #include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 #include <locale.h>
-#include "ICharsetConverter.h"
-#include "ILog.h"
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static void printOdbcStatus(ILog::Level errorLevel, SQLSMALLINT type, SQLHANDLE handle) {
 	SQLSMALLINT i = 0, len;
@@ -19,19 +19,22 @@ static void printOdbcStatus(ILog::Level errorLevel, SQLSMALLINT type, SQLHANDLE 
 
 	do {
 		ret = SQLGetDiagRec(type, handle, ++i, state, &native, text, sizeof(text), &len);
-		if (SQL_SUCCEEDED(ret))
-			getLogger()->log(errorLevel, "SQL: %s:%d:%ld:%s\n", state, i, (long)native, text);
+		if(SQL_SUCCEEDED(ret))
+			getLogger()->log(errorLevel, "SQL: %s:%d:%ld:%s\n", state, i, (long) native, text);
 	} while(ret == SQL_SUCCESS);
 }
-
 
 namespace RappelzRDBBase {
 
 int SQLSource::checkSqlResult(int result, const char* functionName, bool ignoreError) {
 	if(result != SQL_SUCCESS && result != SQL_NO_DATA && result != SQL_NEED_DATA) {
-		ILog::Level level = result == SQL_SUCCESS_WITH_INFO? ILog::LL_Info : ILog::LL_Error;
+		ILog::Level level = result == SQL_SUCCESS_WITH_INFO ? ILog::LL_Info : ILog::LL_Error;
 
-		getLogger()->log(level, "SQL: %s %s(%d):\n", functionName, result == SQL_SUCCESS_WITH_INFO? "additional info" : "error", result);
+		getLogger()->log(level,
+		                 "SQL: %s %s(%d):\n",
+		                 functionName,
+		                 result == SQL_SUCCESS_WITH_INFO ? "additional info" : "error",
+		                 result);
 		getLogger()->log(level, "SQL: query: %s\n", query);
 		printOdbcStatus(level, SQL_HANDLE_STMT, hstmt);
 		printOdbcStatus(level, SQL_HANDLE_DBC, hdbc);
@@ -46,7 +49,7 @@ int SQLSource::checkSqlResult(int result, const char* functionName, bool ignoreE
 	return 0;
 }
 
-SQLSource::SQLSource(SQLLanguage *language) {
+SQLSource::SQLSource(SQLLanguage* language) {
 	henv = 0;
 	hdbc = 0;
 	hstmt = 0;
@@ -59,11 +62,12 @@ SQLSource::SQLSource(SQLLanguage *language) {
 
 SQLSource::~SQLSource() {
 	close();
-	if(tableName) free(tableName);
+	if(tableName)
+		free(tableName);
 	delete sqlLanguage;
 }
 
-int SQLSource::open(const char* source, eOpenMode openMode, const char *location, const char* options) {
+int SQLSource::open(const char* source, eOpenMode openMode, const char* location, const char* options) {
 	IDataSource::open(source, openMode, location, options);
 
 	SQLRETURN result;
@@ -104,8 +108,9 @@ int SQLSource::open(const char* source, eOpenMode openMode, const char *location
 	}
 
 	SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
-	if(checkSqlResult(SQLDriverConnect(hdbc, 0, (UCHAR*)connectionString, SQL_NTS, 0, 0, 0, 0), "SQLDriverConnect")) {
-		getLogger()->log(ILog::LL_Error, "SQLSource: Failed to connect to connection string: \"%s\"\n", connectionString);
+	if(checkSqlResult(SQLDriverConnect(hdbc, 0, (UCHAR*) connectionString, SQL_NTS, 0, 0, 0, 0), "SQLDriverConnect")) {
+		getLogger()->log(
+		    ILog::LL_Error, "SQLSource: Failed to connect to connection string: \"%s\"\n", connectionString);
 		SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
 		SQLFreeHandle(SQL_HANDLE_ENV, henv);
 		hdbc = 0;
@@ -118,7 +123,11 @@ int SQLSource::open(const char* source, eOpenMode openMode, const char *location
 	if(openMode == OM_Write) {
 		SQLSetConnectAttr(hdbc, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF, SQL_IS_UINTEGER);
 		commitTransaction = true;
-	} else SQLSetConnectAttr(hdbc, SQL_ATTR_TXN_ISOLATION, (SQLPOINTER)SQL_TXN_SERIALIZABLE, SQL_IS_UINTEGER);	//consitent results with select count(*) and select *
+	} else
+		SQLSetConnectAttr(hdbc,
+		                  SQL_ATTR_TXN_ISOLATION,
+		                  (SQLPOINTER) SQL_TXN_SERIALIZABLE,
+		                  SQL_IS_UINTEGER);  // consitent results with select count(*) and select *
 
 	tableName = strdup(source);
 
@@ -133,9 +142,12 @@ void SQLSource::close() {
 			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 	}
 
-	if(hstmt) SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-	if(hdbc) SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
-	if(henv) SQLFreeHandle(SQL_HANDLE_ENV, henv);
+	if(hstmt)
+		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+	if(hdbc)
+		SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
+	if(henv)
+		SQLFreeHandle(SQL_HANDLE_ENV, henv);
 	hstmt = 0;
 	hdbc = 0;
 	henv = 0;
@@ -145,16 +157,17 @@ void SQLSource::close() {
 	if(utf16To8bits)
 		delete utf16To8bits;
 	utf16To8bits = 0;
-	if(tableName) free(tableName);
+	if(tableName)
+		free(tableName);
 	tableName = 0;
 }
 
-int SQLSource::prepareRead(IRowManipulator *row) {
+int SQLSource::prepareRead(IRowManipulator* row) {
 	int rowCount = 0;
 
-	//retreive row count
+	// retreive row count
 	sprintf(query, "SELECT COUNT(*) FROM %s;", tableName);
-	if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "SQLExecDirect"))
+	if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*) query, SQL_NTS), "SQLExecDirect"))
 		return ENOENT;
 
 	if(checkSqlResult(SQLFetch(hstmt), "prepareRead.SQLFetch"))
@@ -166,7 +179,7 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 	SQLCloseCursor(hstmt);
 
 	columnsToProcess.clear();
-	for(int curCol=0; curCol<row->getColumnCount(); curCol++) {
+	for(int curCol = 0; curCol < row->getColumnCount(); curCol++) {
 		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE) || row->getType(curCol) == TYPE_VARCHAR_SIZE)
 			continue;
 
@@ -175,29 +188,29 @@ int SQLSource::prepareRead(IRowManipulator *row) {
 
 	prepareReadQuery();
 
-	if(checkSqlResult(SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS), "SQLPrepare"))
+	if(checkSqlResult(SQLPrepare(hstmt, (SQLCHAR*) query, SQL_NTS), "SQLPrepare"))
 		return ENOEXEC;
 
 	if(checkSqlResult(SQLExecute(hstmt), "SQLExecute"))
 		return EINVAL;
 
-
-	//rows are pre-fetched
+	// rows are pre-fetched
 	if(!SQL_SUCCEEDED(SQLFetch(hstmt))) {
 		endOfRecordSet = true;
-	} else endOfRecordSet = false;
+	} else
+		endOfRecordSet = false;
 
 	return 0;
 }
 
-int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
+int SQLSource::prepareWrite(IRowManipulator* row, unsigned int rowCount) {
 	clearBoundParameters(row->getColumnCount());
 
 	if(reuseTableSchema) {
 		SQLRETURN result;
 
 		sprintf(query, "DELETE FROM %s;", tableName);
-		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "SQLExecDirect")) {
+		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*) query, SQL_NTS), "SQLExecDirect")) {
 			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 			return ENOENT;
 		}
@@ -205,7 +218,7 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 		std::vector<char*> dotPositions;
 		char columnName[128];
 		SQLLEN cbColumnName;
-		char *p = tableName;
+		char* p = tableName;
 		char *tableNamePart, *endOfDatabasePart;
 
 		while(p) {
@@ -216,20 +229,23 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 			}
 		}
 
-
 		if(dotPositions.size() >= 1)
-			tableNamePart = dotPositions[dotPositions.size()-1] + 1;
+			tableNamePart = dotPositions[dotPositions.size() - 1] + 1;
 		else
 			tableNamePart = tableName;
 
-
 		if(dotPositions.size() >= 2)
-			endOfDatabasePart = dotPositions[dotPositions.size()-2] + 1;
+			endOfDatabasePart = dotPositions[dotPositions.size() - 2] + 1;
 		else
 			endOfDatabasePart = tableName;
 
-		sprintf(query, "SELECT COLUMN_NAME FROM %.*sINFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = \'%s\' ORDER BY ORDINAL_POSITION ASC;", endOfDatabasePart - tableName, tableName, tableNamePart);
-		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS), "SQLExecDirect")) {
+		sprintf(query,
+		        "SELECT COLUMN_NAME FROM %.*sINFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = \'%s\' ORDER BY "
+		        "ORDINAL_POSITION ASC;",
+		        endOfDatabasePart - tableName,
+		        tableName,
+		        tableNamePart);
+		if(checkSqlResult(SQLExecDirect(hstmt, (SQLCHAR*) query, SQL_NTS), "SQLExecDirect")) {
 			SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_ROLLBACK);
 			return ENOEXEC;
 		}
@@ -260,10 +276,10 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 		SQLEndTran(SQL_HANDLE_DBC, hdbc, SQL_COMMIT);
 	} else {
 		sprintf(query, "DROP TABLE %s;", tableName);
-		SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+		SQLExecDirect(hstmt, (SQLCHAR*) query, SQL_NTS);
 
 		columnsToProcess.clear();
-		for(int curCol=0; curCol<row->getColumnCount(); curCol++) {
+		for(int curCol = 0; curCol < row->getColumnCount(); curCol++) {
 			if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_SQLIGNORE) || row->getType(curCol) == TYPE_VARCHAR_SIZE)
 				continue;
 
@@ -280,17 +296,17 @@ int SQLSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 
 	prepareWriteQuery();
 
-	int result = SQLPrepare(hstmt, (SQLCHAR*)query, SQL_NTS);
+	int result = SQLPrepare(hstmt, (SQLCHAR*) query, SQL_NTS);
 	if(checkSqlResult(result, "SQLPrepare"))
 		return ENOEXEC;
 
 	return 0;
 }
 
-int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
-	char *p;
+int SQLSource::createSQLTable(SQLHSTMT hstmt, const char* table) {
+	char* p;
 	int isFirstColumn = 1, curCol;
-	IRowManipulator *row = getRowManipulator();
+	IRowManipulator* row = getRowManipulator();
 	size_t i;
 
 	p = query;
@@ -316,14 +332,14 @@ int SQLSource::createSQLTable(SQLHSTMT hstmt, const char *table) {
 		strcpy(p, " NOT NULL");
 		p += strlen(p);
 
-		if(GET_FLAGBIT(row->getFlags(curCol),TYPE_FLAG_KEY)) {
+		if(GET_FLAGBIT(row->getFlags(curCol), TYPE_FLAG_KEY)) {
 			strcpy(p, " PRIMARY KEY");
 			p += strlen(p);
 		}
 	}
 	strcpy(p, ");");
 
-	int result = SQLExecDirect(hstmt, (SQLCHAR*)query, SQL_NTS);
+	int result = SQLExecDirect(hstmt, (SQLCHAR*) query, SQL_NTS);
 	if(checkSqlResult(result, "SQLExecDirect"))
 		return ENOENT;
 
@@ -335,7 +351,8 @@ int SQLSource::readRow() {
 
 	if(!SQL_SUCCEEDED(SQLFetch(hstmt)))
 		endOfRecordSet = true;
-	else endOfRecordSet = false;
+	else
+		endOfRecordSet = false;
 
 	return 0;
 }
@@ -353,10 +370,10 @@ int SQLSource::writeRow() {
 	return 0;
 }
 
-char* SQLSource::appendColumnNames(char *p) {
+char* SQLSource::appendColumnNames(char* p) {
 	bool isFirstColumn = true;
 	size_t i;
-	IRowManipulator *row = getRowManipulator();
+	IRowManipulator* row = getRowManipulator();
 
 	for(i = 0; i < columnsToProcess.size(); i++) {
 		if(isFirstColumn) {
@@ -372,7 +389,7 @@ char* SQLSource::appendColumnNames(char *p) {
 }
 
 int SQLSource::prepareReadQuery() {
-	char *p = query;
+	char* p = query;
 
 	strcpy(p, "SELECT ");
 	p += strlen(p);
@@ -383,7 +400,7 @@ int SQLSource::prepareReadQuery() {
 	p += strlen(p);
 
 	size_t i;
-	IRowManipulator *row = getRowManipulator();
+	IRowManipulator* row = getRowManipulator();
 
 	for(i = 0; i < columnsToProcess.size(); i++) {
 		if(row->getFlags(columnsToProcess[i]) & TYPE_FLAG_SORT) {
@@ -399,11 +416,11 @@ int SQLSource::prepareReadQuery() {
 }
 
 int SQLSource::prepareWriteQuery() {
-	char *p = query;
+	char* p = query;
 	int curCol;
 	size_t i;
 	bool isFirstColumn = true;
-	IRowManipulator *row = getRowManipulator();
+	IRowManipulator* row = getRowManipulator();
 
 	p += sprintf(p, "INSERT INTO %s (", tableName);
 
@@ -439,7 +456,7 @@ int SQLSource::prepareWriteQuery() {
 				columnType = SQL_C_WCHAR;
 				dbType = SQL_WVARCHAR;
 				columnSize = row->getMaxDataCount(curCol);
-				bufferSize = columnSize*4; //worst case: each UTF16 character is 4 bytes wide
+				bufferSize = columnSize * 4;  // worst case: each UTF16 character is 4 bytes wide
 				break;
 
 			case TYPE_INT8:
@@ -495,11 +512,20 @@ int SQLSource::prepareWriteQuery() {
 				columnType = SQL_C_WCHAR;
 				dbType = SQL_WVARCHAR;
 				columnSize = row->getMaxDataCount(curCol);
-				bufferSize = columnSize*4; //worst case: each UTF16 character is 4 bytes wide
+				bufferSize = columnSize * 4;  // worst case: each UTF16 character is 4 bytes wide
 				break;
 		}
 		ParameterInfo* paramInfo = initParameter(curCol, bufferSize);
-		int result = SQLBindParameter(hstmt, i+1, SQL_PARAM_INPUT, columnType, dbType, columnSize, precision, paramInfo->data, 0, &paramInfo->dataSizeOrInd);
+		int result = SQLBindParameter(hstmt,
+		                              i + 1,
+		                              SQL_PARAM_INPUT,
+		                              columnType,
+		                              dbType,
+		                              columnSize,
+		                              precision,
+		                              paramInfo->data,
+		                              0,
+		                              &paramInfo->dataSizeOrInd);
 		if(checkSqlResult(result, "SQLBindParameter")) {
 			getLogger()->log(ILog::LL_Error, "Error while binding column \"%s\"\n", row->getColumnName(curCol));
 			return ENOEXEC;
@@ -513,8 +539,8 @@ int SQLSource::prepareWriteQuery() {
 }
 
 int SQLSource::prepareWriteRowQuery() {
-	IRowManipulator *row = getRowManipulator();
-	void *buffer;
+	IRowManipulator* row = getRowManipulator();
+	void* buffer;
 	int curCol, count;
 	size_t i;
 
@@ -554,8 +580,8 @@ int SQLSource::prepareWriteRowQuery() {
 			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR: {
 				ICharsetConverter::ConvertedString in, out;
-				in.data = (char*)buffer;
-				in.size = strlen((char*)buffer);
+				in.data = (char*) buffer;
+				in.size = strlen((char*) buffer);
 				utf16To8bits->convertToUtf16(in, &out);
 
 				setParameterData(curCol, out.data, out.size);
@@ -574,13 +600,12 @@ int SQLSource::prepareWriteRowQuery() {
 		}
 	}
 
-
 	return 0;
 }
 
 int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
-	IRowManipulator *row = getRowManipulator();
-	void *buffer;
+	IRowManipulator* row = getRowManipulator();
+	void* buffer;
 	int curCol, columnIndex, dummy;
 	size_t i;
 	SQLLEN dataSize;
@@ -590,7 +615,7 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 		curCol = columnsToProcess[i];
 		columnIndex = i + 1;
 
-		//Special handling for varchar
+		// Special handling for varchar
 		if(row->getType(curCol) != TYPE_VARCHAR_STR && row->getType(curCol) != TYPE_NVARCHAR_STR)
 			row->initData(curCol);
 
@@ -599,44 +624,54 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 		switch(row->getType(curCol)) {
 			case TYPE_BIT:
 				SQLGetData(hstmt, columnIndex, SQL_C_BIT, buffer, sizeof(char), &isDataNull);
-				if(isDataNull == SQL_NULL_DATA) *static_cast<char*>(buffer) = 0;
+				if(isDataNull == SQL_NULL_DATA)
+					*static_cast<char*>(buffer) = 0;
 				break;
 
 			case TYPE_INT8:
 				SQLGetData(hstmt, columnIndex, SQL_C_TINYINT, buffer, sizeof(char), &isDataNull);
-				if(isDataNull == SQL_NULL_DATA) *static_cast<char*>(buffer) = 0;
+				if(isDataNull == SQL_NULL_DATA)
+					*static_cast<char*>(buffer) = 0;
 				break;
 
 			case TYPE_INT16:
 				SQLGetData(hstmt, columnIndex, SQL_C_SHORT, buffer, sizeof(short), &isDataNull);
-				if(isDataNull == SQL_NULL_DATA) *static_cast<short*>(buffer) = 0;
+				if(isDataNull == SQL_NULL_DATA)
+					*static_cast<short*>(buffer) = 0;
 				break;
 
 			case TYPE_INT32:
 				SQLGetData(hstmt, columnIndex, SQL_C_LONG, buffer, sizeof(int), &isDataNull);
-				if(isDataNull == SQL_NULL_DATA) *static_cast<int*>(buffer) = 0;
+				if(isDataNull == SQL_NULL_DATA)
+					*static_cast<int*>(buffer) = 0;
 				break;
 
-			case TYPE_DECIMAL:
-			{
+			case TYPE_DECIMAL: {
 				char decimalTemp[20];
 				SQLGetData(hstmt, columnIndex, SQL_C_CHAR, decimalTemp, 19, &isDataNull);
-				if(isDataNull == SQL_NULL_DATA) *static_cast<int*>(buffer) = 0;
+				if(isDataNull == SQL_NULL_DATA)
+					*static_cast<int*>(buffer) = 0;
 				else {
 					float decimalValue;
 					sscanf(decimalTemp, "%f", &decimalValue);
-					decimalValue = decimalValue*pow((float)10, row->getDataIndex(curCol));
+					decimalValue = decimalValue * pow((float) 10, row->getDataIndex(curCol));
 					if(decimalValue < 0)
 						decimalValue -= 0.5;
 					else
 						decimalValue += 0.5;
-					*static_cast<int*>(buffer) = (int)decimalValue;
+					*static_cast<int*>(buffer) = (int) decimalValue;
 				}
 				break;
 			}
 
 			case TYPE_INT64:
-				SQLGetData(hstmt, columnIndex, SQL_C_DEFAULT, buffer, sizeof(long long int), &isDataNull);	//using SQL_C_DEFAULT as SQL_C_SBIGINT has some problem with some odbc implementation
+				SQLGetData(
+				    hstmt, columnIndex, SQL_C_DEFAULT, buffer, sizeof(long long int), &isDataNull);  // using
+				                                                                                     // SQL_C_DEFAULT as
+				                                                                                     // SQL_C_SBIGINT has
+				                                                                                     // some problem with
+				                                                                                     // some odbc
+				                                                                                     // implementation
 				if(isDataNull == SQL_NULL_DATA)
 					*static_cast<long long int*>(buffer) = 0;
 				break;
@@ -659,23 +694,28 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 			case TYPE_CHAR:
 			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR: {
-				char *unicodeBuffer;
+				char* unicodeBuffer;
 				int bufferSize;
 				int bytesRead = 0;
 
 				SQLGetData(hstmt, columnIndex, SQL_C_BINARY, &dummy, 0, &dataSize);
 				if(dataSize % 2 == 0)
-					bufferSize = dataSize+2;
+					bufferSize = dataSize + 2;
 				else
-					bufferSize = dataSize+1;
-				unicodeBuffer = (char*)malloc(bufferSize);
+					bufferSize = dataSize + 1;
+				unicodeBuffer = (char*) malloc(bufferSize);
 
 				int ret;
-				while((ret = SQLGetData(hstmt, columnIndex, SQL_C_WCHAR, unicodeBuffer + bytesRead, bufferSize - bytesRead, &isDataNull)) == SQL_SUCCESS_WITH_INFO) {
+				while((ret = SQLGetData(hstmt,
+				                        columnIndex,
+				                        SQL_C_WCHAR,
+				                        unicodeBuffer + bytesRead,
+				                        bufferSize - bytesRead,
+				                        &isDataNull)) == SQL_SUCCESS_WITH_INFO) {
 					if(isDataNull == SQL_NULL_DATA)
 						break;
 
-					bytesRead = bufferSize-2; //dont keep null terminator
+					bytesRead = bufferSize - 2;  // dont keep null terminator
 					bufferSize *= 2;
 					unicodeBuffer = (char*) realloc(unicodeBuffer, bufferSize);
 				}
@@ -687,21 +727,21 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 						row->initData(curCol, 1);
 					*static_cast<char*>(row->getValuePtr(curCol)) = 0;
 				} else {
-					char *outBuffer;
+					char* outBuffer;
 					ICharsetConverter::ConvertedString in, out;
 					in.data = unicodeBuffer;
 					in.size = bytesRead;
 					utf16To8bits->convertFromUtf16(in, &out);
 
 					if(row->getType(curCol) == TYPE_CHAR) {
-						//Cap max size
+						// Cap max size
 						if(out.size > row->getDataCount(curCol))
 							out.size = row->getDataCount(curCol);
-					} else { //Varchar is autosized
-						if(out.size > 0 && out.data[out.size-1] == 0)
+					} else {  // Varchar is autosized
+						if(out.size > 0 && out.data[out.size - 1] == 0)
 							row->initData(curCol, out.size);
 						else
-							row->initData(curCol, out.size+1);
+							row->initData(curCol, out.size + 1);
 					}
 					outBuffer = static_cast<char*>(row->getValuePtr(curCol));
 					memcpy(outBuffer, out.data, out.size);
@@ -719,7 +759,6 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 bool SQLSource::hasNext() {
 	return !endOfRecordSet;
 }
-
 
 /***********************************/
 /*** Parameter binding functions ***/
@@ -757,9 +796,9 @@ SQLLEN* SQLSource::getParameterSizeOrInd(int index) {
 	return &boundBuffers[index].dataSizeOrInd;
 }
 
-void SQLSource::setParameterData(int index, void *data, SQLLEN size) {
+void SQLSource::setParameterData(int index, void* data, SQLLEN size) {
 	memcpy(boundBuffers[index].data, data, size);
 	boundBuffers[index].dataSizeOrInd = size;
 }
 
-} //namespace
+}  // namespace RappelzRDBBase

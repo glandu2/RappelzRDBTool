@@ -5,16 +5,21 @@
 #ifndef UNICODE
 #define UNICODE
 #endif
-#include <windows.h>
 #include <QDir>
 #include <QFileInfo>
+#include <windows.h>
 #endif
 
 #include "FileDialog.h"
 
 #ifdef _WIN32
 
-QString FileDialog::getSaveFileName(QWidget* parent, const QString &caption, const QString& dir, const QString& filter, QString *selectedFilter, QFileDialog::Options options) {
+QString FileDialog::getSaveFileName(QWidget* parent,
+                                    const QString& caption,
+                                    const QString& dir,
+                                    const QString& filter,
+                                    QString* selectedFilter,
+                                    QFileDialog::Options options) {
 	OPENFILENAME ofn;
 	WCHAR filename[1024];
 	QFileInfo initialFileInfo(dir);
@@ -52,11 +57,11 @@ QString FileDialog::getSaveFileName(QWidget* parent, const QString &caption, con
 		i++;
 	}
 
-	memcpy(filename, initialFileName.utf16(), (initialFileName.size()+1)*sizeof(QChar));
+	memcpy(filename, initialFileName.utf16(), (initialFileName.size() + 1) * sizeof(QChar));
 
 	memset(&ofn, 0, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = parent ? (HWND)parent->winId() : 0;
+	ofn.hwndOwner = parent ? (HWND) parent->winId() : 0;
 	ofn.lpstrFilter = (LPCWSTR) nullSeparatedFilter.utf16();
 	if(selectedFilter)
 		ofn.nFilterIndex = initialFilterIndex;
@@ -72,7 +77,7 @@ QString FileDialog::getSaveFileName(QWidget* parent, const QString &caption, con
 		ofn.Flags |= OFN_OVERWRITEPROMPT;
 
 	if(GetSaveFileName(&ofn)) {
-		if(selectedFilter && ((int)ofn.nFilterIndex - 1) >= 0 && ((int)ofn.nFilterIndex - 1) < filters.size()) {
+		if(selectedFilter && ((int) ofn.nFilterIndex - 1) >= 0 && ((int) ofn.nFilterIndex - 1) < filters.size()) {
 			*selectedFilter = filters[ofn.nFilterIndex - 1];
 		}
 		return QDir::fromNativeSeparators(QString::fromWCharArray(filename));
@@ -81,7 +86,12 @@ QString FileDialog::getSaveFileName(QWidget* parent, const QString &caption, con
 	return QString();
 }
 
-QString FileDialog::getOpenFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options) {
+QString FileDialog::getOpenFileName(QWidget* parent,
+                                    const QString& caption,
+                                    const QString& dir,
+                                    const QString& filter,
+                                    QString* selectedFilter,
+                                    QFileDialog::Options options) {
 	OPENFILENAME ofn;
 	WCHAR filename[1024];
 	QFileInfo initialFileInfo(dir);
@@ -119,11 +129,11 @@ QString FileDialog::getOpenFileName(QWidget *parent, const QString &caption, con
 		i++;
 	}
 
-	memcpy(filename, initialFileName.utf16(), (initialFileName.size()+1)*sizeof(QChar));
+	memcpy(filename, initialFileName.utf16(), (initialFileName.size() + 1) * sizeof(QChar));
 
 	memset(&ofn, 0, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = parent ? (HWND)parent->winId() : 0;
+	ofn.hwndOwner = parent ? (HWND) parent->winId() : 0;
 	ofn.lpstrFilter = (LPCWSTR) nullSeparatedFilter.utf16();
 	if(selectedFilter)
 		ofn.nFilterIndex = initialFilterIndex;
@@ -137,7 +147,7 @@ QString FileDialog::getOpenFileName(QWidget *parent, const QString &caption, con
 		ofn.Flags |= OFN_NODEREFERENCELINKS;
 
 	if(GetOpenFileName(&ofn)) {
-		if(selectedFilter && ((int)ofn.nFilterIndex - 1) >= 0 && ((int)ofn.nFilterIndex - 1) < filters.size()) {
+		if(selectedFilter && ((int) ofn.nFilterIndex - 1) >= 0 && ((int) ofn.nFilterIndex - 1) < filters.size()) {
 			*selectedFilter = filters[ofn.nFilterIndex - 1];
 		}
 		return QDir::fromNativeSeparators(QString::fromWCharArray(filename));
@@ -146,14 +156,23 @@ QString FileDialog::getOpenFileName(QWidget *parent, const QString &caption, con
 	return QString();
 }
 
-
 #else
 
-QString FileDialog::getSaveFileName(QWidget* parent, const QString &caption, const QString& dir, const QString& filter, QString *selectedFilter, QFileDialog::Options options) {
+QString FileDialog::getSaveFileName(QWidget* parent,
+                                    const QString& caption,
+                                    const QString& dir,
+                                    const QString& filter,
+                                    QString* selectedFilter,
+                                    QFileDialog::Options options) {
 	return QFileDialog::getSaveFileName(parent, caption, dir, filter, selectedFilter, options);
 }
 
-QString FileDialog::getOpenFileName(QWidget *parent, const QString &caption, const QString &dir, const QString &filter, QString *selectedFilter, QFileDialog::Options options) {
+QString FileDialog::getOpenFileName(QWidget* parent,
+                                    const QString& caption,
+                                    const QString& dir,
+                                    const QString& filter,
+                                    QString* selectedFilter,
+                                    QFileDialog::Options options) {
 	return QFileDialog::getOpenFileName(parent, caption, dir, filter, selectedFilter, options);
 }
 

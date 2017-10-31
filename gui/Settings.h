@@ -3,14 +3,13 @@
 
 #include <QSettings>
 
-class Settings
-{
+class Settings {
 public:
-	static QSettings *getSettings() { return options; }
-	static void setSettings(QSettings *settings) { options = settings; }
+	static QSettings* getSettings() { return options; }
+	static void setSettings(QSettings* settings) { options = settings; }
 
 private:
 	static QSettings* options;
 };
 
-#endif // SETTINGS_H
+#endif  // SETTINGS_H

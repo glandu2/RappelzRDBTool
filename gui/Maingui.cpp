@@ -1,32 +1,26 @@
 #include "Maingui.h"
 #include "ui_Maingui.h"
 
-#include "IDatabase.h"
-#include "IRowManipulator.h"
+#include "DatabaseDescManageDialog.h"
 #include "DatabaseDescriptionListModel.h"
 #include "DatabaseTableModel.h"
-#include "SqlConfigDialog.h"
 #include "DatabaseView.h"
-#include "OpenSaveSource.h"
-#include "TabBarEventFilter.h"
-#include "DatabaseDescManageDialog.h"
+#include "IDatabase.h"
+#include "IRowManipulator.h"
 #include "NameToHash.h"
+#include "OpenSaveSource.h"
 #include "Settings.h"
+#include "SqlConfigDialog.h"
+#include "TabBarEventFilter.h"
 
-#include <QMessageBox>
-#include <QStringList>
-#include <QSettings>
-#include <QLabel>
 #include <QCloseEvent>
+#include <QLabel>
+#include <QMessageBox>
+#include <QSettings>
+#include <QStringList>
 
-Maingui::Maingui(QWidget *parent) :
-	QMainWindow(parent),
-	ui(new Ui::MainWindow),
-	hashConverter(this),
-	logWindow(this)
-{
+Maingui::Maingui(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow), hashConverter(this), logWindow(this) {
 	ui->setupUi(this);
-
 
 	tabEventFilter = new TabBarEventFilter(ui->databaseTab, this);
 
@@ -67,12 +61,10 @@ Maingui::Maingui(QWidget *parent) :
 	connect(tabEventFilter, SIGNAL(addTab()), this, SLOT(onAddTab()));
 	connect(tabEventFilter, SIGNAL(removeTab(int)), this, SLOT(onRemoveTab(int)));
 
-
 	onAddTab();  // Have at least one tab
 }
 
-Maingui::~Maingui()
-{
+Maingui::~Maingui() {
 	Settings::getSettings()->setValue("useHashedFilename", ui->actionUse_hashed_files->isChecked());
 	delete dbDescriptionModel;
 	delete sqlConfigDialog;
@@ -80,7 +72,7 @@ Maingui::~Maingui()
 }
 
 void Maingui::onTabChanged(int index) {
-	DatabaseView *currentView = databaseViews.value(index, 0);
+	DatabaseView* currentView = databaseViews.value(index, 0);
 	if(!currentView)
 		return;
 
@@ -96,7 +88,7 @@ void Maingui::onTabChanged(int index) {
 
 void Maingui::onAddTab() {
 	int index;
-	DatabaseView *tabView = new DatabaseView(dbDescriptionModel, ui->databaseTab);
+	DatabaseView* tabView = new DatabaseView(dbDescriptionModel, ui->databaseTab);
 	connect(tabView, SIGNAL(titleChanged(DatabaseView*)), this, SLOT(onViewTitleChanged(DatabaseView*)));
 	connect(tabView, SIGNAL(onHighlightDbStruct(int)), this, SLOT(onDbStructHighlighted(int)));
 
@@ -107,17 +99,17 @@ void Maingui::onAddTab() {
 
 	databaseViews.insert(index, tabView);
 
-
 	if(ui->databaseTab->currentIndex() == index)
 		onTabChanged(index);
-	else ui->databaseTab->setCurrentIndex(index);
+	else
+		ui->databaseTab->setCurrentIndex(index);
 }
 
 void Maingui::onRemoveTab(int index) {
 	if(index < 0)
 		index = ui->databaseTab->currentIndex();
 
-	DatabaseView *tabView = databaseViews.at(index);
+	DatabaseView* tabView = databaseViews.at(index);
 
 	if(tabView->closeDb() == false)
 		return;
@@ -130,11 +122,10 @@ void Maingui::onRemoveTab(int index) {
 	ui->databaseTab->removeTab(index);
 	databaseViews.removeAt(index);
 
-
 	delete tabView;
 
 	if(ui->databaseTab->count() == 0)
-		onAddTab();  //Always have at least 1 tab
+		onAddTab();  // Always have at least 1 tab
 }
 
 void Maingui::onViewTitleChanged(DatabaseView* view) {
@@ -152,11 +143,12 @@ void Maingui::onViewTitleChanged(DatabaseView* view) {
 void Maingui::onDbStructHighlighted(int index) {
 	if(index < 0)
 		statusBar()->clearMessage();
-	else statusBar()->showMessage(QString(dbDescriptionModel->getDbDescription(index)->getFilename()), 5000);
+	else
+		statusBar()->showMessage(QString(dbDescriptionModel->getDbDescription(index)->getFilename()), 5000);
 }
 
 bool Maingui::onLoadDbStructDLL() {
-	DatabaseView *currentView = databaseViews.value(ui->databaseTab->currentIndex(), 0);
+	DatabaseView* currentView = databaseViews.value(ui->databaseTab->currentIndex(), 0);
 
 	if(currentView == 0)
 		return false;
@@ -165,20 +157,20 @@ bool Maingui::onLoadDbStructDLL() {
 }
 
 void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
-	OpenSaveSource *openSaveSource;
+	OpenSaveSource* openSaveSource;
 	bool ok;
 	bool autoDetectType;
 	bool hashedFilename = ui->actionUse_hashed_files->isChecked();
 	QString sourceName;
 	QByteArray defaultSourceName;
 	eDataSourceType sourceType;
-	DatabaseView *currentView = databaseViews.value(ui->databaseTab->currentIndex(), 0);
+	DatabaseView* currentView = databaseViews.value(ui->databaseTab->currentIndex(), 0);
 	QByteArray options;
 
 	if(currentView == 0)
 		return;
 
-	//Load the current select db structure if not already done
+	// Load the current select db structure if not already done
 	if(!onLoadDbStructDLL())
 		return;
 
@@ -190,7 +182,14 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 
 	if(!save && currentView->isSaved() == false) {
 		QMessageBox::StandardButton button;
-		button = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?", "User wants to load another database but the current is modified and not saved").arg(currentView->getLoadedDatabaseName()), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+		button =
+		    QMessageBox::warning(this,
+		                         QCoreApplication::applicationName(),
+		                         tr("The database %1 is not saved.\n\nContinue ?",
+		                            "User wants to load another database but the current is modified and not saved")
+		                             .arg(currentView->getLoadedDatabaseName()),
+		                         QMessageBox::Yes | QMessageBox::No,
+		                         QMessageBox::No);
 		if(button == QMessageBox::No)
 			return;
 	}
@@ -248,29 +247,39 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 	delete openSaveSource;
 
 	if(ok) {
-		if(!save) currentView->closeDb(true);
+		if(!save)
+			currentView->closeDb(true);
 
 		if(!save)
-			currentView->loadDb(sourceType, sourceName, sqlConfigDialog->getConnectionString().toLocal8Bit().constData(), options);
-		else currentView->saveDb(sourceType, sourceName, sqlConfigDialog->getConnectionString().toLocal8Bit().constData(), options);
+			currentView->loadDb(
+			    sourceType, sourceName, sqlConfigDialog->getConnectionString().toLocal8Bit().constData(), options);
+		else
+			currentView->saveDb(
+			    sourceType, sourceName, sqlConfigDialog->getConnectionString().toLocal8Bit().constData(), options);
 	}
 }
 
 void Maingui::onCloseDb() {
-	DatabaseView *currentView = databaseViews.value(ui->databaseTab->currentIndex(), 0);
+	DatabaseView* currentView = databaseViews.value(ui->databaseTab->currentIndex(), 0);
 
 	if(currentView)
 		currentView->closeDb();
 }
 
-void Maingui::closeEvent(QCloseEvent *event)
-{
+void Maingui::closeEvent(QCloseEvent* event) {
 	for(int i = 0; i < databaseViews.size(); i++) {
-		DatabaseView *currentView = databaseViews.value(i, 0);
+		DatabaseView* currentView = databaseViews.value(i, 0);
 		if(!currentView->isSaved()) {
 			ui->databaseTab->setCurrentIndex(i);
 			QMessageBox::StandardButton retButton;
-			retButton = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?", "User want to quit but there is at least one database modified but not saved").arg(currentView->getLoadedDatabaseName()), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+			retButton =
+			    QMessageBox::warning(this,
+			                         QCoreApplication::applicationName(),
+			                         tr("The database %1 is not saved.\n\nContinue ?",
+			                            "User want to quit but there is at least one database modified but not saved")
+			                             .arg(currentView->getLoadedDatabaseName()),
+			                         QMessageBox::Yes | QMessageBox::No,
+			                         QMessageBox::No);
 			if(retButton != QMessageBox::Yes) {
 				event->ignore();
 				return;
@@ -295,7 +304,6 @@ void Maingui::onLoadCSV() {
 void Maingui::onLoadSQLDatabase() {
 	loadSaveDbFile(false, ST_SqlDatabase);
 }
-
 
 void Maingui::onSaveFile() {
 	loadSaveDbFile(true, ST_None);
@@ -340,5 +348,10 @@ void Maingui::onToggleLogWindow() {
 }
 
 void Maingui::onAbout() {
-	QMessageBox::information(this, QCoreApplication::applicationName(), QString("This tool can convert RDB files to CSV files and CSV to RDB. It was made by Glandu2 for epvp.\nVersion: %1\nUsing locale: %2").arg(QCoreApplication::applicationVersion()).arg(QLocale::system().name()));
+	QMessageBox::information(this,
+	                         QCoreApplication::applicationName(),
+	                         QString("This tool can convert RDB files to CSV files and CSV to RDB. It was made by "
+	                                 "Glandu2 for epvp.\nVersion: %1\nUsing locale: %2")
+	                             .arg(QCoreApplication::applicationVersion())
+	                             .arg(QLocale::system().name()));
 }

@@ -1,13 +1,11 @@
 #include "FileToRenameListModel.h"
-#include "NameToHash.h"
 #include "HashToName.h"
+#include "NameToHash.h"
 #include "Settings.h"
 #include <QFileInfo>
 #include <QRegExp>
 
-FileToRenameListModel::FileToRenameListModel(QObject *parent) :
-	QAbstractTableModel(parent)
-{
+FileToRenameListModel::FileToRenameListModel(QObject* parent) : QAbstractTableModel(parent) {
 	int i = 0;
 	QString value;
 
@@ -17,7 +15,8 @@ FileToRenameListModel::FileToRenameListModel(QObject *parent) :
 	optionGroupName = "FilesToRenameWindows";
 #endif
 
-	while((value = Settings::getSettings()->value((optionGroupName + "/filepath/%1").arg(i)).toString()).isNull() == false) {
+	while((value = Settings::getSettings()->value((optionGroupName + "/filepath/%1").arg(i)).toString()).isNull() ==
+	      false) {
 		QFileInfo targetFileInfo(value);
 
 		FileInfo fileInfo;
@@ -71,7 +70,6 @@ QString FileToRenameListModel::getTargetFilename(int index) {
 	return convertFilename(fileList.at(index));
 }
 
-
 int FileToRenameListModel::columnCount(const QModelIndex& parent) const {
 	if(parent.isValid())
 		return 0;
@@ -83,9 +81,12 @@ QVariant FileToRenameListModel::headerData(int section, Qt::Orientation orientat
 		return QVariant();
 
 	switch(section) {
-		case 0: return tr("Type", "column name in file to rename dialogbox");
-		case 1: return tr("File path", "column name in file to rename dialogbox");
-		case 2: return tr("Converted", "column name in file to rename dialogbox");
+		case 0:
+			return tr("Type", "column name in file to rename dialogbox");
+		case 1:
+			return tr("File path", "column name in file to rename dialogbox");
+		case 2:
+			return tr("Converted", "column name in file to rename dialogbox");
 	}
 
 	return QVariant();
@@ -102,9 +103,13 @@ QVariant FileToRenameListModel::data(const QModelIndex& index, int role) const {
 		return QVariant();
 
 	switch(index.column()) {
-		case 0: return fileList.at(index.row()).isHashed ? tr("Hashed", "Filename type") : tr("Not hashed", "Filename type");
-		case 1: return fileList.at(index.row()).filename;
-		case 2: return convertFilename(fileList.at(index.row()));
+		case 0:
+			return fileList.at(index.row()).isHashed ? tr("Hashed", "Filename type")
+			                                         : tr("Not hashed", "Filename type");
+		case 1:
+			return fileList.at(index.row()).filename;
+		case 2:
+			return convertFilename(fileList.at(index.row()));
 	}
 
 	return QVariant();
@@ -140,9 +145,9 @@ QByteArray FileToRenameListModel::convertHashToName(QByteArray hash) {
 	QByteArray name;
 
 	if(hash.size() >= 2) {
-		name.resize(hash.size()-1);
+		name.resize(hash.size() - 1);
 		::convertHashToName(hash.constData(), name.data());
-		name.resize(name.size()-1);
+		name.resize(name.size() - 1);
 
 		return name;
 	}
@@ -153,9 +158,9 @@ QByteArray FileToRenameListModel::convertHashToName(QByteArray hash) {
 QByteArray FileToRenameListModel::convertNameToHash(QByteArray name) {
 	QByteArray hash;
 
-	hash.resize(name.size()+3);
+	hash.resize(name.size() + 3);
 	::convertNameToHash(name.constData(), hash.data(), LEGACY_SEED);
-	hash.resize(hash.size()-1);
+	hash.resize(hash.size() - 1);
 
 	return hash;
 }

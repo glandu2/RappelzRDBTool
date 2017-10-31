@@ -1,17 +1,17 @@
 #include "CharsetConverter.h"
+#include "Log.h"
 #include <errno.h>
 #include <stdio.h>
-#include "Log.h"
 
-CharsetConverter::CharsetConverter(const char *charset) {
+CharsetConverter::CharsetConverter(const char* charset) {
 	ic_toUtf16 = iconv_open("UTF-16LE", charset);
-	if(!ic_toUtf16 || ic_toUtf16 == (iconv_t)-1) {
+	if(!ic_toUtf16 || ic_toUtf16 == (iconv_t) -1) {
 		getLogger()->log(ILog::LL_Fatal, "Cant open charset \"%s\"\n", charset);
 		throw errno;
 	}
 
 	ic_fromUtf16 = iconv_open(charset, "UTF-16LE");
-	if(!ic_fromUtf16 || ic_fromUtf16 == (iconv_t)-1) {
+	if(!ic_fromUtf16 || ic_fromUtf16 == (iconv_t) -1) {
 		iconv_close(ic_toUtf16);
 		getLogger()->log(ILog::LL_Fatal, "Cant open charset \"%s\"\n", charset);
 		throw errno;
@@ -29,13 +29,13 @@ int CharsetConverter::toUtf16(const char** inBuf, int* inSize, char** outBuf, in
 	const char* inPtr = *inBuf;
 	char* outPtr = *outBuf;
 
-	iconv(ic_toUtf16,NULL,NULL,NULL,NULL);
+	iconv(ic_toUtf16, NULL, NULL, NULL, NULL);
 	while(iconv(ic_toUtf16, &inPtr, &sInSize, &outPtr, &sOutSize) == -1 && sInSize > 0 && sOutSize > 1) {
 		if(errno == EINVAL || errno == E2BIG)
 			break;
 
-		inPtr ++;
-		sInSize --;
+		inPtr++;
+		sInSize--;
 
 		*outPtr = '?';
 		outPtr++;
@@ -46,9 +46,9 @@ int CharsetConverter::toUtf16(const char** inBuf, int* inSize, char** outBuf, in
 	}
 
 	*inBuf = inPtr;
-	*inSize = (int)sInSize;
+	*inSize = (int) sInSize;
 	*outBuf = outPtr;
-	*outSize = (int)sOutSize;
+	*outSize = (int) sOutSize;
 
 	if(sInSize == 0)
 		return 0;
@@ -67,7 +67,7 @@ int CharsetConverter::fromUtf16(const char** inBuf, int* inSize, char** outBuf, 
 	char* outPtr = *outBuf;
 	size_t result;
 
-	iconv(ic_fromUtf16,NULL,NULL,NULL,NULL);
+	iconv(ic_fromUtf16, NULL, NULL, NULL, NULL);
 	while((result = iconv(ic_fromUtf16, &inPtr, &sInSize, &outPtr, &sOutSize)) == -1 && sInSize > 1 && sOutSize > 0) {
 		if(errno == EINVAL || errno == E2BIG)
 			break;
@@ -82,9 +82,9 @@ int CharsetConverter::fromUtf16(const char** inBuf, int* inSize, char** outBuf, 
 	}
 
 	*inBuf = inPtr;
-	*inSize = (int)sInSize;
+	*inSize = (int) sInSize;
 	*outBuf = outPtr;
-	*outSize = (int)sOutSize;
+	*outSize = (int) sOutSize;
 
 	if(sInSize == 0)
 		return 0;

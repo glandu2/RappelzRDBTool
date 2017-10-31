@@ -1,44 +1,47 @@
 #include "ExternDescriptedDatabase.h"
+#include "Log.h"
 #include "SpecialDatabaseRules.h"
+#include <algorithm>
 #include <errno.h>
 #include <string.h>
-#include <algorithm>
-#include "Log.h"
 
 #ifdef __linux__
-#  include <dlfcn.h>
+#include <dlfcn.h>
 #else
-#  include <windows.h>
+#include <windows.h>
 #endif
 
 #include <stdio.h>
 
 namespace RappelzRDBBase {
 
-ExternDescriptedDatabase::ExternDescriptedDatabase()
-{}
+ExternDescriptedDatabase::ExternDescriptedDatabase() {}
 
 int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
 	int dummy;
-	if(!systemError) systemError = &dummy;
+	if(!systemError)
+		systemError = &dummy;
 	*systemError = 0;
 
 #ifdef __unix__
-	libHinst = (unsigned long long)dlopen(databaseName, RTLD_NOW);
+	libHinst = (unsigned long long) dlopen(databaseName, RTLD_NOW);
 	if(!libHinst) {
 		*systemError = errno;
-		getLogger()->log(ILog::LL_Error, "Unable to load Database description DLL %s, last error: %s\n", databaseName, dlerror());
+		getLogger()->log(
+		    ILog::LL_Error, "Unable to load Database description DLL %s, last error: %s\n", databaseName, dlerror());
 		return ENOENT;
 	}
 #else
-	libHinst = (unsigned long long)LoadLibrary(databaseName);
+	libHinst = (unsigned long long) LoadLibrary(databaseName);
 	if(!libHinst) {
 		*systemError = GetLastError();
-		getLogger()->log(ILog::LL_Error, "Unable to load Database description DLL %s, last error: 0x%08x\n", databaseName, *systemError);
+		getLogger()->log(ILog::LL_Error,
+		                 "Unable to load Database description DLL %s, last error: 0x%08x\n",
+		                 databaseName,
+		                 *systemError);
 		return ENOENT;
 	}
 #endif
-
 
 	DLLregisterDBStructure = (DLLREGISTERSTRUCTPROC) getProcAddress("registerDBStructure", 8);
 	DLLgetSQLColumnOrder = (DLLSQLORDERPROC) getProcAddress("getSQLColumnOrder", 0);
@@ -50,11 +53,15 @@ int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
 
 	if(DLLregisterDBStructure == 0) {
 #ifdef __unix__
-		dlclose((void*)libHinst);
+		dlclose((void*) libHinst);
 #else
-		FreeLibrary((HINSTANCE)libHinst);
+		FreeLibrary((HINSTANCE) libHinst);
 #endif
-		getLogger()->log(ILog::LL_Error, "ExternDescriptedDatabase: %s is not a database description DLL (no function registerDBStructure found in DLL)\n", databaseName, strerror(errno));
+		getLogger()->log(ILog::LL_Error,
+		                 "ExternDescriptedDatabase: %s is not a database description DLL (no function "
+		                 "registerDBStructure found in DLL)\n",
+		                 databaseName,
+		                 strerror(errno));
 		return EINVAL;
 	}
 
@@ -66,37 +73,45 @@ int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
 ExternDescriptedDatabase::~ExternDescriptedDatabase() {
 	if(libHinst) {
 #ifdef __unix__
-		dlclose((void*)libHinst);
+		dlclose((void*) libHinst);
 #else
-		FreeLibrary((HINSTANCE)libHinst);
+		FreeLibrary((HINSTANCE) libHinst);
 #endif
 	}
 }
 
-void ExternDescriptedDatabase::registerDBStructure(FieldDescriptor **dfm, int *size) {
+void ExternDescriptedDatabase::registerDBStructure(FieldDescriptor** dfm, int* size) {
 	DLLregisterDBStructure(dfm, size);
 }
 
 const char* ExternDescriptedDatabase::getSQLColumnOrder() {
-	if(DLLgetSQLColumnOrder) return DLLgetSQLColumnOrder();
-	else return NULL;
+	if(DLLgetSQLColumnOrder)
+		return DLLgetSQLColumnOrder();
+	else
+		return NULL;
 }
 
 const char* ExternDescriptedDatabase::getCSVColumnOrder() {
-	if(DLLgetCSVColumnOrder) return DLLgetCSVColumnOrder();
-	else return NULL;
+	if(DLLgetCSVColumnOrder)
+		return DLLgetCSVColumnOrder();
+	else
+		return NULL;
 }
 
-void ExternDescriptedDatabase::convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
+void ExternDescriptedDatabase::convertData(eDataFormat dst,
+                                           eDataConvertionType mode,
+                                           IRowManipulator* row,
+                                           unsigned int rowNum) {
 	if(DLLconvertData) {
 		DLLconvertData(dst, mode, row, rowNum);
 	}
 }
 
-
 int ExternDescriptedDatabase::getSpecialCaseID() {
-	if(DLLgetSpecialCaseID) return DLLgetSpecialCaseID();
-	else return SPECIALCASE_NONE;
+	if(DLLgetSpecialCaseID)
+		return DLLgetSpecialCaseID();
+	else
+		return SPECIALCASE_NONE;
 }
 
 const char* ExternDescriptedDatabase::getFilename() {
@@ -116,8 +131,8 @@ const char* ExternDescriptedDatabase::getDefaultFileName() {
 	if(endPos == std::string::npos)
 		endPos = filename.size();
 
-	//Discard version number
-	while(endPos > 0 && isdigit(filename.at(endPos-1)))
+	// Discard version number
+	while(endPos > 0 && isdigit(filename.at(endPos - 1)))
 		endPos--;
 
 	size_t beginPos = filename.find_last_of("/\\");
@@ -128,7 +143,10 @@ const char* ExternDescriptedDatabase::getDefaultFileName() {
 		beginPos++;
 
 	fallbackDefaultFileName = std::string("db_") + filename.substr(beginPos, endPos - beginPos);
-	std::transform(fallbackDefaultFileName.begin() + 3, fallbackDefaultFileName.end(), fallbackDefaultFileName.begin() + 3, ::tolower);
+	std::transform(fallbackDefaultFileName.begin() + 3,
+	               fallbackDefaultFileName.end(),
+	               fallbackDefaultFileName.begin() + 3,
+	               ::tolower);
 
 	return fallbackDefaultFileName.c_str();
 }
@@ -146,8 +164,8 @@ const char* ExternDescriptedDatabase::getDefaultTableName() {
 	if(endPos == std::string::npos)
 		endPos = filename.size();
 
-	//Discard version number
-	while(endPos > 0 && isdigit(filename.at(endPos-1)))
+	// Discard version number
+	while(endPos > 0 && isdigit(filename.at(endPos - 1)))
 		endPos--;
 
 	size_t beginPos = filename.find_last_of("/\\");
@@ -166,13 +184,15 @@ void* ExternDescriptedDatabase::getProcAddress(const char* name, int argumentsBy
 	void* procAddress;
 
 	procAddress = nativeGetProcAddress(libHinst, name);
-	if(procAddress) return procAddress;
+	if(procAddress)
+		return procAddress;
 
-	char* buffer = (char*)alloca(strlen(name) + 10);
+	char* buffer = (char*) alloca(strlen(name) + 10);
 
 	sprintf(buffer, "%s@%d", name, argumentsBytes);
 	procAddress = nativeGetProcAddress(libHinst, buffer);
-	if(procAddress) return procAddress;
+	if(procAddress)
+		return procAddress;
 
 	sprintf(buffer, "_%s@%d", name, argumentsBytes);
 	procAddress = nativeGetProcAddress(libHinst, buffer);
@@ -182,10 +202,10 @@ void* ExternDescriptedDatabase::getProcAddress(const char* name, int argumentsBy
 
 void* ExternDescriptedDatabase::nativeGetProcAddress(unsigned long long handle, const char* name) {
 #ifdef __unix__
-	return dlsym((void*)handle, name);
+	return dlsym((void*) handle, name);
 #else
-	return GetProcAddress((HINSTANCE)handle, name);
+	return GetProcAddress((HINSTANCE) handle, name);
 #endif
 }
 
-} //namespace
+}  // namespace RappelzRDBBase

@@ -2,8 +2,8 @@
 #define ICHARSETCONVERTER_H
 
 #include "IObject.h"
-#include <stdlib.h>
 #include <errno.h>
+#include <stdlib.h>
 
 class ICharsetConverter;
 
@@ -16,34 +16,33 @@ struct CharsetInfo {
 	const char* description;
 };
 
-EBASEDLL ICharsetConverter * DLLCALLCONV createCharsetConverter(const char* charset);
-EBASEDLL const struct CharsetInfo * DLLCALLCONV availableCharsets();
+EBASEDLL ICharsetConverter* DLLCALLCONV createCharsetConverter(const char* charset);
+EBASEDLL const struct CharsetInfo* DLLCALLCONV availableCharsets();
 
 #ifdef __cplusplus
 }
 #endif
 
-class ICharsetConverter : public IObject
-{
+class ICharsetConverter : public IObject {
 public:
 	struct ConvertedString {
 		char* data;
 		int size;
 	};
 
-	//Convert input to out. Return error
-	//Invalid or non convertible characters are replaced by ?
-	//only utf16le is used
+	// Convert input to out. Return error
+	// Invalid or non convertible characters are replaced by ?
+	// only utf16le is used
 	virtual int toUtf16(const char** inbuf, int* inSize, char** outbuf, int* outSize) = 0;
 	virtual int fromUtf16(const char** inbuf, int* inSize, char** outbuf, int* outSize) = 0;
 
-	//return number of significant bytes in converted buffer
-	inline int convertToUtf16(ConvertedString in, ConvertedString *converted) {
+	// return number of significant bytes in converted buffer
+	inline int convertToUtf16(ConvertedString in, ConvertedString* converted) {
 		ConvertedString out;
 
 		if(in.size == 0) {
 			out.size = 0;
-			out.data = (char*)calloc(1, 2);
+			out.data = (char*) calloc(1, 2);
 			*converted = out;
 			return out.size;
 		}
@@ -61,7 +60,7 @@ public:
 				if(result == -E2BIG) {
 					int outDone = out.size - outRemainingBytes;
 					out.size *= 2;
-					out.data = (char*)realloc(out.data, out.size);
+					out.data = (char*) realloc(out.data, out.size);
 					outPtr = out.data + outDone;
 					outRemainingBytes = out.size - outDone;
 				} else {
@@ -75,13 +74,13 @@ public:
 		return out.size;
 	}
 
-	//return number of significant bytes in converted buffer
-	inline int convertFromUtf16(ConvertedString in, ConvertedString *converted) {
+	// return number of significant bytes in converted buffer
+	inline int convertFromUtf16(ConvertedString in, ConvertedString* converted) {
 		ConvertedString out;
 
 		if(in.size == 0) {
 			out.size = 0;
-			out.data = (char*)calloc(1, 1);
+			out.data = (char*) calloc(1, 1);
 			*converted = out;
 			return out.size;
 		}
@@ -99,7 +98,7 @@ public:
 				if(result == -E2BIG) {
 					int outDone = out.size - outRemainingBytes;
 					out.size *= 2;
-					out.data = (char*)realloc(out.data, out.size);
+					out.data = (char*) realloc(out.data, out.size);
 					outPtr = out.data + outDone;
 					outRemainingBytes = out.size - outDone;
 				} else {
@@ -114,4 +113,4 @@ public:
 	}
 };
 
-#endif // ICHARSETCONVERTER_H
+#endif  // ICHARSETCONVERTER_H

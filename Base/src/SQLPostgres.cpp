@@ -4,7 +4,7 @@
 
 namespace RappelzRDBBase {
 
-void SQLPostgres::getTypeName(char *buffer, int type, int count, int index) {
+void SQLPostgres::getTypeName(char* buffer, int type, int count, int index) {
 	switch(type) {
 		case TYPE_INT8:
 			sprintf(buffer, "smallint");
@@ -46,4 +46,4 @@ void SQLPostgres::getTypeName(char *buffer, int type, int count, int index) {
 	}
 }
 
-} //namespace
+}  // namespace RappelzRDBBase

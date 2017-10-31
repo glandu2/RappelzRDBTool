@@ -1,39 +1,38 @@
 #include "DatabaseView.h"
-#include "ui_DatabaseView.h"
 #include "DatabaseTableModel.h"
-#include "IDatabase.h"
 #include "ICharsetConverter.h"
+#include "IDatabase.h"
 #include "Settings.h"
 #include "SqlConfigDialog.h"
+#include "ui_DatabaseView.h"
 
-#include <QMessageBox>
-#include <QFileInfo>
 #include <QDate>
+#include <QFileInfo>
+#include <QMessageBox>
 
-bool sortStringCaseInsensitive( QByteArray a, QByteArray b ) {
+bool sortStringCaseInsensitive(QByteArray a, QByteArray b) {
 	return qstricmp(a.constData(), b.constData()) < 0;
 }
 
-DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel, QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::DatabaseView),
-	dbDescriptionListModel(dbDescriptionListModel)
-{
+DatabaseView::DatabaseView(DatabaseDescriptionListModel* dbDescriptionListModel, QWidget* parent)
+    : QWidget(parent), ui(new Ui::DatabaseView), dbDescriptionListModel(dbDescriptionListModel) {
 	ui->setupUi(this);
 	progressBarOffset = 0;
 	lastPercentage = -1;
 	db = NULL;
 	currentStatus = TS_NoDbDescLoaded;
 
-	const struct CharsetInfo * codepageList = availableCharsets();
+	const struct CharsetInfo* codepageList = availableCharsets();
 	QString defaultCodec = Settings::getSettings()->value("charset", "CP1252").toString();
 	for(int i = 0; codepageList[i].name; i++) {
-		ui->encodingCombo->insertItem(i, QString::fromLatin1(codepageList[i].description), QString::fromLatin1(codepageList[i].name));
+		ui->encodingCombo->insertItem(
+		    i, QString::fromLatin1(codepageList[i].description), QString::fromLatin1(codepageList[i].name));
 		if(QString::fromLatin1(codepageList[i].name) == defaultCodec)
 			ui->encodingCombo->setCurrentIndex(i);
 	}
 
-	databaseModel = new DatabaseTableModel(ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray(), this);
+	databaseModel =
+	    new DatabaseTableModel(ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray(), this);
 	statusBarLabel = new QLabel(this);
 	statusBarLabel->hide();
 	setStatus(TS_NoDbDescLoaded);
@@ -58,15 +57,15 @@ DatabaseView::DatabaseView(DatabaseDescriptionListModel *dbDescriptionListModel,
 
 	connect(ui->searchButton, SIGNAL(clicked()), this, SLOT(onSearch()));
 	connect(ui->searchTextEdit, SIGNAL(returnPressed()), this, SLOT(onSearch()));
-	connect(databaseModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(onModifyDb(QModelIndex, QModelIndex)));
+	connect(
+	    databaseModel, SIGNAL(dataChanged(QModelIndex, QModelIndex)), this, SLOT(onModifyDb(QModelIndex, QModelIndex)));
 	connect(ui->dbLoadClose, SIGNAL(clicked(bool)), this, SLOT(loadCloseDbDescriptionFile(bool)));
 	connect(ui->dbStructCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentDbDescChanged(int)));
 	connect(ui->dbStructCombo, SIGNAL(highlighted(int)), this, SIGNAL(onHighlightDbStruct(int)));
 	connect(ui->dbStructCombo, SIGNAL(activated(int)), this, SIGNAL(onHighlightDbStruct()));
 }
 
-DatabaseView::~DatabaseView()
-{
+DatabaseView::~DatabaseView() {
 	Settings::getSettings()->setValue("charset", ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()));
 	delete ui;
 	if(db)
@@ -82,8 +81,9 @@ void DatabaseView::setDbDescButtonChecked(bool checked) {
 }
 
 bool DatabaseView::loadCloseDbDescriptionFile(bool isLoad) {
-	//Db description already loaded, nothing to do
-	if(isLoad && db && db->getDatabaseDescription() == dbDescriptionListModel->getDbDescription(ui->dbStructCombo->currentIndex()))
+	// Db description already loaded, nothing to do
+	if(isLoad && db &&
+	   db->getDatabaseDescription() == dbDescriptionListModel->getDbDescription(ui->dbStructCombo->currentIndex()))
 		return true;
 
 	if(db != NULL) {
@@ -99,13 +99,17 @@ bool DatabaseView::loadCloseDbDescriptionFile(bool isLoad) {
 
 	if(isLoad) {
 		if(ui->dbStructCombo->currentIndex() == -1) {
-			QMessageBox::warning(this, QCoreApplication::applicationName(), tr("You must add Database Description files first !", "Error when there is no db description files but the user attempt to load one"));
+			QMessageBox::warning(this,
+			                     QCoreApplication::applicationName(),
+			                     tr("You must add Database Description files first !",
+			                        "Error when there is no db description files but the user attempt to load one"));
 			setDbDescButtonChecked(false);
 			return false;
 		}
 
 		setStatus(TS_LoadingDbDesc);
-		IDatabaseDescription* dbDescription = dbDescriptionListModel->getDbDescription(ui->dbStructCombo->currentIndex());
+		IDatabaseDescription* dbDescription =
+		    dbDescriptionListModel->getDbDescription(ui->dbStructCombo->currentIndex());
 
 		db = createDatabase(dbDescription);
 		if(!db) {
@@ -133,8 +137,8 @@ void DatabaseView::onCurrentDbDescChanged(int index) {
 		setDbDescButtonChecked(false);
 }
 
-void DatabaseView::progressBarUpdateCallback(void *database, int itemProceeded, int totalItem) {
-	DatabaseView *dbView = reinterpret_cast<DatabaseView*>(database);
+void DatabaseView::progressBarUpdateCallback(void* database, int itemProceeded, int totalItem) {
+	DatabaseView* dbView = reinterpret_cast<DatabaseView*>(database);
 
 	dbView->progressBarUpdate(itemProceeded, totalItem);
 }
@@ -142,9 +146,10 @@ void DatabaseView::progressBarUpdateCallback(void *database, int itemProceeded, 
 void DatabaseView::progressBarUpdate(int itemProceeded, int totalItem) {
 	int newPercentage;
 
-	if(!totalItem) return;
+	if(!totalItem)
+		return;
 
-	newPercentage = itemProceeded*100/totalItem;
+	newPercentage = itemProceeded * 100 / totalItem;
 
 	if(newPercentage != lastPercentage) {
 		ui->progressBar->setValue(progressBarOffset + newPercentage);
@@ -158,7 +163,8 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 	int result;
 	QByteArray locationStr;
 
-	options += QByteArray("charset=") + ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray() + ";";
+	options +=
+	    QByteArray("charset=") + ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray() + ";";
 
 	setStatus(TS_LoadingDB);
 
@@ -181,11 +187,18 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 	if(!location.isEmpty())
 		locationStr = location.toLocal8Bit();
 
-	result = db->readData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr, options.constData());
+	result = db->readData(
+	    type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr, options.constData());
 	savedData = true;
 
 	if(result != 0)
-		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't load the database file: %1 (error code %2). See logs in menu Options -> Show log.", "Load error global message in messagebox").arg(errorToString(type, result, false)).arg(result));
+		QMessageBox::warning(
+		    this,
+		    QCoreApplication::applicationName(),
+		    tr("Couldn't load the database file: %1 (error code %2). See logs in menu Options -> Show log.",
+		       "Load error global message in messagebox")
+		        .arg(errorToString(type, result, false))
+		        .arg(result));
 
 	if(result != 0 && db->getRowCount() <= 0) {
 		closeDb();
@@ -200,7 +213,7 @@ int DatabaseView::loadDb(eDataSourceType type, QString filename, QString locatio
 		ui->databaseTable->setEnabled(true);
 
 		ui->searchColumnCombo->clear();
-		for(int i = 0; i<databaseModel->columnCount(); i++) {
+		for(int i = 0; i < databaseModel->columnCount(); i++) {
 			ui->searchColumnCombo->addItem(databaseModel->headerData(i, Qt::Horizontal).toString());
 		}
 
@@ -217,7 +230,8 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 	int result;
 	QByteArray locationStr;
 
-	options += QByteArray("charset=") + ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray() + ";";
+	options +=
+	    QByteArray("charset=") + ui->encodingCombo->itemData(ui->encodingCombo->currentIndex()).toByteArray() + ";";
 
 	setStatus(TS_SavingDB);
 
@@ -227,13 +241,24 @@ int DatabaseView::saveDb(eDataSourceType type, QString filename, QString locatio
 	if(!location.isEmpty())
 		locationStr = location.toLocal8Bit();
 
-	result = db->writeData(type, filename.toLocal8Bit().constData(), &progressBarUpdateCallback, this, locationStr.constData(), options.constData());
+	result = db->writeData(type,
+	                       filename.toLocal8Bit().constData(),
+	                       &progressBarUpdateCallback,
+	                       this,
+	                       locationStr.constData(),
+	                       options.constData());
 
 	setStatus(TS_DbLoaded);
 
 	if(result != 0) {
 		ui->progressBar->reset();
-		QMessageBox::warning(this, QCoreApplication::applicationName(), tr("Couldn't save the database file: %1 (error code %2). See logs in menu Options -> Show log.", "Save error global message in messagebox").arg(errorToString(type, result, true)).arg(result));
+		QMessageBox::warning(
+		    this,
+		    QCoreApplication::applicationName(),
+		    tr("Couldn't save the database file: %1 (error code %2). See logs in menu Options -> Show log.",
+		       "Save error global message in messagebox")
+		        .arg(errorToString(type, result, true))
+		        .arg(result));
 	} else {
 		savedData = true;
 		loadedDatabaseName = filename;
@@ -248,7 +273,13 @@ bool DatabaseView::closeDb(bool force) {
 	if(db) {
 		if(!force && savedData == false) {
 			QMessageBox::StandardButton button;
-			button = QMessageBox::warning(this, QCoreApplication::applicationName(), tr("The database %1 is not saved.\n\nContinue ?", "User closes unsaved database").arg(loadedDatabaseName), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+			button =
+			    QMessageBox::warning(this,
+			                         QCoreApplication::applicationName(),
+			                         tr("The database %1 is not saved.\n\nContinue ?", "User closes unsaved database")
+			                             .arg(loadedDatabaseName),
+			                         QMessageBox::Yes | QMessageBox::No,
+			                         QMessageBox::No);
 			if(button == QMessageBox::No)
 				return false;
 		}
@@ -275,11 +306,11 @@ void DatabaseView::onSearch() {
 	bool found = false;
 	QModelIndexList selection = ui->databaseTable->selectionModel()->selectedIndexes();
 
-
 	if(selection.isEmpty())
 		i = 0;
-	else i = selection.first().row()+1; //allow several search without changing selection with mouse
-	for(; i<rowCount; i++) {
+	else
+		i = selection.first().row() + 1;  // allow several search without changing selection with mouse
+	for(; i < rowCount; i++) {
 		QModelIndex modelIdx = databaseModel->index(i, column);
 		if(databaseModel->data(modelIdx).toString().contains(ui->searchTextEdit->text())) {
 			ui->databaseTable->selectionModel()->select(modelIdx, QItemSelectionModel::SelectCurrent);
@@ -313,24 +344,40 @@ void DatabaseView::setStatus(eToolStatus newStatus) {
 	currentStatus = newStatus;
 
 	switch(currentStatus) {
-		case TS_NoDbDescLoaded: newMessage = tr("No Database Description Loaded", "Status in statusbar");   break;
-		case TS_LoadingDbDesc:  newMessage = tr("Loading Database Description ...", "Status in statusbar"); break;
-		case TS_NoDbLoaded:     newMessage = tr("No Database Loaded", "Status in statusbar");               break;
-		case TS_LoadingDB:      newMessage = tr("Loading Database ...", "Status in statusbar");             break;
-		case TS_DbLoaded:       newMessage = tr("Database loaded, %1 rows", "Status in statusbar").arg(db ? db->getRowCount() : 0);                  break;
-		case TS_SavingDB:       newMessage = tr("Saving Database ...", "Status in statusbar");              break;
-		case TS_ClosingDB:      newMessage = tr("Closing Database ...", "Status in statusbar");             break;
+		case TS_NoDbDescLoaded:
+			newMessage = tr("No Database Description Loaded", "Status in statusbar");
+			break;
+		case TS_LoadingDbDesc:
+			newMessage = tr("Loading Database Description ...", "Status in statusbar");
+			break;
+		case TS_NoDbLoaded:
+			newMessage = tr("No Database Loaded", "Status in statusbar");
+			break;
+		case TS_LoadingDB:
+			newMessage = tr("Loading Database ...", "Status in statusbar");
+			break;
+		case TS_DbLoaded:
+			newMessage = tr("Database loaded, %1 rows", "Status in statusbar").arg(db ? db->getRowCount() : 0);
+			break;
+		case TS_SavingDB:
+			newMessage = tr("Saving Database ...", "Status in statusbar");
+			break;
+		case TS_ClosingDB:
+			newMessage = tr("Closing Database ...", "Status in statusbar");
+			break;
 	}
 
 	if(db && db->getDate() && currentStatus == TS_DbLoaded) {
-		newMessage += " | " + tr("Creation date: %1", "RDB Creation date label in statusbar").arg(QDateTime::fromTime_t(db->getDate()).toString(tr("yyyy/MM/dd", "RDB Creation date format shown in statusbar")));
+		newMessage += " | " + tr("Creation date: %1", "RDB Creation date label in statusbar")
+		                          .arg(QDateTime::fromTime_t(db->getDate())
+		                                   .toString(tr("yyyy/MM/dd", "RDB Creation date format shown in statusbar")));
 	}
 
 	if(!newMessage.isNull())
 		statusBarLabel->setText(newMessage);
 }
 
-void DatabaseView::setWindowTitle(const QString &title) {
+void DatabaseView::setWindowTitle(const QString& title) {
 	QString shortTitle = QFileInfo(title).fileName();
 	if(savedData == false)
 		QWidget::setWindowTitle(shortTitle + "*");
@@ -346,27 +393,34 @@ QString DatabaseView::errorToString(eDataSourceType type, int error, bool save) 
 			if(IS_DST_FILESOURCE(type))
 				return tr("The file does not exist", "Load/Save file error messagebox");
 			else
-				return tr("The SQL database or table does not exist. Double-quotes are needed around words with special characters (for example: \"Arcadia-8.1\".\"dbo\".\"StringResource\")", "Load/Save SQL table error messagebox");
+				return tr("The SQL database or table does not exist. Double-quotes are needed around words with "
+				          "special characters (for example: \"Arcadia-8.1\".\"dbo\".\"StringResource\")",
+				          "Load/Save SQL table error messagebox");
 			break;
 
 		case ENXIO:
-			return tr("Can\'t connect to data source, check SQL configuration and ODBC data sources", "Load/Save SQL table error messagebox");
+			return tr("Can\'t connect to data source, check SQL configuration and ODBC data sources",
+			          "Load/Save SQL table error messagebox");
 
 		case EIO:
 			if(save)
 				return tr("Can\'t save the file, I/O error", "Load/Save file error messagebox");
 			else
-				return tr("Can\'t load the file, I/O error", "Load/Save file error messagebox, not related to the existence of the file");
+				return tr("Can\'t load the file, I/O error",
+				          "Load/Save file error messagebox, not related to the existence of the file");
 
 		case EINVAL:
 			if(IS_DST_FILESOURCE(type))
-				return tr("Can\'t read the file, invalid format", "Load/Save file error messagebox, the file has not the expected file format");
+				return tr("Can\'t read the file, invalid format",
+				          "Load/Save file error messagebox, the file has not the expected file format");
 			else
-				return tr("Can't run SQL query, check that columns names exist.", "Load/Save SQL table error messagebox");
+				return tr("Can't run SQL query, check that columns names exist.",
+				          "Load/Save SQL table error messagebox");
 			break;
 
 		case ENOMEM:
-			return tr("No enough memory", "Load/Save error messagebox, memory allocation failed, will probably cause a crash later");
+			return tr("No enough memory",
+			          "Load/Save error messagebox, memory allocation failed, will probably cause a crash later");
 
 		case ENOSYS:
 			return tr("Operation not supported", "Load/Save error messagebox, non implemented/unsuppored operation");
@@ -381,6 +435,8 @@ QString DatabaseView::errorToString(eDataSourceType type, int error, bool save) 
 			return tr("The target table has unknown columns", "Save SQL table error messagebox");
 
 		default:
-			return tr("Unknown error: %1", "Load/Save error messagebox, unknown error, %1 is a generated message from the error").arg(strerror(error));
+			return tr("Unknown error: %1",
+			          "Load/Save error messagebox, unknown error, %1 is a generated message from the error")
+			    .arg(strerror(error));
 	}
 }

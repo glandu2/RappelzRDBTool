@@ -1,6 +1,6 @@
-#include "IRowManipulator.h"
 #include "DataType.h"
 #include "ExportDLL.h"
+#include "IRowManipulator.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,26 +8,25 @@
 extern "C" {
 #endif
 
-static FieldDescriptor df[] =
-	{{1, TYPE_INT32, "id"},
-	 {1, TYPE_INT32, "text_id"},
-	 {1, TYPE_INT32, "stati_id"},
-	 {1, TYPE_INT8, "job_class"},
-	 {1, TYPE_INT8, "job_depth"},
-	 {1, TYPE_INT16, "up_lv"},
-	 {1, TYPE_INT16, "up_jlv"},
-	 {1, TYPE_INT16, "available_job_0"},
-	 {1, TYPE_INT16, "available_job_1"},
-	 {1, TYPE_INT16, "available_job_2"},
-	 {1, TYPE_INT16, "available_job_3"},
-	 {1, TYPE_INT16 | TYPE_SQLIGNORE, "unknown_value"},
-	 {1, TYPE_INT32, "icon_id"},
-	 {256, TYPE_CHAR, "icon_file_name"}};
+static FieldDescriptor df[] = {{1, TYPE_INT32, "id"},
+                               {1, TYPE_INT32, "text_id"},
+                               {1, TYPE_INT32, "stati_id"},
+                               {1, TYPE_INT8, "job_class"},
+                               {1, TYPE_INT8, "job_depth"},
+                               {1, TYPE_INT16, "up_lv"},
+                               {1, TYPE_INT16, "up_jlv"},
+                               {1, TYPE_INT16, "available_job_0"},
+                               {1, TYPE_INT16, "available_job_1"},
+                               {1, TYPE_INT16, "available_job_2"},
+                               {1, TYPE_INT16, "available_job_3"},
+                               {1, TYPE_INT16 | TYPE_SQLIGNORE, "unknown_value"},
+                               {1, TYPE_INT32, "icon_id"},
+                               {256, TYPE_CHAR, "icon_file_name"}};
 
 #ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 #endif
-void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
+void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor** dfmPtr, int* sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
@@ -35,7 +34,10 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #ifndef _WIN64
 #pragma comment(linker, "/EXPORT:convertData=_convertData@16")
 #endif
-void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) {
+void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst,
+                                          eDataConvertionType mode,
+                                          IRowManipulator* row,
+                                          unsigned int rowNum) {
 	if(mode == DCT_Read && dst == DF_SQL) {
 		row->setDataInt16("unknown_value", 163);
 	}
@@ -44,4 +46,3 @@ void EDATABASEDLL DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType m
 #ifdef __cplusplus
 }
 #endif
-

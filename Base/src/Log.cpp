@@ -1,18 +1,17 @@
 #include "Log.h"
 #include <stdarg.h>
-#include <string>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+#include <string>
 
 #if defined(_MSC_VER)
-	#define snprintf(buffer, size, ...) _snprintf_s(buffer, size, _TRUNCATE, __VA_ARGS__)
-	#if _MSC_VER < 1800
-		#define va_copy(d,s) ((d) = (s))
-	#endif
+#define snprintf(buffer, size, ...) _snprintf_s(buffer, size, _TRUNCATE, __VA_ARGS__)
+#if _MSC_VER < 1800
+#define va_copy(d, s) ((d) = (s))
+#endif
 #endif
 
-Log::Log()
-{
+Log::Log() {
 	maxLevel = LL_Info;
 	onMessage = &defaultCallback;
 }
@@ -43,10 +42,10 @@ static void stringformat(std::string& dest, const char* message, va_list args) {
 		return;
 	}
 
-	if(result < (int)dest.size()) {
+	if(result < (int) dest.size()) {
 		dest.resize(result);
-	} else if(result >= (int)dest.size()) {
-		dest.resize(result+1);
+	} else if(result >= (int) dest.size()) {
+		dest.resize(result + 1);
 
 		vsnprintf(&dest[0], dest.size(), message, argsFor2ndPass);
 		dest.resize(result);
@@ -56,7 +55,7 @@ static void stringformat(std::string& dest, const char* message, va_list args) {
 void Log::log(Level level, const char* message, ...) {
 	if(!wouldLog(level))
 		return;
-	static const char* LEVEL_NAME[] = { "Fatal: ", "Error: ", "Warning: ", "Info: ", "Debug: ", "Trace: " };
+	static const char* LEVEL_NAME[] = {"Fatal: ", "Error: ", "Warning: ", "Info: ", "Debug: ", "Trace: "};
 
 	va_list args;
 	std::string messageStr;
@@ -79,7 +78,6 @@ void Log::setMaxLevel(Level level) {
 bool Log::wouldLog(Level level) {
 	return level <= maxLevel;
 }
-
 
 void Log::setCallback(CallbackOnLogMessage callback) {
 	if(callback)

@@ -1,21 +1,13 @@
 #ifndef ILOG_H
 #define ILOG_H
 
-#include "IObject.h"
 #include "DataType.h"
 #include "ExportDLL.h"
+#include "IObject.h"
 
-class ILog : public IObject
-{
+class ILog : public IObject {
 public:
-	enum Level {
-		LL_Fatal,
-		LL_Error,
-		LL_Warning,
-		LL_Info,
-		LL_Debug,
-		LL_Trace
-	};
+	enum Level { LL_Fatal, LL_Error, LL_Warning, LL_Info, LL_Debug, LL_Trace };
 	typedef void (*CallbackOnLogMessage)(ILog* logger, const char* message);
 
 public:
@@ -31,10 +23,10 @@ public:
 extern "C" {
 #endif
 
-EBASEDLL ILog * DLLCALLCONV getLogger();
+EBASEDLL ILog* DLLCALLCONV getLogger();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // ILOG_H
+#endif  // ILOG_H

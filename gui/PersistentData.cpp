@@ -1,9 +1,7 @@
 #include "PersistentData.h"
 #include <QSettings>
 
-PersistentData::PersistentData(QSettings *settings, QString key) : key(key), settings(settings)
-{
-}
+PersistentData::PersistentData(QSettings* settings, QString key) : key(key), settings(settings) {}
 
 PersistentData::PersistentData(const PersistentData& other) {
 	key = other.key;
@@ -18,5 +16,6 @@ void PersistentData::setValue(const QVariant& val) {
 QVariant PersistentData::value(const QVariant& defaultValue) {
 	if(settings)
 		return settings->value(key, defaultValue);
-	else return QVariant();
+	else
+		return QVariant();
 }

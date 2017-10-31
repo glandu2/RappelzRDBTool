@@ -3,12 +3,11 @@
 
 namespace RappelzRDBBase {
 
-class SQLLanguage
-{
-	public:
-		virtual void getTypeName(char *buffer, int type, int count = 1, int index = 0) = 0;
+class SQLLanguage {
+public:
+	virtual void getTypeName(char* buffer, int type, int count = 1, int index = 0) = 0;
 };
 
-} //namespace
+}  // namespace RappelzRDBBase
 
-#endif // SQLLANGUAGE_H_INCLUDED
+#endif  // SQLLANGUAGE_H_INCLUDED

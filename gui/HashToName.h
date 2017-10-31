@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-int getAssociatedDataFileNumber(const char *hash);
-int convertHashToName(const char *hash, char *name);
+int getAssociatedDataFileNumber(const char* hash);
+int convertHashToName(const char* hash, char* name);
 
 #ifdef __cplusplus
 }

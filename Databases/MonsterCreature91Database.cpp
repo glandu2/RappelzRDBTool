@@ -9,24 +9,23 @@
 extern "C" {
 #endif
 
-static FieldDescriptor df[] =
-	{{1, TYPE_INT32, "sid"},
-	{1, TYPE_INT32, "use_code"},
-	{1, TYPE_INT32, "summon_code_1"},
-	{1, TYPE_INT32, "summon_code_2"},
-	{1, TYPE_INT32, "summon_code_3"},
-	{1, TYPE_INT32, "summon_code_4"},
-	{1, TYPE_INT32, "summon_code_5"},
-	{1, TYPE_INT32, "summon_code_6"},
-	{1, TYPE_INT32, "summon_code_7"},
-	{1, TYPE_INT32, "summon_code_8"},
-	{1, TYPE_INT32, "summon_code_9"},
-	{1, TYPE_INT32, "summon_code_10"}};
+static FieldDescriptor df[] = {{1, TYPE_INT32, "sid"},
+                               {1, TYPE_INT32, "use_code"},
+                               {1, TYPE_INT32, "summon_code_1"},
+                               {1, TYPE_INT32, "summon_code_2"},
+                               {1, TYPE_INT32, "summon_code_3"},
+                               {1, TYPE_INT32, "summon_code_4"},
+                               {1, TYPE_INT32, "summon_code_5"},
+                               {1, TYPE_INT32, "summon_code_6"},
+                               {1, TYPE_INT32, "summon_code_7"},
+                               {1, TYPE_INT32, "summon_code_8"},
+                               {1, TYPE_INT32, "summon_code_9"},
+                               {1, TYPE_INT32, "summon_code_10"}};
 
 #ifndef _WIN64
 #pragma comment(linker, "/EXPORT:registerDBStructure=_registerDBStructure@8")
 #endif
-void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int *sizePtr) {
+void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor** dfmPtr, int* sizePtr) {
 	*dfmPtr = df;
 	*sizePtr = sizeof(df) / sizeof(FieldDescriptor);
 }
@@ -34,11 +33,10 @@ void EDATABASEDLL DLLCALLCONV registerDBStructure(FieldDescriptor **dfmPtr, int 
 #ifndef _WIN64
 #pragma comment(linker, "/EXPORT:getDefaultFileName=_getDefaultFileName@0")
 #endif
-EDATABASEDLL const char*  DLLCALLCONV getDefaultFileName() {
+EDATABASEDLL const char* DLLCALLCONV getDefaultFileName() {
 	return "db_monster_creature";
 }
 
 #ifdef __cplusplus
 }
 #endif
-

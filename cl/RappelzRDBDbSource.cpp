@@ -1,16 +1,24 @@
+#include "DataType.h"
+#include "ExportDLL.h"
+#include "IDatabaseDescription.h"
+#include "SpecialDatabaseRules.h"
+#include <algorithm>
 #include <stdio.h>
 #include <string.h>
-#include "ExportDLL.h"
-#include "DataType.h"
-#include "SpecialDatabaseRules.h"
-#include "IDatabaseDescription.h"
 #include <string>
-#include <algorithm>
 
-#define DECL_CASE(name) case name: strcat(out, #name); break
-#define DECL_CASE_ADD(name) case name: strcat(out, " | " #name); break
+#define DECL_CASE(name) \
+	case name: \
+		strcat(out, #name); \
+		break
+#define DECL_CASE_ADD(name) \
+	case name: \
+		strcat(out, " | " #name); \
+		break
 
-#define DECL_ADD_FLAG(var, name) if(var & name) strcat(out, " | " #name);
+#define DECL_ADD_FLAG(var, name) \
+	if(var & name) \
+		strcat(out, " | " #name);
 
 bool getSizeString(int type, int size, char* out) {
 	int len, index;
@@ -49,7 +57,8 @@ static bool getTypeString(int in, char* out) {
 		DECL_CASE(TYPE_DECIMAL);
 		DECL_CASE(TYPE_NVARCHAR_STR);
 
-		default: sprintf(out, "%d", type);
+		default:
+			sprintf(out, "%d", type);
 	}
 
 	DECL_ADD_FLAG(ignoreType, TYPE_RDBIGNORE);
@@ -65,15 +74,16 @@ static bool getTypeString(int in, char* out) {
 
 static const char* getSpecialCaseString(int specialCaseId) {
 	switch(specialCaseId) {
-		case SPECIALCASE_NONE: return "SPECIALCASE_NONE";
-		case SPECIALCASE_DOUBLEFORRDB: return "SPECIALCASE_DOUBLEFORRDB";
-		case SPECIALCASE_SKILLJPSP: return "SPECIALCASE_SKILLJPSP";
+		case SPECIALCASE_NONE:
+			return "SPECIALCASE_NONE";
+		case SPECIALCASE_DOUBLEFORRDB:
+			return "SPECIALCASE_DOUBLEFORRDB";
+		case SPECIALCASE_SKILLJPSP:
+			return "SPECIALCASE_SKILLJPSP";
 	}
 
 	return "";
 }
-
-
 
 std::string getDefaultFileName(std::string filename) {
 	size_t endPos = filename.find("Database.");
@@ -82,8 +92,8 @@ std::string getDefaultFileName(std::string filename) {
 	if(endPos == std::string::npos)
 		endPos = filename.size();
 
-	//Discard version number
-	while(endPos > 0 && isdigit(filename.at(endPos-1)))
+	// Discard version number
+	while(endPos > 0 && isdigit(filename.at(endPos - 1)))
 		endPos--;
 
 	size_t beginPos = filename.find_last_of("/\\");
@@ -94,7 +104,10 @@ std::string getDefaultFileName(std::string filename) {
 		beginPos++;
 
 	std::string fallbackDefaultFileName = std::string("db_") + filename.substr(beginPos, endPos - beginPos);
-	std::transform(fallbackDefaultFileName.begin() + 3, fallbackDefaultFileName.end(), fallbackDefaultFileName.begin() + 3, ::tolower);
+	std::transform(fallbackDefaultFileName.begin() + 3,
+	               fallbackDefaultFileName.end(),
+	               fallbackDefaultFileName.begin() + 3,
+	               ::tolower);
 
 	return fallbackDefaultFileName;
 }
@@ -106,8 +119,8 @@ std::string getDefaultTableName(std::string filename) {
 	if(endPos == std::string::npos)
 		endPos = filename.size();
 
-	//Discard version number
-	while(endPos > 0 && isdigit(filename.at(endPos-1)))
+	// Discard version number
+	while(endPos > 0 && isdigit(filename.at(endPos - 1)))
 		endPos--;
 
 	size_t beginPos = filename.find_last_of("/\\");
@@ -205,8 +218,8 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	const char *ext = strrchr(argv[1], '.');
-	if (ext && !strcmp(ext, ".lua")) {
+	const char* ext = strrchr(argv[1], '.');
+	if(ext && !strcmp(ext, ".lua")) {
 		dbDescription = createLuaDescriptedDatabase();
 	} else {
 		dbDescription = createExternDescriptedDatabase();
@@ -217,16 +230,16 @@ int main(int argc, char** argv) {
 		printf("Can't load dll %s: %d:%s\n", argv[1], result, strerror(result));
 		return 2;
 	}
-/*
-	printf("C description:\n");
-	printf("-----------------\n");
-	printC(dbDescription);
-	printf("-----------------\n\n");
+	/*
+	    printf("C description:\n");
+	    printf("-----------------\n");
+	    printC(dbDescription);
+	    printf("-----------------\n\n");
 
-	printf("LUA description:\n");
-	printf("-----------------\n");*/
+	    printf("LUA description:\n");
+	    printf("-----------------\n");*/
 	printLua(dbDescription);
-	//printf("-----------------\n\n");
+	// printf("-----------------\n\n");
 
 	dbDescription->destroy();
 

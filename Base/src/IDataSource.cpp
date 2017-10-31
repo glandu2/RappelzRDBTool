@@ -1,7 +1,7 @@
 #include "IDataSource.h"
 #include "string.h"
 
-int IDataSource::open(const char* source, eOpenMode openMode, const char *location, const char* options) {
+int IDataSource::open(const char* source, eOpenMode openMode, const char* location, const char* options) {
 	this->openMode = openMode;
 	return 0;
 }
@@ -28,7 +28,7 @@ const char* IDataSource::getNextOption(const char* options, char* key, char* val
 	return valueEnd[0] == '\0' ? 0 : (valueEnd + 1);
 }
 
-int IDataSource::prepare(IRowManipulator *row, unsigned int rowCount) {
+int IDataSource::prepare(IRowManipulator* row, unsigned int rowCount) {
 	this->row = row;
 	this->rowNumber = rowCount;
 

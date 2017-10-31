@@ -1,12 +1,12 @@
 #include "RDUSource.h"
 #include "RowManipulator.h"
+#include <cmath>
 #include <errno.h>
+#include <float.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <cmath>
-#include <float.h>
 
 namespace RappelzRDBBase {
 
@@ -14,15 +14,17 @@ RDUSource::RDUSource() {
 	date = 0;
 }
 
-int RDUSource::open(const char* source, eOpenMode openMode, const char *location, const char* options) {
+int RDUSource::open(const char* source, eOpenMode openMode, const char* location, const char* options) {
 	IDataSource::open(source, openMode, location, options);
 
 	const char* fopenOpenMode;
-	if(!source) return EINVAL;
+	if(!source)
+		return EINVAL;
 
 	if(openMode == OM_Read)
 		fopenOpenMode = "rb";
-	else fopenOpenMode = "wb";
+	else
+		fopenOpenMode = "wb";
 
 	rdbFile = fopen(source, fopenOpenMode);
 	rowRead = 0;
@@ -35,7 +37,7 @@ int RDUSource::open(const char* source, eOpenMode openMode, const char *location
 	}
 
 	io_buffer = malloc(65536);
-	setvbuf(rdbFile, (char*)io_buffer, _IOFBF, 65536);
+	setvbuf(rdbFile, (char*) io_buffer, _IOFBF, 65536);
 
 	return 0;
 }
@@ -47,7 +49,7 @@ void RDUSource::close() {
 	io_buffer = 0;
 }
 
-static void copyWithNOT(char *buffer, const char *src) {
+static void copyWithNOT(char* buffer, const char* src) {
 	while(*src) {
 		*buffer = ~*src;
 		buffer++;
@@ -55,14 +57,16 @@ static void copyWithNOT(char *buffer, const char *src) {
 	}
 }
 
-int RDUSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
+int RDUSource::prepareWrite(IRowManipulator* row, unsigned int rowCount) {
 	char header[0x80];
 	time_t rawtime;
 
 	memset(header, 0, 0x80);
 	time(&rawtime);
 	strftime(header, 9, "%Y%m%d", localtime(&rawtime));
-	copyWithNOT(header + 16, "\xad\xbb\xbd\xdf\xbc\x8d\x9a\x9e\x8b\x9a\x9b\xdf\x9d\x86\xdf\xad\x9e\x8f\x8f\x9a\x93\x85\xad\xbb\xbd\xab\x90\x90\x93\xdf\x99\x8d\x90\x92\xdf\xb8\x93\x9e\x91\x9b\x8a\xcd");
+	copyWithNOT(header + 16,
+	            "\xad\xbb\xbd\xdf\xbc\x8d\x9a\x9e\x8b\x9a\x9b\xdf\x9d\x86\xdf\xad\x9e\x8f\x8f\x9a\x93\x85\xad\xbb\xbd"
+	            "\xab\x90\x90\x93\xdf\x99\x8d\x90\x92\xdf\xb8\x93\x9e\x91\x9b\x8a\xcd");
 	fwrite(header, 1, 0x80, rdbFile);
 	fwrite(&rowCount, 4, 1, rdbFile);
 
@@ -71,7 +75,7 @@ int RDUSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
 	return 0;
 }
 
-int RDUSource::prepareRead(IRowManipulator *row) {
+int RDUSource::prepareRead(IRowManipulator* row) {
 	int rowNumber;
 	char dateBuffer[9];
 	fread(dateBuffer, 1, 8, rdbFile);
@@ -94,10 +98,10 @@ int RDUSource::prepareRead(IRowManipulator *row) {
 
 int RDUSource::readRow() {
 	int bitRead, i, curCol, count;
-	void *buffer;
-	IRowManipulator *row = getRowManipulator();
+	void* buffer;
+	IRowManipulator* row = getRowManipulator();
 
-	for(i=0; i<row->getColumnCount(); i++) {
+	for(i = 0; i < row->getColumnCount(); i++) {
 		curCol = i;
 		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_RDBIGNORE))
 			continue;
@@ -108,23 +112,25 @@ int RDUSource::readRow() {
 
 		switch(row->getType(curCol)) {
 			case TYPE_BIT:
-				*(char*)buffer = 0;
+				*(char*) buffer = 0;
 				bitRead = 0;
 				for(; count > 0; count--) {
 					if(bitAvailable == 0) {
 						if(fread(&currentByte, 1, 1, rdbFile) != 1) {
-							if(errno) return EIO;
-							else return EINVAL;
+							if(errno)
+								return EIO;
+							else
+								return EINVAL;
 						}
 						bitAvailable = 8;
 					}
 					bitAvailable--;
-					*(char*)buffer |= (currentByte & 1) << bitRead;
+					*(char*) buffer |= (currentByte & 1) << bitRead;
 					currentByte >>= 1;
 					bitRead++;
 					if(!(bitRead % 8)) {
-						buffer = (char*)buffer + 1;
-						*(char*)buffer = 0;
+						buffer = (char*) buffer + 1;
+						*(char*) buffer = 0;
 						bitRead = 0;
 					}
 				}
@@ -135,15 +141,19 @@ int RDUSource::readRow() {
 			case TYPE_CHAR:
 			case TYPE_INT8:
 				if(fread(buffer, 1, count, rdbFile) != count) {
-					if(errno) return EIO;
-					else return EINVAL;
+					if(errno)
+						return EIO;
+					else
+						return EINVAL;
 				}
 				break;
 
 			case TYPE_INT16:
 				if(fread(buffer, 2, count, rdbFile) != count) {
-					if(errno) return EIO;
-					else return EINVAL;
+					if(errno)
+						return EIO;
+					else
+						return EINVAL;
 				}
 				break;
 
@@ -152,16 +162,20 @@ int RDUSource::readRow() {
 			case TYPE_DECIMAL:
 			case TYPE_INT32:
 				if(fread(buffer, 4, count, rdbFile) != count) {
-					if(errno) return EIO;
-					else return EINVAL;
+					if(errno)
+						return EIO;
+					else
+						return EINVAL;
 				}
 				break;
 
 			case TYPE_FLOAT64:
 			case TYPE_INT64:
 				if(fread(buffer, 8, count, rdbFile) != count) {
-					if(errno) return EIO;
-					else return EINVAL;
+					if(errno)
+						return EIO;
+					else
+						return EINVAL;
 				}
 				break;
 		}
@@ -219,7 +233,7 @@ int RDUSource::readRow() {
 					break;
 			}
 
-			//Denormalized numbers are not correctly detected on msvc2010
+			// Denormalized numbers are not correctly detected on msvc2010
 			if((*val > 0 && *val < FLT_MIN) || (*val < 0 && *val > -FLT_MIN))
 				*val = 0;
 		} else if(row->getType(curCol) == TYPE_FLOAT64 && buffer) {
@@ -256,10 +270,10 @@ int RDUSource::readRow() {
 
 int RDUSource::writeRow() {
 	int bitRead, i, curCol, count;
-	void *buffer;
-	IRowManipulator *row = getRowManipulator();
+	void* buffer;
+	IRowManipulator* row = getRowManipulator();
 
-	for(i=0; i<row->getColumnCount(); i++) {
+	for(i = 0; i < row->getColumnCount(); i++) {
 		curCol = i;
 		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_RDBIGNORE))
 			continue;
@@ -287,11 +301,11 @@ int RDUSource::writeRow() {
 						bitAvailable = 8;
 						currentByte = 0;
 					}
-					currentByte |= ((*(char*)buffer >> bitRead) & 1) << (8-bitAvailable);
+					currentByte |= ((*(char*) buffer >> bitRead) & 1) << (8 - bitAvailable);
 					bitAvailable--;
 					bitRead++;
 					if(!(bitRead % 8)) {
-						buffer = (char*)buffer + 1;
+						buffer = (char*) buffer + 1;
 						bitRead = 0;
 					}
 				}
@@ -337,4 +351,4 @@ bool RDUSource::hasNext() {
 	return !feof(rdbFile) && rowRead < getRowNumber();
 }
 
-} //namespace
+}  // namespace RappelzRDBBase

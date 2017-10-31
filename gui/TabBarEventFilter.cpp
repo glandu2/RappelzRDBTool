@@ -1,16 +1,14 @@
 #include "TabBarEventFilter.h"
-#include <QTabBar>
-#include <QTabWidget>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QTabBar>
+#include <QTabWidget>
 
-TabBarEventFilter::TabBarEventFilter(QTabWidget *tabWidget, QObject *parent) :
-    QObject(parent)
-{
-	QObject *tabWidgetParent;
+TabBarEventFilter::TabBarEventFilter(QTabWidget* tabWidget, QObject* parent) : QObject(parent) {
+	QObject* tabWidgetParent;
 
 	foreach(tabWidgetParent, tabWidget->children()) {
-		QTabBar *tabBar = qobject_cast<QTabBar*>(tabWidgetParent);
+		QTabBar* tabBar = qobject_cast<QTabBar*>(tabWidgetParent);
 		if(tabBar) {
 			watchedTabBar = tabBar;
 			watchedTabBar->installEventFilter(this);
@@ -21,7 +19,7 @@ TabBarEventFilter::TabBarEventFilter(QTabWidget *tabWidget, QObject *parent) :
 	}
 }
 
-bool TabBarEventFilter::eventFilter(QObject *watched, QEvent *event) {
+bool TabBarEventFilter::eventFilter(QObject* watched, QEvent* event) {
 	bool result = QObject::eventFilter(watched, event);
 
 	if(watched != watchedTabBar && watched != watchedTabWidget)
@@ -32,7 +30,8 @@ bool TabBarEventFilter::eventFilter(QObject *watched, QEvent *event) {
 
 	if(watched == watchedTabWidget && event->type() == QEvent::MouseButtonDblClick) {
 		QMouseEvent* me = static_cast<QMouseEvent*>(event);
-		if(me->button() == Qt::LeftButton && me->pos().y() < watchedTabBar->sizeHint().height() && watchedTabBar->tabAt(me->pos()) == -1)
+		if(me->button() == Qt::LeftButton && me->pos().y() < watchedTabBar->sizeHint().height() &&
+		   watchedTabBar->tabAt(me->pos()) == -1)
 			emit addTab();
 	} else if(watched == watchedTabBar && event->type() == QEvent::MouseButtonPress) {
 		QMouseEvent* me = static_cast<QMouseEvent*>(event);

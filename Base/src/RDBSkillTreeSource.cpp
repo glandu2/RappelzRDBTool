@@ -4,19 +4,19 @@
 
 namespace RappelzRDBBase {
 
-int RDBSkillTreeSource::prepareRead(IRowManipulator *row) {
+int RDBSkillTreeSource::prepareRead(IRowManipulator* row) {
 	int result = RDBSource::prepareRead(row);
 	if(result == 0) {
 		fread(&subNumber, 1, 4, rdbFile);
 		totalRecordNumber = getRowNumber();
-		setRowNumber(0);	//can't get total row number :/
+		setRowNumber(0);  // can't get total row number :/
 		recordNumber = 0;
 		return 0;
 	}
 	return result;
 }
 
-int RDBSkillTreeSource::prepareWrite(IRowManipulator *row, unsigned int rowCount) {
+int RDBSkillTreeSource::prepareWrite(IRowManipulator* row, unsigned int rowCount) {
 	int result = RDBSource::prepareWrite(row, rowCount);
 
 	lastJobId = -1;
@@ -29,9 +29,10 @@ int RDBSkillTreeSource::prepareWrite(IRowManipulator *row, unsigned int rowCount
 
 int RDBSkillTreeSource::readRow() {
 	int result = RDBSource::readRow();
-	if(result) return result;
+	if(result)
+		return result;
 
-	setRowNumber(getRowNumber()+1);
+	setRowNumber(getRowNumber() + 1);
 
 	subNumber--;
 
@@ -45,8 +46,7 @@ int RDBSkillTreeSource::readRow() {
 
 int RDBSkillTreeSource::writeRow() {
 	int jobId;
-	IRowManipulator *row = getRowManipulator();
-
+	IRowManipulator* row = getRowManipulator();
 
 	jobId = *static_cast<int*>(row->getValuePtr(0));
 	if(lastJobId != jobId) {
@@ -86,4 +86,4 @@ bool RDBSkillTreeSource::hasNext() {
 	return !feof(rdbFile) && recordNumber < totalRecordNumber;
 }
 
-} //namespace
+}  // namespace RappelzRDBBase

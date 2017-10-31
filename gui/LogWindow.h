@@ -1,19 +1,18 @@
 #ifndef LOGWINDOW_H
 #define LOGWINDOW_H
 
-#include <QDialog>
 #include "ILog.h"
+#include <QDialog>
 
 namespace Ui {
 class LogWindow;
 }
 
-class LogWindow : public QDialog
-{
+class LogWindow : public QDialog {
 	Q_OBJECT
 
 public:
-	explicit LogWindow(QWidget *parent = 0);
+	explicit LogWindow(QWidget* parent = 0);
 	~LogWindow();
 
 protected slots:
@@ -24,8 +23,8 @@ private:
 	static void onLogMessage(ILog* logger, const char* message);
 
 private:
-	Ui::LogWindow *ui;
+	Ui::LogWindow* ui;
 	static LogWindow* instance;
 };
 
-#endif // LOGWINDOW_H
+#endif  // LOGWINDOW_H

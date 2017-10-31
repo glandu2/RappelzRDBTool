@@ -3,17 +3,15 @@
 #include "NameToHash.h"
 #include "Settings.h"
 
-#include <QSettings>
 #include <QDir>
 #include <QFileInfoList>
+#include <QSettings>
 
 static bool compareDbDescriptionNameLessThan(IDatabaseDescription* a, IDatabaseDescription* b) {
 	return strcmp(a->getFilename(), b->getFilename()) < 0;
 }
 
-DatabaseDescriptionListModel::DatabaseDescriptionListModel(QObject *parent) :
-	QAbstractTableModel(parent)
-{
+DatabaseDescriptionListModel::DatabaseDescriptionListModel(QObject* parent) : QAbstractTableModel(parent) {
 	int i = 0;
 	QString value;
 	QString nativeDbDescriptionExtension;
@@ -26,7 +24,8 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QObject *parent) :
 	nativeDbDescriptionExtension = "Database.dll";
 #endif
 
-	while((value = Settings::getSettings()->value((optionGroupName + "/filepath/%1").arg(i)).toString()).isNull() == false) {
+	while((value = Settings::getSettings()->value((optionGroupName + "/filepath/%1").arg(i)).toString()).isNull() ==
+	      false) {
 		IDatabaseDescription* dbDesc;
 
 		if(value.endsWith(nativeDbDescriptionExtension))
@@ -47,8 +46,7 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QObject *parent) :
 	for(i = 0; i < subFiles.size(); i++) {
 		const QFileInfo& fileInfo = subFiles.at(i);
 
-		if(fileInfo.fileName().endsWith(nativeDbDescriptionExtension))
-		{
+		if(fileInfo.fileName().endsWith(nativeDbDescriptionExtension)) {
 			IDatabaseDescription* dbDesc = createExternDescriptedDatabase();
 			if(dbDesc->open(fileInfo.absoluteFilePath().toLocal8Bit().constData(), 0) == 0) {
 				append(dbDesc);
@@ -73,11 +71,12 @@ DatabaseDescriptionListModel::DatabaseDescriptionListModel(QObject *parent) :
 DatabaseDescriptionListModel::~DatabaseDescriptionListModel() {
 	Settings::getSettings()->remove(optionGroupName + "/filepath");
 	for(int i = 0; i < dbDescriptions.size(); i++)
-		Settings::getSettings()->setValue((optionGroupName + "/filepath/%1").arg(i), QString::fromLocal8Bit(dbDescriptions.at(i)->getFilename()));
+		Settings::getSettings()->setValue((optionGroupName + "/filepath/%1").arg(i),
+		                                  QString::fromLocal8Bit(dbDescriptions.at(i)->getFilename()));
 }
 
 void DatabaseDescriptionListModel::append(IDatabaseDescription* value) {
-	IDatabaseDescription *currentDbDesc;
+	IDatabaseDescription* currentDbDesc;
 
 	foreach(currentDbDesc, dbDescriptions) {
 		if(!qstrcmp(currentDbDesc->getFilename(), value->getFilename()))
@@ -108,11 +107,16 @@ QVariant DatabaseDescriptionListModel::headerData(int section, Qt::Orientation o
 		return QVariant();
 
 	switch(section) {
-		case 0: return tr("Name", "column name in Database description file manage dialogbox");
-		case 1: return tr("File name", "column name in Database description file manage dialogbox");
-		case 2: return tr("Default DB file base name", "column name in Database description file manage dialogbox");
-		case 3: return tr("Default DB table", "column name in Database description file manage dialogbox");
-		case 4: return tr("Default RDB hash", "column name in Database description file manage dialogbox");
+		case 0:
+			return tr("Name", "column name in Database description file manage dialogbox");
+		case 1:
+			return tr("File name", "column name in Database description file manage dialogbox");
+		case 2:
+			return tr("Default DB file base name", "column name in Database description file manage dialogbox");
+		case 3:
+			return tr("Default DB table", "column name in Database description file manage dialogbox");
+		case 4:
+			return tr("Default RDB hash", "column name in Database description file manage dialogbox");
 	}
 
 	return QVariant();

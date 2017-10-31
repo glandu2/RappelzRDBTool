@@ -7,12 +7,11 @@ namespace Ui {
 class SqlOpenSaveDialog;
 }
 
-class SqlOpenSaveDialog : public QDialog
-{
+class SqlOpenSaveDialog : public QDialog {
 	Q_OBJECT
 
 public:
-	explicit SqlOpenSaveDialog(QWidget *parent = 0);
+	explicit SqlOpenSaveDialog(QWidget* parent = 0);
 	~SqlOpenSaveDialog();
 
 	void setMessage(const QString& message);
@@ -22,7 +21,7 @@ public:
 	bool useExistingTableSchema();
 
 private:
-	Ui::SqlOpenSaveDialog *ui;
+	Ui::SqlOpenSaveDialog* ui;
 };
 
-#endif // SQLOPENSAVEDIALOG_H
+#endif  // SQLOPENSAVEDIALOG_H

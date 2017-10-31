@@ -5,12 +5,11 @@
 
 namespace RappelzRDBBase {
 
-class SQLServer : public SQLLanguage
-{
-	public:
-		virtual void getTypeName(char *buffer, int type, int count = 1, int index = 0);
+class SQLServer : public SQLLanguage {
+public:
+	virtual void getTypeName(char* buffer, int type, int count = 1, int index = 0);
 };
 
-} //namespace
+}  // namespace RappelzRDBBase
 
-#endif // SQLSERVER_H
+#endif  // SQLSERVER_H

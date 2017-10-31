@@ -9,12 +9,11 @@ class HashConverterDialog;
 
 class FileToRenameListModel;
 
-class HashConverterDialog : public QDialog
-{
+class HashConverterDialog : public QDialog {
 	Q_OBJECT
 
 public:
-	explicit HashConverterDialog(QWidget *parent = 0);
+	explicit HashConverterDialog(QWidget* parent = 0);
 	~HashConverterDialog();
 
 public slots:
@@ -26,8 +25,8 @@ public slots:
 	void renameFiles();
 
 private:
-	Ui::HashConverterDialog *ui;
+	Ui::HashConverterDialog* ui;
 	FileToRenameListModel* fileListmodel;
 };
 
-#endif // HASHCONVERTERDIALOG_H
+#endif  // HASHCONVERTERDIALOG_H

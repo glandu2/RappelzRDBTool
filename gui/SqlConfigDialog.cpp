@@ -7,10 +7,10 @@
 #include <QUrl>
 
 #ifdef __unix__
-#  include <sql.h>
+#include <sql.h>
 #else
-#  undef UNICODE
-#  include <windows.h>
+#undef UNICODE
+#include <windows.h>
 #endif
 #include <sqlext.h>
 
@@ -18,10 +18,7 @@
 #include <windows.h>
 #endif
 
-SqlConfigDialog::SqlConfigDialog() :
-	QDialog(0),
-	ui(new Ui::SqlConfigDialog)
-{
+SqlConfigDialog::SqlConfigDialog() : QDialog(0), ui(new Ui::SqlConfigDialog) {
 	ui->setupUi(this);
 
 	ui->serverTypeCombo->setCurrentIndex(Settings::getSettings()->value("SqlConfig/serverType").toInt());
@@ -34,13 +31,11 @@ SqlConfigDialog::SqlConfigDialog() :
 	if(ui->passwordSaveCheck->isChecked())
 		ui->passwordEdit->setText(Settings::getSettings()->value("SqlConfig/password").toString());
 
-
 	resize(width(), sizeHint().height());
 	connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
 }
 
-SqlConfigDialog::~SqlConfigDialog()
-{
+SqlConfigDialog::~SqlConfigDialog() {
 	Settings::getSettings()->setValue("SqlConfig/serverType", ui->serverTypeCombo->currentIndex());
 	Settings::getSettings()->setValue("SqlConfig/connectionString", ui->connectionStringEdit->text());
 	Settings::getSettings()->setValue("SqlConfig/serverIp", ui->serverIpEdit->text());
@@ -50,7 +45,8 @@ SqlConfigDialog::~SqlConfigDialog()
 
 	if(ui->passwordSaveCheck->isChecked())
 		Settings::getSettings()->setValue("SqlConfig/password", ui->passwordEdit->text());
-	else Settings::getSettings()->remove("SqlConfig/password");
+	else
+		Settings::getSettings()->remove("SqlConfig/password");
 	delete ui;
 }
 
@@ -88,19 +84,19 @@ QString SqlConfigDialog::getConnectionString(int tabIndex) {
 		if(getServerType() == DST_SQLServer) {
 			if(!sqlPort)
 				sqlPort = 1433;
-	#ifdef _WIN32
+#ifdef _WIN32
 			connectionString = "Driver=SQL Server;Server=%0,%1;UID=%2;PWD=%3;";
-	#else
+#else
 			connectionString = "Driver=FreeTDS;TDS_Version=7.2;Server=%0,%1;UID=%2;PWD=%3;";
-	#endif
+#endif
 		} else if(getServerType() == DST_SQLPostgres) {
 			if(!sqlPort)
 				sqlPort = 5432;
-	#ifdef _WIN64
+#ifdef _WIN64
 			connectionString = "Driver={PostgreSQL Unicode(x64)};Server=%0;Port=%1;UID=%2;PWD=%3;";
-	#else
+#else
 			connectionString = "Driver={PostgreSQL Unicode};Server=%0;Port=%1;UID=%2;PWD=%3;";
-	#endif
+#endif
 		}
 
 		return connectionString.arg(getServerIp(), QString::number(sqlPort), getUsername(), getPassword());

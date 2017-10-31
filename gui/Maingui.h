@@ -1,11 +1,11 @@
 #ifndef MAINGUI_H
 #define MAINGUI_H
 
-#include <QMainWindow>
-#include <QModelIndex>
-#include "PersistentData.h"
 #include "HashConverterDialog.h"
 #include "LogWindow.h"
+#include "PersistentData.h"
+#include <QMainWindow>
+#include <QModelIndex>
 
 class IDatabase;
 class IRowManipulator;
@@ -23,69 +23,62 @@ class DatabaseDescriptionListModel;
 class TabBarEventFilter;
 class DatabaseDescManageDialog;
 
-class Maingui : public QMainWindow
-{
-		Q_OBJECT
+class Maingui : public QMainWindow {
+	Q_OBJECT
 
-	public:
-		enum eSourceType {
-			ST_None,
-			ST_Rdb,
-			ST_Csv,
-			ST_Sql,
-			ST_SqlDatabase
-		};
+public:
+	enum eSourceType { ST_None, ST_Rdb, ST_Csv, ST_Sql, ST_SqlDatabase };
 
-		explicit Maingui(QWidget *parent = 0);
-		~Maingui();
+	explicit Maingui(QWidget* parent = 0);
+	~Maingui();
 
-	public slots:
-		bool onLoadDbStructDLL();
+public slots:
+	bool onLoadDbStructDLL();
 
-		void onLoadFile();
-		void onLoadRDB();
-		void onLoadCSV();
-		void onLoadSQLDatabase();
+	void onLoadFile();
+	void onLoadRDB();
+	void onLoadCSV();
+	void onLoadSQLDatabase();
 
-		void onSaveFile();
-		void onSaveRDB();
-		void onSaveCSV();
-		void onSaveSQL();
-		void onSaveSQLDatabase();
+	void onSaveFile();
+	void onSaveRDB();
+	void onSaveCSV();
+	void onSaveSQL();
+	void onSaveSQLDatabase();
 
-		void onCloseDb();
+	void onCloseDb();
 
-		void onSQLOptions();
-		void onDbDescManage();
-		void onToggleHashConverterDialog();
-		void onToggleLogWindow();
+	void onSQLOptions();
+	void onDbDescManage();
+	void onToggleHashConverterDialog();
+	void onToggleLogWindow();
 
-		void onAbout();
+	void onAbout();
 
-	protected slots:
-		void onTabChanged(int index);
-		void onAddTab();
-		void onRemoveTab(int index = -1);
-		void onViewTitleChanged(DatabaseView* view);
-		void onDbStructHighlighted(int index);
+protected slots:
+	void onTabChanged(int index);
+	void onAddTab();
+	void onRemoveTab(int index = -1);
+	void onViewTitleChanged(DatabaseView* view);
+	void onDbStructHighlighted(int index);
 
-	protected:
-		void loadSaveDbFile(bool save, eSourceType srcType);
-		virtual void closeEvent(QCloseEvent *event);
+protected:
+	void loadSaveDbFile(bool save, eSourceType srcType);
+	virtual void closeEvent(QCloseEvent* event);
 
-	private:
-		DatabaseDescriptionListModel *dbDescriptionModel;
-		QList<DatabaseView*> databaseViews;
+private:
+	DatabaseDescriptionListModel* dbDescriptionModel;
+	QList<DatabaseView*> databaseViews;
 
-		Ui::MainWindow *ui;
-		SqlConfigDialog *sqlConfigDialog;
-		DatabaseDescManageDialog *dbDescriptionManageDialog;
+	Ui::MainWindow* ui;
+	SqlConfigDialog* sqlConfigDialog;
+	DatabaseDescManageDialog* dbDescriptionManageDialog;
 
-		TabBarEventFilter *tabEventFilter;
-		QLabel *currentStatusBarLabel;
+	TabBarEventFilter* tabEventFilter;
+	QLabel* currentStatusBarLabel;
 
-		HashConverterDialog hashConverter;
-		LogWindow logWindow;
+	HashConverterDialog hashConverter;
+	LogWindow logWindow;
 };
 
-#endif // MAINGUI_H
+#endif  // MAINGUI_H

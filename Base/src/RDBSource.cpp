@@ -51,7 +51,7 @@ int RDBSource::open(const char* source, eOpenMode openMode, const char* location
 	}
 
 	io_buffer = malloc(65536);
-	setvbuf(rdbFile, (char*)io_buffer, _IOFBF, 65536);
+	setvbuf(rdbFile, (char*) io_buffer, _IOFBF, 65536);
 
 	return 0;
 }
@@ -63,7 +63,7 @@ void RDBSource::close() {
 	io_buffer = 0;
 }
 
-static void copyWithNOT(char *buffer, const char *src) {
+static void copyWithNOT(char* buffer, const char* src) {
 	while(*src) {
 		*buffer = ~*src;
 		buffer++;
@@ -140,10 +140,10 @@ int RDBSource::prepareRead(IRowManipulator* row) {
 
 int RDBSource::readRow() {
 	int bitRead, i, curCol, count;
-	void *buffer;
-	IRowManipulator *row = getRowManipulator();
+	void* buffer;
+	IRowManipulator* row = getRowManipulator();
 
-	for(i=0; i<row->getColumnCount(); i++) {
+	for(i = 0; i < row->getColumnCount(); i++) {
 		curCol = i;
 		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_RDBIGNORE))
 			continue;
@@ -233,18 +233,24 @@ int RDBSource::readRow() {
 			case TYPE_DECIMAL:
 			case TYPE_INT32:
 				if(fread(buffer, 4, count, rdbFile) != count) {
-					getLogger()->log(ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
-					if(errno) return EIO;
-					else return EINVAL;
+					getLogger()->log(
+					    ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
+					if(errno)
+						return EIO;
+					else
+						return EINVAL;
 				}
 				break;
 
 			case TYPE_FLOAT64:
 			case TYPE_INT64:
 				if(fread(buffer, 8, count, rdbFile) != count) {
-					getLogger()->log(ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
-					if(errno) return EIO;
-					else return EINVAL;
+					getLogger()->log(
+					    ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
+					if(errno)
+						return EIO;
+					else
+						return EINVAL;
 				}
 				break;
 		}
@@ -302,7 +308,7 @@ int RDBSource::readRow() {
 					break;
 			}
 
-			//Denormalized numbers are not correctly detected on msvc2010
+			// Denormalized numbers are not correctly detected on msvc2010
 			if((*val > 0 && *val < FLT_MIN) || (*val < 0 && *val > -FLT_MIN))
 				*val = 0;
 		} else if(row->getType(curCol) == TYPE_FLOAT64 && buffer) {
@@ -339,10 +345,10 @@ int RDBSource::readRow() {
 
 int RDBSource::writeRow() {
 	int bitRead, i, curCol, count;
-	void *buffer;
-	IRowManipulator *row = getRowManipulator();
+	void* buffer;
+	IRowManipulator* row = getRowManipulator();
 
-	for(i=0; i<row->getColumnCount(); i++) {
+	for(i = 0; i < row->getColumnCount(); i++) {
 		curCol = i;
 		if(GET_FLAGBIT(row->getIgnoreType(curCol), TYPE_RDBIGNORE))
 			continue;
@@ -353,7 +359,8 @@ int RDBSource::writeRow() {
 		if(row->getType(curCol) != TYPE_BIT) {
 			if(bitAvailable != 8)
 				if(fwrite(&currentByte, 1, 1, rdbFile) != 1) {
-					getLogger()->log(ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
+					getLogger()->log(
+					    ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
 					return EIO;
 				}
 			bitAvailable = 8;
@@ -437,7 +444,8 @@ int RDBSource::writeRow() {
 			case TYPE_DECIMAL:
 			case TYPE_INT32:
 				if(fwrite(buffer, 4, count, rdbFile) != count) {
-					getLogger()->log(ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
+					getLogger()->log(
+					    ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
 					return EIO;
 				}
 				break;
@@ -445,7 +453,8 @@ int RDBSource::writeRow() {
 			case TYPE_FLOAT64:
 			case TYPE_INT64:
 				if(fwrite(buffer, 8, count, rdbFile) != count) {
-					getLogger()->log(ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
+					getLogger()->log(
+					    ILog::LL_Error, "RDBSource: Error while writing record data: %s\n", strerror(errno));
 					return EIO;
 				}
 				break;
@@ -459,4 +468,4 @@ bool RDBSource::hasNext() {
 	return !feof(rdbFile) && rowRead < getRowNumber();
 }
 
-} //namespace
+}  // namespace RappelzRDBBase

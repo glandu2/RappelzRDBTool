@@ -1,17 +1,13 @@
 #include "SqlOpenSaveDialog.h"
 #include "ui_SqlOpenSaveDialog.h"
 
-SqlOpenSaveDialog::SqlOpenSaveDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::SqlOpenSaveDialog)
-{
+SqlOpenSaveDialog::SqlOpenSaveDialog(QWidget* parent) : QDialog(parent), ui(new Ui::SqlOpenSaveDialog) {
 	ui->setupUi(this);
 	setWindowTitle(QApplication::applicationName());
 	layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
-SqlOpenSaveDialog::~SqlOpenSaveDialog()
-{
+SqlOpenSaveDialog::~SqlOpenSaveDialog() {
 	delete ui;
 }
 

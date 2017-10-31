@@ -5,8 +5,7 @@
 
 #include "ICharsetConverter.h"
 
-class CharsetConverter : public CImplement<ICharsetConverter>
-{
+class CharsetConverter : public CImplement<ICharsetConverter> {
 public:
 	CharsetConverter(const char* charset);
 	~CharsetConverter();
@@ -19,4 +18,4 @@ private:
 	iconv_t ic_fromUtf16;
 };
 
-#endif // CHARSETCONVERTER_H
+#endif  // CHARSETCONVERTER_H

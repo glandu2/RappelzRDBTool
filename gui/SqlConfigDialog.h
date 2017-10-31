@@ -1,37 +1,36 @@
 #ifndef SQLCONFIGDIALOG_H
 #define SQLCONFIGDIALOG_H
 
-#include <QDialog>
 #include "DataType.h"
+#include <QDialog>
 
 namespace Ui {
 class SqlConfigDialog;
 }
 
-class SqlConfigDialog : public QDialog
-{
-		Q_OBJECT
-		
-	public:
-		explicit SqlConfigDialog();
-		~SqlConfigDialog();
+class SqlConfigDialog : public QDialog {
+	Q_OBJECT
 
-		eDataSourceType getServerType();
+public:
+	explicit SqlConfigDialog();
+	~SqlConfigDialog();
 
-		QString getConnectionString(int tabIndex = -1);
+	eDataSourceType getServerType();
 
-		bool isConfigSet();
+	QString getConnectionString(int tabIndex = -1);
 
-	protected slots:
-		void onTabChanged(int newIndex);
+	bool isConfigSet();
 
-	private:
-		QString getServerIp();
-		int getServerPort();
-		QString getUsername();
-		QString getPassword();
+protected slots:
+	void onTabChanged(int newIndex);
 
-		Ui::SqlConfigDialog *ui;
+private:
+	QString getServerIp();
+	int getServerPort();
+	QString getUsername();
+	QString getPassword();
+
+	Ui::SqlConfigDialog* ui;
 };
 
-#endif // SQLCONFIGDIALOG_H
+#endif  // SQLCONFIGDIALOG_H

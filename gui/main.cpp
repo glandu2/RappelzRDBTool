@@ -1,26 +1,28 @@
 #include <QApplication>
 
-#include <QMessageBox>
-#include <QTextStream>
-#include <QLocale>
-#include <QTranslator>
 #include "Maingui.h"
 #include "Settings.h"
+#include <QLocale>
+#include <QMessageBox>
+#include <QTextStream>
+#include <QTranslator>
+#include <version.h>
 
-//Open files on command line
+// Open files on command line
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[]) {
 	QApplication a(argc, argv);
 
 	setlocale(LC_NUMERIC, "C");
 	QLocale::setDefault(QLocale::c());
 
-
 	QSettings options(QApplication::applicationDirPath() + "/RappelzRDBToolQt.ini", QSettings::IniFormat);
 	Settings::setSettings(&options);
 
-	QString translationFileName = Settings::getSettings()->value("translationFile", QString("RappelzRDBToolQt.%1.qm").arg(QLocale::system().name())).toString();
+	QString translationFileName =
+	    Settings::getSettings()
+	        ->value("translationFile", QString("RappelzRDBToolQt.%1.qm").arg(QLocale::system().name()))
+	        .toString();
 	QTranslator translationFile;
 
 	if(translationFile.load(translationFileName))

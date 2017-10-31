@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-int convertNameToHash(const char *name, char *hash, int encodeSeed);
+int convertNameToHash(const char* name, char* hash, int encodeSeed);
 
 #ifdef __cplusplus
 }

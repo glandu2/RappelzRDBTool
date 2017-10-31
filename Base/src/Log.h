@@ -1,11 +1,10 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include "ILog.h"
 #include "DataType.h"
+#include "ILog.h"
 
-class Log : public CImplement<ILog>
-{
+class Log : public CImplement<ILog> {
 public:
 	Log();
 
@@ -24,4 +23,4 @@ private:
 	Level maxLevel;
 };
 
-#endif // LOG_H
+#endif  // LOG_H

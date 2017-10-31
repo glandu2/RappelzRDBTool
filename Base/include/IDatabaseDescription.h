@@ -10,8 +10,8 @@ class IDatabaseDescription;
 extern "C" {
 #endif
 
-EBASEDLL IDatabaseDescription * DLLCALLCONV createExternDescriptedDatabase();
-EBASEDLL IDatabaseDescription * DLLCALLCONV createLuaDescriptedDatabase();
+EBASEDLL IDatabaseDescription* DLLCALLCONV createExternDescriptedDatabase();
+EBASEDLL IDatabaseDescription* DLLCALLCONV createLuaDescriptedDatabase();
 
 #ifdef __cplusplus
 }
@@ -19,25 +19,30 @@ EBASEDLL IDatabaseDescription * DLLCALLCONV createLuaDescriptedDatabase();
 
 class IRowManipulator;
 
-class IDatabaseDescription : public IObject
-{
-	public:
-		virtual int DLLCALLCONV open(const char* databaseName, int* systemError) = 0;
-		virtual void DLLCALLCONV registerDBStructure(FieldDescriptor **dfm, int *size) = 0;
-		virtual const char * DLLCALLCONV getSQLColumnOrder() = 0;
-		virtual const char * DLLCALLCONV getCSVColumnOrder() = 0;
-		virtual void DLLCALLCONV convertData(eDataFormat dst, eDataConvertionType mode, IRowManipulator *row, unsigned int rowNum) = 0;
-		virtual int DLLCALLCONV getSpecialCaseID() = 0;
+class IDatabaseDescription : public IObject {
+public:
+	virtual int DLLCALLCONV open(const char* databaseName, int* systemError) = 0;
+	virtual void DLLCALLCONV registerDBStructure(FieldDescriptor** dfm, int* size) = 0;
+	virtual const char* DLLCALLCONV getSQLColumnOrder() = 0;
+	virtual const char* DLLCALLCONV getCSVColumnOrder() = 0;
+	virtual void DLLCALLCONV convertData(eDataFormat dst,
+	                                     eDataConvertionType mode,
+	                                     IRowManipulator* row,
+	                                     unsigned int rowNum) = 0;
+	virtual int DLLCALLCONV getSpecialCaseID() = 0;
 
-		virtual const char* getFilename() = 0;
+	virtual const char* getFilename() = 0;
 
-		virtual const char* getDefaultFileName() = 0;    //get the default filename, like db_string for StringDatabase (without extension).
-		virtual const char* getDefaultTableName() = 0;   //get the default table name for use with sql servers. (without dbo. or anything before that)
+	virtual const char*
+	getDefaultFileName() = 0;  // get the default filename, like db_string for StringDatabase (without extension).
+	virtual const char* getDefaultTableName() = 0;  // get the default table name for use with sql servers. (without
+	                                                // dbo. or anything before that)
 
-		//Incoming version:
-		/*
-		virtual int getDBStructVersion();            //get the database description object version. To prevent version mismash and crashs. Might also used for a compatibility layer.
-		*/
+	// Incoming version:
+	/*
+	virtual int getDBStructVersion();            //get the database description object version. To prevent version
+	mismash and crashs. Might also used for a compatibility layer.
+	*/
 };
 
-#endif // DATABASEDESCRIPTION_H
+#endif  // DATABASEDESCRIPTION_H

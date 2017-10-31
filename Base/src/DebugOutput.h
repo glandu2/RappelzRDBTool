@@ -1,4 +1,4 @@
 #ifndef DEBUGOUTPUT_H
 #define DEBUGOUTPUT_H
 
-#endif // DEBUGOUTPUT_H
+#endif  // DEBUGOUTPUT_H

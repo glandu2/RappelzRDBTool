@@ -1,13 +1,12 @@
 #include "OpenSaveSource.h"
-#include <QFileDialog>
-#include <QCoreApplication>
-#include <QString>
-#include "Settings.h"
 #include "FileDialog.h"
+#include "Settings.h"
 #include "SqlOpenSaveDialog.h"
+#include <QCoreApplication>
+#include <QFileDialog>
+#include <QString>
 
-OpenSaveSource::OpenSaveSource()
-{
+OpenSaveSource::OpenSaveSource() {
 	autoDetectSourceType = true;
 	source = DST_RDB;
 
@@ -31,7 +30,8 @@ void OpenSaveSource::setAutoDetectSourceType() {
 	autoDetectSourceType = true;
 }
 
-bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceName, eDataSourceType *sourceType, QByteArray* options) {
+bool OpenSaveSource::getSource(
+    bool save, QString defaultName, QString* sourceName, eDataSourceType* sourceType, QByteArray* options) {
 	eDataSourceType dummySource = DST_CSV;
 
 	if(sourceType == 0)
@@ -42,14 +42,17 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 		QString message;
 
 		if(save)
-			message = tr("Enter full SQL target table (like Arcadia.dbo.StringResource)\nWarning: the table will be overwritten without prompt if it already exists !", "Save to SQL database inputbox label");
+			message = tr("Enter full SQL target table (like Arcadia.dbo.StringResource)\nWarning: the table will be "
+			             "overwritten without prompt if it already exists !",
+			             "Save to SQL database inputbox label");
 		else
-			message = tr("Enter full SQL target table (like Arcadia.dbo.StringResource)", "Load from SQL database inputbox label");
+			message = tr("Enter full SQL target table (like Arcadia.dbo.StringResource)",
+			             "Load from SQL database inputbox label");
 
 		SqlOpenSaveDialog sqlDialog;
 		sqlDialog.setMessage(message);
 		sqlDialog.setTableName(defaultName);
-		sqlDialog.setUseExistingTableSchemaEnabled(save); //enable use existing table schema only when saving
+		sqlDialog.setUseExistingTableSchemaEnabled(save);  // enable use existing table schema only when saving
 
 		ok = sqlDialog.exec() == QDialog::Accepted;
 
@@ -82,11 +85,20 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 	filter = filterList.join(";;");
 
 	if(save) {
-		*sourceName = FileDialog::getSaveFileName(0, tr("Choose Database Source", "File dialogbox title when saving"), defaultDirSourceSave.value(defaultDirSourceOpen.value(".")).toString() + "/" + defaultName, filter, &selectedFilter);
+		*sourceName = FileDialog::getSaveFileName(
+		    0,
+		    tr("Choose Database Source", "File dialogbox title when saving"),
+		    defaultDirSourceSave.value(defaultDirSourceOpen.value(".")).toString() + "/" + defaultName,
+		    filter,
+		    &selectedFilter);
 		if(!sourceName->isNull())
 			defaultDirSourceSave = QFileInfo(*sourceName).absolutePath();
 	} else {
-		*sourceName = FileDialog::getOpenFileName(0, tr("Choose Database Source", "File dialogbox title when loading"), defaultDirSourceOpen.value(".").toString() + "/" + defaultName, filter, &selectedFilter);
+		*sourceName = FileDialog::getOpenFileName(0,
+		                                          tr("Choose Database Source", "File dialogbox title when loading"),
+		                                          defaultDirSourceOpen.value(".").toString() + "/" + defaultName,
+		                                          filter,
+		                                          &selectedFilter);
 		if(!sourceName->isNull())
 			defaultDirSourceOpen = QFileInfo(*sourceName).absolutePath();
 	}

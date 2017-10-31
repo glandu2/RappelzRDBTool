@@ -3,11 +3,10 @@
 
 #include <QAbstractTableModel>
 
-class FileToRenameListModel : public QAbstractTableModel
-{
+class FileToRenameListModel : public QAbstractTableModel {
 	Q_OBJECT
 public:
-	FileToRenameListModel(QObject *parent = 0);
+	FileToRenameListModel(QObject* parent = 0);
 	~FileToRenameListModel();
 
 	void append(QString filename);
@@ -33,10 +32,8 @@ protected:
 	static bool isHashedName(QString filename);
 
 private:
-
 	QList<FileInfo> fileList;
 	QString optionGroupName;
-
 };
 
-#endif // FILETORENAMELISTMODEL_H
+#endif  // FILETORENAMELISTMODEL_H

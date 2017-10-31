@@ -5,12 +5,11 @@
 
 namespace RappelzRDBBase {
 
-class SQLPostgres : public SQLLanguage
-{
-	public:
-		virtual void getTypeName(char *buffer, int type, int count = 1, int index = 0);
+class SQLPostgres : public SQLLanguage {
+public:
+	virtual void getTypeName(char* buffer, int type, int count = 1, int index = 0);
 };
 
-} //namespace
+}  // namespace RappelzRDBBase
 
-#endif // SQLPOSTGRES_H
+#endif  // SQLPOSTGRES_H

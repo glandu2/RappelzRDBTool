@@ -1,19 +1,17 @@
 #include "DatabaseTableModel.h"
-#include "IDatabase.h"
-#include "IRowManipulator.h"
 #include "ICharsetConverter.h"
-#include <errno.h>
-#include "Settings.h"
+#include "IDatabase.h"
 #include "ILog.h"
+#include "IRowManipulator.h"
+#include "Settings.h"
+#include <errno.h>
 
+#include <QByteArray>
 #include <math.h>
 #include <stdio.h>
-#include <QByteArray>
 #include <vector>
 
-DatabaseTableModel::DatabaseTableModel(QByteArray charset, QObject *parent) :
-	QAbstractTableModel(parent)
-{
+DatabaseTableModel::DatabaseTableModel(QByteArray charset, QObject* parent) : QAbstractTableModel(parent) {
 	db = NULL;
 	row = NULL;
 	currentLocale = createCharsetConverter(charset.constData());
@@ -30,17 +28,16 @@ void DatabaseTableModel::changeLocale(QByteArray newLocale) {
 	}
 }
 
-void DatabaseTableModel::bindToDatabase(IDatabase *db) {
+void DatabaseTableModel::bindToDatabase(IDatabase* db) {
 	int i, colCount;
-
 
 	beginResetModel();
 
 	row = createRowManipulator(db->getRowManipulator()->getColumnType(), 0);
 
-	for(colCount=i=0; i<row->getColumnCount(); i++) {
+	for(colCount = i = 0; i < row->getColumnCount(); i++) {
 		if(row->getType(i) != TYPE_VARCHAR_SIZE && (row->getIgnoreType(i) & TYPE_GUIIGNORE) == 0) {
-			columnBinding.resize(colCount+1);
+			columnBinding.resize(colCount + 1);
 			columnBinding[colCount] = i;
 			colCount++;
 		}
@@ -61,29 +58,32 @@ void DatabaseTableModel::unbindDatabase() {
 }
 
 Qt::ItemFlags DatabaseTableModel::flags(const QModelIndex&) const {
-	//if(db && index.isValid() && index.column() < columnCount() && index.row() < rowCount())             //Fixme: needed ?
+	// if(db && index.isValid() && index.column() < columnCount() && index.row() < rowCount())             //Fixme:
+	// needed ?
 	return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-	//return Qt::NoItemFlags;
+	// return Qt::NoItemFlags;
 }
 
 int DatabaseTableModel::columnCount(const QModelIndex& parent) const {
 	if(parent.isValid() || !db)
 		return 0;
-	else return columnBinding.size();
+	else
+		return columnBinding.size();
 }
 
 int DatabaseTableModel::rowCount(const QModelIndex& parent) const {
 	if(parent.isValid() || !db)
 		return 0;
-	else return db->getRowCount();
+	else
+		return db->getRowCount();
 }
 
 QString DatabaseTableModel::toUnicode(const char* data, int size) const {
 	ICharsetConverter::ConvertedString in, out;
-	in.data = (char*)data;
+	in.data = (char*) data;
 	in.size = size;
 	currentLocale->convertToUtf16(in, &out);
-	QString ret((const QChar*)out.data, out.size/2);
+	QString ret((const QChar*) out.data, out.size / 2);
 
 	free(out.data);
 
@@ -92,8 +92,8 @@ QString DatabaseTableModel::toUnicode(const char* data, int size) const {
 
 QByteArray DatabaseTableModel::fromUnicode(QString data) const {
 	ICharsetConverter::ConvertedString in, out;
-	in.data = (char*)data.data();
-	in.size = data.size()*2;
+	in.data = (char*) data.data();
+	in.size = data.size() * 2;
 	currentLocale->convertFromUtf16(in, &out);
 	QByteArray ret(out.data, out.size);
 
@@ -110,17 +110,17 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 
 	int realColumnIndex = columnBinding.at(index.column());
 	int count = row->getDataCount(realColumnIndex);
-	void *buffer = row->getValuePtr(realColumnIndex);
+	void* buffer = row->getValuePtr(realColumnIndex);
 
 	switch(row->getType(realColumnIndex)) {
 		case TYPE_BIT: {
 			QByteArray item;
 			int bitRead = 0;
 			for(; count > 0; count--) {
-				item.append(QByteArray::number((int)((*(char*)buffer >> bitRead) & 1)));
+				item.append(QByteArray::number((int) ((*(char*) buffer >> bitRead) & 1)));
 				bitRead++;
 				if(!(bitRead % 8)) {
-					buffer = (char*)buffer + 1;
+					buffer = (char*) buffer + 1;
 					bitRead = 0;
 				}
 			}
@@ -128,35 +128,36 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 			break;
 		}
 
-		case TYPE_CHAR: {     //avoid big strings in table
+		case TYPE_CHAR: {  // avoid big strings in table
 			int i;
-			for(i=0; ((char*)buffer)[i] && i<count; i++) ;
-			return QVariant::fromValue(toUnicode((char*)buffer, i));
+			for(i = 0; ((char*) buffer)[i] && i < count; i++)
+				;
+			return QVariant::fromValue(toUnicode((char*) buffer, i));
 			break;
 		}
 
 		case TYPE_NVARCHAR_STR:
 		case TYPE_VARCHAR_STR:
-			if(((char*)buffer)[count-1] == '\0')  //On ne met pas de 0 final dans le QString
-				return QVariant::fromValue(toUnicode((char*)buffer, count-1));
+			if(((char*) buffer)[count - 1] == '\0')  // On ne met pas de 0 final dans le QString
+				return QVariant::fromValue(toUnicode((char*) buffer, count - 1));
 			else
-				return QVariant::fromValue(toUnicode((char*)buffer, count));
+				return QVariant::fromValue(toUnicode((char*) buffer, count));
 			break;
 
 		case TYPE_INT8:
-			return QVariant::fromValue((int)*(char*)buffer);
+			return QVariant::fromValue((int) *(char*) buffer);
 			break;
 
 		case TYPE_INT16:
-			return QVariant::fromValue((int)*(short*)buffer);
+			return QVariant::fromValue((int) *(short*) buffer);
 			break;
 
 		case TYPE_FLOAT32:
-			return QVariant::fromValue(*(float*)buffer);
+			return QVariant::fromValue(*(float*) buffer);
 			break;
 
 		case TYPE_DECIMAL:
-			return QVariant::fromValue((double)(*(int*)buffer)/pow((float)10, row->getDataIndex(realColumnIndex)));
+			return QVariant::fromValue((double) (*(int*) buffer) / pow((float) 10, row->getDataIndex(realColumnIndex)));
 			break;
 
 		case TYPE_VARCHAR_SIZE:
@@ -164,15 +165,15 @@ QVariant DatabaseTableModel::data(const QModelIndex& index, int role) const {
 			break;
 
 		case TYPE_INT32:
-			return QVariant::fromValue(*(int*)buffer);
+			return QVariant::fromValue(*(int*) buffer);
 			break;
 
 		case TYPE_FLOAT64:
-			return QVariant::fromValue(*(double*)buffer);
+			return QVariant::fromValue(*(double*) buffer);
 			break;
 
 		case TYPE_INT64:
-			return QVariant::fromValue(*(long long int*)buffer);
+			return QVariant::fromValue(*(long long int*) buffer);
 			break;
 	}
 
@@ -184,8 +185,10 @@ QVariant DatabaseTableModel::headerData(int section, Qt::Orientation orientation
 		return QVariant(QVariant::Invalid);
 
 	if(orientation == Qt::Horizontal) {
-		return QVariant::fromValue(QByteArray::fromRawData(row->getColumnName(columnBinding.at(section)), qstrlen(row->getColumnName(columnBinding.at(section)))));
-	} else return QVariant::fromValue(section);
+		return QVariant::fromValue(QByteArray::fromRawData(row->getColumnName(columnBinding.at(section)),
+		                                                   qstrlen(row->getColumnName(columnBinding.at(section)))));
+	} else
+		return QVariant::fromValue(section);
 }
 
 bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value, int role) {
@@ -198,14 +201,15 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 
 		QByteArray converted;
 
-		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR || row->getType(realColumnIndex) == TYPE_NVARCHAR_STR || row->getType(realColumnIndex) == TYPE_CHAR)
+		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR || row->getType(realColumnIndex) == TYPE_NVARCHAR_STR ||
+		   row->getType(realColumnIndex) == TYPE_CHAR)
 			converted = fromUnicode(value.toString());
 
 		if(row->getType(realColumnIndex) == TYPE_VARCHAR_STR || row->getType(realColumnIndex) == TYPE_NVARCHAR_STR) {
 			row->freeValue(realColumnIndex);
-			row->initData(realColumnIndex, converted.size()+1);
+			row->initData(realColumnIndex, converted.size() + 1);
 		}
-		void *buffer = row->getValuePtr(realColumnIndex);
+		void* buffer = row->getValuePtr(realColumnIndex);
 		bool result = false;
 
 		switch(row->getType(realColumnIndex)) {
@@ -215,7 +219,7 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 				if(val & 0xFFFFFF00)
 					result = false;
 				if(result)
-					*(char*)buffer = val;
+					*(char*) buffer = val;
 				break;
 			}
 
@@ -224,54 +228,54 @@ bool DatabaseTableModel::setData(const QModelIndex& index, const QVariant& value
 				if(val & 0xFFFF0000)
 					result = false;
 				if(result)
-					*(short*)buffer = val;
+					*(short*) buffer = val;
 				break;
 			}
 
 			case TYPE_INT32: {
 				int val = value.toInt(&result);
 				if(result)
-					*(int*)buffer = val;
+					*(int*) buffer = val;
 				break;
 			}
 
 			case TYPE_DECIMAL: {
 				float decimalTemp = value.toFloat(&result);
 				if(result)
-					*(int*)buffer = (int)(decimalTemp*pow((float)10, row->getDataIndex(realColumnIndex)) + 0.5);
+					*(int*) buffer = (int) (decimalTemp * pow((float) 10, row->getDataIndex(realColumnIndex)) + 0.5);
 				break;
 			}
 
 			case TYPE_INT64: {
 				long long int val = value.toLongLong(&result);
 				if(result)
-					*(long long int*)buffer = val;
+					*(long long int*) buffer = val;
 				break;
 			}
 
 			case TYPE_CHAR:
 				result = true;
-				qstrncpy((char*)buffer, converted.constData(), row->getDataCount(realColumnIndex)+1);
+				qstrncpy((char*) buffer, converted.constData(), row->getDataCount(realColumnIndex) + 1);
 				break;
 
 			case TYPE_FLOAT32: {
 				float val = value.toFloat(&result);
 				if(result)
-					*(float*)buffer = val;
+					*(float*) buffer = val;
 				break;
 			}
 
 			case TYPE_FLOAT64: {
 				double val = value.toDouble(&result);
 				if(result)
-					*(double*)buffer = val;
+					*(double*) buffer = val;
 				break;
 			}
 
 			case TYPE_NVARCHAR_STR:
 			case TYPE_VARCHAR_STR:
 				result = true;
-				qstrncpy((char*)buffer, converted.constData(), row->getDataCount(realColumnIndex)+1);
+				qstrncpy((char*) buffer, converted.constData(), row->getDataCount(realColumnIndex) + 1);
 				break;
 		}
 
