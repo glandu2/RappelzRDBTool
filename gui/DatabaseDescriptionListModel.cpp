@@ -129,12 +129,16 @@ QVariant DatabaseDescriptionListModel::data(const QModelIndex& index, int role) 
 		return QVariant();
 
 	switch(index.column()) {
-		case 0: return QFileInfo(QString::fromLocal8Bit(dbDescriptions.at(index.row())->getFilename())).fileName();
-		case 1: return QString::fromLocal8Bit(dbDescriptions.at(index.row())->getFilename());
-		case 2: return QString::fromLocal8Bit(dbDescriptions.at(index.row())->getDefaultFileName());
-		case 3: return QString::fromLocal8Bit(dbDescriptions.at(index.row())->getDefaultTableName());
+		case 0:
+			return QFileInfo(QString::fromLocal8Bit(dbDescriptions.at(index.row())->getFilename())).fileName();
+		case 1:
+			return QString::fromLocal8Bit(dbDescriptions.at(index.row())->getFilename());
+		case 2:
+			return QString::fromLocal8Bit(dbDescriptions.at(index.row())->getDefaultFileName());
+		case 3:
+			return QString::fromLocal8Bit(dbDescriptions.at(index.row())->getDefaultTableName());
 		case 4: {
-			QByteArray defaultFileName = QByteArray(dbDescriptions.at(index.row())->getDefaultFileName()) + ".rdb";
+			QByteArray defaultFileName = getDefaultRDBFileName(dbDescriptions.at(index.row())->getDefaultFileName());
 			QByteArray hash(defaultFileName.size() + 2, 0);
 			convertNameToHash(defaultFileName.constData(), hash.data(), LEGACY_SEED);
 			return QString::fromLocal8Bit(hash);
@@ -142,4 +146,11 @@ QVariant DatabaseDescriptionListModel::data(const QModelIndex& index, int role) 
 	}
 
 	return QVariant();
+}
+
+QByteArray DatabaseDescriptionListModel::getDefaultRDBFileName(QByteArray defaultFileName) {
+	if(!defaultFileName.contains('.'))
+		return defaultFileName + ".rdb";
+
+	return defaultFileName;
 }

@@ -94,14 +94,15 @@ bool OpenSaveSource::getSource(bool save, QString defaultName, QString *sourceNa
 	if(autoDetectSourceType) {
 		QString filename = QFileInfo(*sourceName).fileName();
 		if(selectedFilter.contains(allFiles)) {
-			if(filename.endsWith(".rdb", Qt::CaseInsensitive))
+			if(filename.endsWith(".rdb", Qt::CaseInsensitive) || filename.endsWith(".ref", Qt::CaseInsensitive))
 				*sourceType = DST_RDB;
-			else if(filename.endsWith(".csv", Qt::CaseInsensitive) || filename.endsWith(".tsv", Qt::CaseInsensitive) || filename.endsWith(".txt", Qt::CaseInsensitive))
+			else if(filename.endsWith(".csv", Qt::CaseInsensitive) || filename.endsWith(".tsv", Qt::CaseInsensitive) ||
+			        filename.endsWith(".txt", Qt::CaseInsensitive))
 				*sourceType = DST_CSV;
 			else if(save && filename.endsWith(".sql", Qt::CaseInsensitive))
 				*sourceType = DST_SQLFile;
 			else
-				*sourceType = DST_RDB; //default, case of hashed names
+				*sourceType = DST_RDB;  // default, case of hashed names
 		} else if(selectedFilter.contains(rdbFiles)) {
 			*sourceType = DST_RDB;
 		} else if(selectedFilter.contains(csvFiles)) {

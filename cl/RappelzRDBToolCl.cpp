@@ -142,24 +142,33 @@ void tempFunction(IDatabase *database) {
 					wis = data;
 				if(flag & 0x40)
 					lck = data;
-			} else break;
+			} else
+				break;
 		}
 		printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\n", str, vit, agi, dex, intel, wis, lck);
 	}
 }
 
-int main(int argc, char *argv[])
-{
+void getDefaultRDBFileName(char* buffer, IDatabase* database) {
+	const char* defaultFilename = database->getDatabaseDescription()->getDefaultFileName();
+	if(strchr(defaultFilename, '.') == nullptr) {
+		sprintf(buffer, "%s.rdb", database->getDatabaseDescription()->getDefaultFileName());
+	} else {
+		strcpy(buffer, defaultFilename);
+	}
+}
+
+int main(int argc, char* argv[]) {
 	int i, result;
-	IDatabase *database = 0;
-	IDatabaseDescription *dbDescription = 0;
+	IDatabase* database = 0;
+	IDatabaseDescription* dbDescription = 0;
 	eDF sType = mDF_None;
 	eDF dType = mDF_None;
-	const char *source = NULL;
-	const char *dest = NULL;
-	const char *sqlUser = "sa";
-	const char *sqlPassword = "";
-	const char *sqlServer = "127.0.0.1";
+	const char* source = NULL;
+	const char* dest = NULL;
+	const char* sqlUser = "sa";
+	const char* sqlPassword = "";
+	const char* sqlServer = "127.0.0.1";
 	int sqlPort = 0;
 #if !defined(NDEBUG) && !defined(__unix__)
 	LARGE_INTEGER beginTime, endTime, freq;
@@ -322,7 +331,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case mDF_RDB:
-			sprintf(buffer, "%s.rdb", database->getDatabaseDescription()->getDefaultFileName());
+			getDefaultRDBFileName(buffer, database);
 			result = database->readData(DST_RDB, source, progressPercentage);
 			break;
 
@@ -363,7 +372,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case mDF_RDB:
-			sprintf(buffer, "%s.rdb", database->getDatabaseDescription()->getDefaultFileName());
+			getDefaultRDBFileName(buffer, database);
 			result = database->writeData(DST_RDB, dest, progressPercentage);
 			break;
 

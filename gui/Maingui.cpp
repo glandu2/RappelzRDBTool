@@ -199,7 +199,7 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 	switch(srcType) {
 		case ST_None:
 			autoDetectType = true;
-			defaultSourceName = currentView->getDefaultFileName() + ".rdb";
+			defaultSourceName = DatabaseDescriptionListModel::getDefaultRDBFileName(currentView->getDefaultFileName());
 			if(hashedFilename) {
 				QByteArray hashed(defaultSourceName.size() + 2, 0);
 				convertNameToHash(defaultSourceName.constData(), hashed.data(), LEGACY_SEED);
@@ -209,13 +209,12 @@ void Maingui::loadSaveDbFile(bool save, eSourceType srcType) {
 
 		case ST_Rdb:
 			sourceType = DST_RDB;
-			defaultSourceName = currentView->getDefaultFileName() + ".rdb";
+			defaultSourceName = DatabaseDescriptionListModel::getDefaultRDBFileName(currentView->getDefaultFileName());
 			if(hashedFilename) {
 				QByteArray hashed(defaultSourceName.size() + 2, 0);
 				convertNameToHash(defaultSourceName.constData(), hashed.data(), LEGACY_SEED);
 				defaultSourceName = hashed;
 			}
-
 			break;
 
 		case ST_Csv:

@@ -1,17 +1,18 @@
 #include "RowManipulator.h"
 
-#include <stdlib.h>
-#include <string.h>
 #include <assert.h>
 #include <errno.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 #include <vector>
 
 #include "Log.h"
 
 namespace RappelzRDBBase {
 
-//linear
-RowManipulator::RowManipulator(const DataDescriptor* columnsType, FieldOrder *order, void **initValue) {
+// linear
+RowManipulator::RowManipulator(const DataDescriptor* columnsType, FieldOrder* order, void** initValue) {
 	int i;
 
 	assert(columnsType != 0);
