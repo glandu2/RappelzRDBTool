@@ -24,23 +24,23 @@ rdb.fields = {
 	{"ethereal_durability", TYPE_INT32},
 	{"endurance", TYPE_INT32},
 	{"wear_type", TYPE_INT32},
-	{"nv0", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
-	{"nv1", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
+	{"nv0", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
+	{"nv1", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
 	{"limit_deva", TYPE_BIT},
 	{"limit_asura", TYPE_BIT},
 	{"limit_gaia", TYPE_BIT},
-	{"nv2", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
-	{"nv3", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
-	{"nv4", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
-	{"nv5", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
-	{"nv6", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
+	{"nv2", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
+	{"nv3", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
+	{"nv4", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
+	{"nv5", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
+	{"nv6", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
 	{"limit_fighter", TYPE_BIT},
 	{"limit_hunter", TYPE_BIT},
 	{"limit_magician", TYPE_BIT},
 	{"limit_summoner", TYPE_BIT},
-	{"nv7", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
-	{"nv8", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
-	{"nv9", TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE},
+	{"nv7", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
+	{"nv8", TYPE_BIT | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
+	{"nv9", TYPE_INT16 | TYPE_SQLIGNORE | TYPE_CSVIGNORE | TYPE_GUIIGNORE},
 	{"item_use_flag", TYPE_INT32},
 	{"material", TYPE_INT32},
 	{"summon_id", TYPE_INT32},
@@ -244,6 +244,8 @@ rdb.sqlColumnOrder = table.concat({
 	"2nd_array\0",
 	"group_bit_set\0",
 })
+
+rdb.csvColumnOrder = rdb.sqlColumnOrder
 
 -- Data values by Ne0@NCarbon
 local arena_point_table = {
