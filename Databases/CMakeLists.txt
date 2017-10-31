@@ -13,8 +13,6 @@ foreach(srcfile ${RappelzRDBTool_databasesdll_src})
 	string(REPLACE ".cpp" "" dllfile ${srcfile})
 	add_library(${dllfile} MODULE ${srcfile})
 	target_link_libraries(${dllfile} RpzRdbBase)
-	install(TARGETS ${dllfile} DESTINATION ./Databases/)
+	install(TARGETS ${dllfile} DESTINATION ./)
 endforeach()
-
-install(DIRECTORY lua DESTINATION ./Databases/)
 

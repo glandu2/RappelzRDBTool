@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 2.8)
 project(RappelzRDB)
 
-#if(COMMAND cmake_policy)
-#	cmake_policy(SET CMP0003 NEW)
-#endif(COMMAND cmake_policy)
+# Packaging
+
+set(CPACK_NSIS_DISPLAY_NAME "Rappelz RDB Tool - Glandu2")
+set(CPACK_PACKAGE_NAME "RappelzRDBTool")
+set(CPACK_PACKAGE_VENDOR "Glandu2")
+set(CPACK_PACKAGE_VERSION "3.1.0" CACHE STRING "Version string")
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_STRIP_FILES ON)
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+message("Package name: ${CPACK_PACKAGE_FILE_NAME}")
 
 add_definitions(-DNDEBUG)
 
@@ -19,7 +27,29 @@ if(WIN32)
 	SET(CMAKE_SHARED_LINKER_FLAGS "/MANIFEST:NO /INCREMENTAL:NO")
 endif()
 
+set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME "bin")
+
+add_subdirectory(libiconv)
+find_package(Lua)
+if(NOT Lua_FOUND)
+	add_subdirectory(lua)
+else()
+	add_library(lua SHARED IMPORTED)
+	set_target_properties(lua PROPERTIES IMPORTED_LOCATION ${LUA_LIBRARY})
+	set_target_properties(lua PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${LUA_INCLUDE_DIR})
+endif()
+
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Base Base)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Databases Databases)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/cl cl)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/gui gui)
+
+set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME "db-dll")
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Databases Databases)
+
+set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME "cli")
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/cl cl)
+
+install(DIRECTORY Databases/ DESTINATION ./ COMPONENT "db-src" FILES_MATCHING PATTERN "*.cpp" PATTERN "lua" EXCLUDE)
+install(DIRECTORY Databases/lua/ DESTINATION ./ COMPONENT "db-lua" FILES_MATCHING PATTERN "*.lua")
+install(DIRECTORY Databases/lua/ DESTINATION ./ COMPONENT "bin" FILES_MATCHING PATTERN "*.lua")
+
+include(CPack OPTIONAL)

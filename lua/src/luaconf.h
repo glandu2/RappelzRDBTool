@@ -249,6 +249,10 @@
 #define LUA_API __declspec(dllimport)
 #endif						/* } */
 
+#elif __GNUC__ >= 4
+#define LUA_API __attribute__((visibility("default")))
+#define LUA_API __attribute__((visibility("default")))
+
 #else				/* }{ */
 
 #define LUA_API		extern
