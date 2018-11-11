@@ -296,7 +296,7 @@ rdb.convertData = function (dst, mode, row, rowNum)
 		row.item_use_flag2 = row.item_use_flag
 		row.unknownValue1 = 0
 
-		for i = 0,14 do
+		for i = 0,9 do
 			row[string.format("nv%d", i)] = 0
 		end
 	elseif mode == DCT_Read and dst == DF_RDB then

@@ -314,7 +314,7 @@ local arena_point_table = {
 
 rdb.convertData = function (dst, mode, row, rowNum)
 	if mode == DCT_Read and dst ~= DF_RDB then
-		for i = 0,14 do
+		for i = 0,9 do
 			row[string.format("nv%d", i)] = 0
 		end
 	elseif mode == DCT_Read and dst == DF_RDB then
