@@ -255,6 +255,13 @@ int RDBSource::readRow() {
 				break;
 		}
 
+		// Protect from negative size in TYPE_VARCHAR_SIZE
+		if(row->getType(curCol) == TYPE_VARCHAR_SIZE) {
+			if(*reinterpret_cast<int*>(buffer) < 0) {
+				*reinterpret_cast<int*>(buffer) = 0;
+			}
+		}
+
 #ifndef _MSC_VER
 		if(row->getType(curCol) == TYPE_FLOAT32 && buffer) {
 			float* val = (float*) buffer;

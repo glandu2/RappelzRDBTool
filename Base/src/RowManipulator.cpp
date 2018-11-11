@@ -311,8 +311,7 @@ void* RowManipulator::getValuePtr(int colPos) {
 
 // ordered
 int RowManipulator::getDataCount(int colPos) {
-	if((getType(colPos) == TYPE_VARCHAR_STR || getType(colPos) == TYPE_NVARCHAR_STR) &&
-	   *this->indexedSizePtrs[getDataIndex(colPos)])
+	if((getType(colPos) == TYPE_VARCHAR_STR || getType(colPos) == TYPE_NVARCHAR_STR))
 		return *this->indexedSizePtrs[getDataIndex(colPos)];
 	return getMaxDataCount(colPos);
 }
