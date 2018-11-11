@@ -5,12 +5,12 @@
 
 LogWindow* LogWindow::instance = 0;
 
-LogWindow::LogWindow(QWidget* parent) : QDialog(parent), ui(new Ui::LogWindow) {
+LogWindow::LogWindow(QWidget* parent) : QDialog(parent), ui(new Ui::LogWindow), logLineCount(0) {
 	ui->setupUi(this);
 	instance = this;
-	getLogger()->setCallback(&onLogMessage);
+	getLogger()->setCallback(&onLogMessageStatic);
 
-	int level = Settings::getSettings()->value("LogWindow/logLevel", 3).toInt();
+	int level = Settings::getSettings()->value("LogWindow/logLevel", (int) ILog::LL_Warning).toInt();
 	ui->logLevelCombo->setCurrentIndex(level);
 	onLogLevelChange(level);
 
@@ -25,6 +25,8 @@ LogWindow::~LogWindow() {
 
 void LogWindow::onClear() {
 	ui->logEdit->clear();
+	logLineCount = 0;
+	emit logMessageCountUpdated(logLineCount);
 }
 
 void LogWindow::onLogLevelChange(int newLevel) {
@@ -52,8 +54,14 @@ void LogWindow::onLogLevelChange(int newLevel) {
 	}
 }
 
-void LogWindow::onLogMessage(ILog* logger, const char* message) {
+void LogWindow::onLogMessageStatic(ILog* logger, const char* message) {
 	logger = logger;
-	instance->ui->logEdit->appendPlainText(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss:zzz ") +
-	                                       QString::fromLatin1(message, strlen(message) - 1));
+	instance->onLogMessage(message);
+}
+
+void LogWindow::onLogMessage(const char* message) {
+	ui->logEdit->appendPlainText(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss:zzz ") +
+	                             QString::fromLatin1(message, strlen(message) - 1));
+	logLineCount++;
+	emit logMessageCountUpdated(logLineCount);
 }

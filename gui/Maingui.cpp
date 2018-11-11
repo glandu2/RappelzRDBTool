@@ -30,7 +30,11 @@ Maingui::Maingui(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow),
 
 	ui->actionUse_hashed_files->setChecked(Settings::getSettings()->value("useHashedFilename").toBool());
 
-	currentStatusBarLabel = 0;
+	currentStatusBarLabel = nullptr;
+	permanentStatusBarLabel = new QLabel(this);
+	permanentStatusBarLabel->hide();
+	permanentStatusBarLabel->setStatusTip(tr("Use menu Options -> Show log to view logs"));
+	ui->statusBar->addPermanentWidget(permanentStatusBarLabel);
 
 	connect(ui->actionNew_Tab, SIGNAL(triggered()), this, SLOT(onAddTab()));
 	connect(ui->actionClose_Tab, SIGNAL(triggered()), this, SLOT(onRemoveTab()));
@@ -60,6 +64,7 @@ Maingui::Maingui(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow),
 	connect(ui->databaseTab, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
 	connect(tabEventFilter, SIGNAL(addTab()), this, SLOT(onAddTab()));
 	connect(tabEventFilter, SIGNAL(removeTab(int)), this, SLOT(onRemoveTab(int)));
+	connect(&logWindow, SIGNAL(logMessageCountUpdated(int)), this, SLOT(onLogMessageCountUpdate(int)));
 
 	onAddTab();  // Have at least one tab
 }
@@ -145,6 +150,16 @@ void Maingui::onDbStructHighlighted(int index) {
 		statusBar()->clearMessage();
 	else
 		statusBar()->showMessage(QString(dbDescriptionModel->getDbDescription(index)->getFilename()), 5000);
+}
+
+void Maingui::onLogMessageCountUpdate(int count) {
+	if(count) {
+		permanentStatusBarLabel->setText(tr("%1 log").arg(count));
+		permanentStatusBarLabel->show();
+	} else {
+		permanentStatusBarLabel->hide();
+		permanentStatusBarLabel->clear();
+	}
 }
 
 bool Maingui::onLoadDbStructDLL() {

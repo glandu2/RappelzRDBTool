@@ -19,11 +19,16 @@ protected slots:
 	void onClear();
 	void onLogLevelChange(int newLevel);
 
+signals:
+	void logMessageCountUpdated(int count);
+
 private:
-	static void onLogMessage(ILog* logger, const char* message);
+	static void onLogMessageStatic(ILog* logger, const char* message);
+	void onLogMessage(const char* message);
 
 private:
 	Ui::LogWindow* ui;
+	int logLineCount;
 	static LogWindow* instance;
 };
 

@@ -61,6 +61,7 @@ protected slots:
 	void onRemoveTab(int index = -1);
 	void onViewTitleChanged(DatabaseView* view);
 	void onDbStructHighlighted(int index);
+	void onLogMessageCountUpdate(int count);
 
 protected:
 	void loadSaveDbFile(bool save, eSourceType srcType);
@@ -76,6 +77,7 @@ private:
 
 	TabBarEventFilter* tabEventFilter;
 	QLabel* currentStatusBarLabel;
+	QLabel* permanentStatusBarLabel;
 
 	HashConverterDialog hashConverter;
 	LogWindow logWindow;
