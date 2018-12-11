@@ -1,6 +1,8 @@
 #include "IDataSource.h"
 #include "string.h"
 
+IDataSource::~IDataSource() {}
+
 int IDataSource::open(const char* source, eOpenMode openMode, const char* location, const char* options) {
 	this->openMode = openMode;
 	return 0;
@@ -28,11 +30,11 @@ const char* IDataSource::getNextOption(const char* options, char* key, char* val
 	return valueEnd[0] == '\0' ? 0 : (valueEnd + 1);
 }
 
-int IDataSource::prepare(IRowManipulator* row, unsigned int rowCount) {
+int IDataSource::prepare(IRowManipulator* row, unsigned int rowCount, unsigned long long date) {
 	this->row = row;
 	this->rowNumber = rowCount;
 
 	if(openMode == OM_Read)
 		return prepareRead(row);
-	return prepareWrite(row, rowNumber);
+	return prepareWrite(row, rowNumber, date);
 }

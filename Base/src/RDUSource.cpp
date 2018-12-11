@@ -57,12 +57,19 @@ static void copyWithNOT(char* buffer, const char* src) {
 	}
 }
 
-int RDUSource::prepareWrite(IRowManipulator* row, unsigned int rowCount) {
+int RDUSource::prepareWrite(IRowManipulator* row, unsigned int rowCount, unsigned long long date) {
 	char header[0x80];
 	time_t rawtime;
 
 	memset(header, 0, 0x80);
-	time(&rawtime);
+
+	// No set date, use current date by default
+	if(date == 0) {
+		time(&rawtime);
+	} else {
+		rawtime = date;
+	}
+
 	strftime(header, 9, "%Y%m%d", localtime(&rawtime));
 	copyWithNOT(header + 16,
 	            "\xad\xbb\xbd\xdf\xbc\x8d\x9a\x9e\x8b\x9a\x9b\xdf\x9d\x86\xdf\xad\x9e\x8f\x8f\x9a\x93\x85\xad\xbb\xbd"

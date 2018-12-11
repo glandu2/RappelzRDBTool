@@ -266,7 +266,8 @@ int Database::writeData(eDataSourceType type,
 	if(result)
 		return result;
 
-	result = ds->prepare(rowManipulator, recordNumber);
+	date = databaseDescription->getRdbDate(destFormat, DCT_Write, date);
+	result = ds->prepare(rowManipulator, recordNumber, date);
 	if(result)
 		return result;
 

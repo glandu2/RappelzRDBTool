@@ -368,9 +368,11 @@ void DatabaseView::setStatus(eToolStatus newStatus) {
 	}
 
 	if(db && db->getDate() && currentStatus == TS_DbLoaded) {
-		newMessage += " | " + tr("Creation date: %1", "RDB Creation date label in statusbar")
-		                          .arg(QDateTime::fromTime_t(db->getDate())
-		                                   .toString(tr("yyyy/MM/dd", "RDB Creation date format shown in statusbar")));
+		newMessage +=
+		    " | " +
+		    tr("Creation date: %1", "RDB Creation date label in statusbar")
+		        .arg(QDateTime::fromMSecsSinceEpoch(db->getDate() * 1000)  // avoid fromTime_t which use 32 bit time_t
+		                 .toString(tr("yyyy/MM/dd", "RDB Creation date format shown in statusbar")));
 	}
 
 	if(!newMessage.isNull())

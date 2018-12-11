@@ -97,7 +97,7 @@ void CSVSource::close() {
 	free(io_buffer);
 }
 
-int CSVSource::prepareWrite(IRowManipulator* row, unsigned int rowNumber) {
+int CSVSource::prepareWrite(IRowManipulator* row, unsigned int rowNumber, unsigned long long date) {
 	int i, firstColumn = 1, curCol;
 
 	for(i = 0; i < row->getColumnCount(); i++) {

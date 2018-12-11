@@ -98,6 +98,9 @@ public:
 	virtual float DLLCALLCONV getDataDecimalArray(const char* columnName, int index) = 0;
 
 	virtual const char* DLLCALLCONV getDataString(const char* columnName) = 0;
+
+	// Explicitly set string data size
+	virtual void DLLCALLCONV setDataStringSize(const char* columnName, int size) = 0;
 };
 
 #endif  // IROWMANIPULATOR_H

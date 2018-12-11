@@ -9,6 +9,8 @@ class IDataSource {
 public:
 	enum eOpenMode { OM_Read, OM_Write };
 
+	virtual ~IDataSource();
+
 	virtual int open(const char* source, eOpenMode openMode, const char* location = 0, const char* options = 0);
 	virtual void close() {}
 
@@ -16,7 +18,7 @@ public:
 
 	virtual unsigned long long int getDate() = 0;
 
-	int prepare(IRowManipulator* row, unsigned int rowCount = 0);
+	int prepare(IRowManipulator* row, unsigned int rowCount = 0, unsigned long long date = 0);
 	inline int processRow() {
 		if(openMode == OM_Read)
 			return readRow();
@@ -30,7 +32,7 @@ public:
 
 protected:
 	virtual int prepareRead(IRowManipulator* row) = 0;
-	virtual int prepareWrite(IRowManipulator* row, unsigned int rowCount) = 0;
+	virtual int prepareWrite(IRowManipulator* row, unsigned int rowCount, unsigned long long date) = 0;
 	virtual int readRow() = 0;
 	virtual int writeRow() = 0;
 

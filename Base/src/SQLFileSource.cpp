@@ -106,7 +106,7 @@ int SQLFileSource::prepareRead(IRowManipulator* row) {
 	return ENOSYS;
 }
 
-int SQLFileSource::prepareWrite(IRowManipulator* row, unsigned int rowCount) {
+int SQLFileSource::prepareWrite(IRowManipulator* row, unsigned int rowCount, unsigned long long date) {
 	int curCol;
 	bool isFirstColumn = true;
 	char* ptr = query;

@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <lua.hpp>
 #include <string.h>
+#include <time.h>
 
 #include <stdio.h>
 
@@ -14,13 +15,20 @@ namespace RappelzRDBBase {
 static const char* const LUA_ROWMANIPULATOR_METATABLE = "rdb.RowManipulator";
 
 LuaDescriptedDatabase::LuaDescriptedDatabase()
-    : state(nullptr), convertDataFunctionRef(LUA_NOREF), specialCaseId(SPECIALCASE_NONE) {}
+    : state(nullptr),
+      convertDataFunctionRef(LUA_NOREF),
+      getRdbDateFunctionRef(LUA_NOREF),
+      specialCaseId(SPECIALCASE_NONE) {}
 
 LuaDescriptedDatabase::~LuaDescriptedDatabase() {
 	lua_State* L = (lua_State*) state;
 	if(convertDataFunctionRef != LUA_NOREF) {
 		luaL_unref(L, LUA_REGISTRYINDEX, convertDataFunctionRef);
 		convertDataFunctionRef = LUA_NOREF;
+	}
+	if(getRdbDateFunctionRef != LUA_NOREF) {
+		luaL_unref(L, LUA_REGISTRYINDEX, getRdbDateFunctionRef);
+		getRdbDateFunctionRef = LUA_NOREF;
 	}
 	freeFields();
 	if(L)
@@ -159,11 +167,7 @@ static int lua_script_row_manipulator_index(lua_State* L) {
 			break;
 
 		case TYPE_VARCHAR_SIZE:
-			getLogger()->log(ILog::LL_Error,
-			                 "Lua RowManipulator: Attempt to get a string size column %s, which can only be get via "
-			                 "the string itself (use the TYPE_VARCHAR_STR field instead)\n",
-			                 columnName);
-			lua_pushnil(L);
+			lua_pushnumber(L, row->getDataInt32(columnName));
 			break;
 
 		default:
@@ -190,6 +194,7 @@ static int lua_script_row_manipulator_newindex(lua_State* L) {
 	int columnType = row->getType(columnIndex);
 
 	int isBoolean = lua_isboolean(L, 3);
+	int isString = lua_isstring(L, 3);
 	int booleanValue = lua_toboolean(L, 3);
 	int isInteger;
 	long long int integerValue = lua_tointegerx(L, 3, &isInteger);
@@ -310,16 +315,31 @@ static int lua_script_row_manipulator_newindex(lua_State* L) {
 		case TYPE_CHAR:
 		case TYPE_VARCHAR_STR:
 		case TYPE_NVARCHAR_STR: {
-			const char* value = lua_tostring(L, 3);
-			row->setDataString(columnName, value);
+			if(!isString && !isInteger) {
+				getLogger()->log(ILog::LL_Error,
+				                 "Lua RowManipulator: Attempt to set string column %s with a non string or number "
+				                 "value with type %s\n",
+				                 columnName,
+				                 lua_typename(L, lua_type(L, 3)));
+			} else {
+				const char* value = lua_tostring(L, 3);
+				row->setDataString(columnName, value);
+			}
 			break;
 		}
 
 		case TYPE_VARCHAR_SIZE:
-			getLogger()->log(ILog::LL_Error,
-			                 "Lua RowManipulator: Attempt to set a string size column %s, which can only be set via "
-			                 "the string itself (use the TYPE_VARCHAR_STR field instead)\n",
-			                 columnName);
+			if(!isInteger && !isBoolean) {
+				getLogger()->log(
+				    ILog::LL_Error,
+				    "Lua RowManipulator: Attempt to set string size column %s with a non integer value with type %s\n",
+				    columnName,
+				    lua_typename(L, lua_type(L, 3)));
+			} else if(isInteger) {
+				row->setDataStringSize(columnName, static_cast<int>(integerValue));
+			} else {
+				row->setDataStringSize(columnName, static_cast<int>(booleanValue));
+			}
 			break;
 
 		default:
@@ -496,6 +516,20 @@ int LuaDescriptedDatabase::open(const char* databaseName, int* systemError) {
 	}
 	lua_pop(L, 1);
 
+	lua_getfield(L, -1, "getRdbDate");
+	if(!lua_isnil(L, -1)) {
+		if(lua_isfunction(L, -1)) {
+			getRdbDateFunctionRef = luaL_ref(L, LUA_REGISTRYINDEX);
+			lua_pushnil(L);  // for the next pop as luaL_ref pop the value
+		} else {
+			getLogger()->log(ILog::LL_Warning,
+			                 "Lua register: rdb.getRdbDate must be a lua function returning the RDB date in seconds "
+			                 "since epoch: uint64_t convertData(eDataFormat dst, eDataConvertionType mode, uint64_t "
+			                 "originalDate)\n");
+		}
+	}
+	lua_pop(L, 1);
+
 	specialCaseId = SPECIALCASE_NONE;
 	lua_getfield(L, -1, "specialCaseId");
 	if(!lua_isnil(L, -1)) {
@@ -576,8 +610,43 @@ void LuaDescriptedDatabase::convertData(eDataFormat dst,
 		if(result) {
 			getLogger()->log(
 			    ILog::LL_Error, "Cannot run lua convertData function: %d:%s\n", result, lua_tostring(L, -1));
+			lua_pop(L, 1);
 		}
 	}
+}
+
+uint64_t LuaDescriptedDatabase::getRdbDate(eDataFormat dst, eDataConvertionType mode, uint64_t originalDate) {
+	lua_State* L = (lua_State*) state;
+
+	if(getRdbDateFunctionRef != LUA_REFNIL && getRdbDateFunctionRef != LUA_NOREF) {
+		lua_rawgeti(L, LUA_REGISTRYINDEX, getRdbDateFunctionRef);
+		lua_pushinteger(L, dst);
+		lua_pushinteger(L, mode);
+		lua_pushinteger(L, originalDate);
+
+		int result = lua_pcall(L, 3, 1, 0);
+		if(result) {
+			getLogger()->log(
+			    ILog::LL_Error, "Cannot run lua getRdbDate function: %d:%s\n", result, lua_tostring(L, -1));
+			lua_pop(L, 1);
+		} else {
+			int isInteger = 0;
+			uint64_t value = lua_tonumberx(L, -1, &isInteger);
+			if(!isInteger) {
+				getLogger()->log(ILog::LL_Error,
+				                 "Bad return type of lua getRdbDate function, expected integer, got %s\n",
+				                 lua_typename(L, lua_type(L, -1)));
+			}
+
+			lua_pop(L, 1);
+
+			if(isInteger) {
+				return value;
+			}
+		}
+	}
+
+	return time(nullptr);
 }
 
 int LuaDescriptedDatabase::getSpecialCaseID() {

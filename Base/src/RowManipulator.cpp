@@ -54,7 +54,12 @@ void RowManipulator::initRow(bool initializedFields) {
 				this->indexedSizePtrs.resize(index + 1, 0);
 			this->indexedSizePtrs[index] = (int*) getValuePtr(i);
 			if(initializedFields == false)
-				*this->indexedSizePtrs[index] = 1;  // minimal size
+				*this->indexedSizePtrs[index] = 0;
+		} else if(getType(i) == TYPE_VARCHAR_STR || getType(i) == TYPE_NVARCHAR_STR) {
+			const unsigned int index = getDataIndex(i);
+			if(this->indexedStringIdx.size() <= index)
+				this->indexedStringIdx.resize(index + 1, -1);
+			this->indexedStringIdx[index] = i;
 		}
 		this->initializedFields[i] = initializedFields;
 	}
@@ -73,13 +78,17 @@ int RowManipulator::allocRow() {
 
 // ordered
 int RowManipulator::initData(int colPos, unsigned int dataCount) {
-	if(dataCount == 0)
+	if(dataCount == 0) {
 		dataCount = getDataCount(colPos);
-	setDataCount(colPos, dataCount);
+	} else {
+		setDataCount(colPos, dataCount);
+	}
 
 	const unsigned int maxDataCount = getMaxDataCount(colPos);
 
-	assert(dataCount != 0);  // disallow 0 data field, if this happen, there is a conception error
+	// Ensure malloc won't return NULL because of 0 size
+	if(dataCount == 0)
+		dataCount = 1;
 
 	// To verify if malloc failed, set to 1 for no error when we don't use malloc,
 	//&result is purely arbitrary, the value has to be non-zero
@@ -311,8 +320,21 @@ void* RowManipulator::getValuePtr(int colPos) {
 
 // ordered
 int RowManipulator::getDataCount(int colPos) {
-	if((getType(colPos) == TYPE_VARCHAR_STR || getType(colPos) == TYPE_NVARCHAR_STR))
-		return *this->indexedSizePtrs[getDataIndex(colPos)];
+	if((getType(colPos) == TYPE_VARCHAR_STR || getType(colPos) == TYPE_NVARCHAR_STR)) {
+		int size = *this->indexedSizePtrs[getDataIndex(colPos)];
+		int maxSize = getMaxDataCount(colPos);
+		if(size < 0)
+			return 0;
+		if(size > maxSize) {
+			getLogger()->log(ILog::LL_Error,
+			                 "RowManipulator: Bad size %d for column \"%s\" above maximum %d\n",
+			                 size,
+			                 getColumnName(colPos),
+			                 maxSize);
+			return maxSize;
+		}
+		return size;
+	}
 	return getMaxDataCount(colPos);
 }
 
@@ -387,6 +409,8 @@ static const char* getTypeName(int type) {
 			return "TYPE_FLOAT64";
 		case TYPE_CHAR:
 			return "TYPE_CHAR";
+		case TYPE_VARCHAR_SIZE:
+			return "TYPE_VARCHAR_SIZE";
 		case TYPE_VARCHAR_STR:
 			return "TYPE_VARCHAR_STR";
 		case TYPE_DECIMAL:
@@ -407,7 +431,8 @@ void* RowManipulator::checkAndGetColumnValuePtr(const char* columnName, int type
 	                ((getType(columnIndex) == TYPE_VARCHAR_STR || getType(columnIndex) == TYPE_NVARCHAR_STR ||
 	                  getType(columnIndex) == TYPE_CHAR) &&
 	                 (type == TYPE_VARCHAR_STR || type == TYPE_NVARCHAR_STR || type == TYPE_CHAR)) ||
-	                (getType(columnIndex) == TYPE_CHAR && type == TYPE_INT8);
+	                (getType(columnIndex) == TYPE_CHAR && type == TYPE_INT8) ||
+	                (getType(columnIndex) == TYPE_VARCHAR_SIZE && type == TYPE_INT32);
 	if(!isTypeOk) {
 		getLogger()->log(ILog::LL_Error,
 		                 "RowManipulator: Attempt to get or set a wrong type value into column "
@@ -554,6 +579,9 @@ void RowManipulator::setDataDecimalArray(const char* columnName, float* array, i
 void RowManipulator::setDataString(const char* columnName, const char* value) {
 	int columnIndex = 0;
 	int size = strlen(value);
+	if(size == 0)
+		size = 1;
+
 	char* buffer = static_cast<char*>(checkAndGetColumnValuePtr(columnName, TYPE_VARCHAR_STR, size, &columnIndex));
 	if(!buffer)
 		return;
@@ -565,6 +593,60 @@ void RowManipulator::setDataString(const char* columnName, const char* value) {
 	memcpy(buffer, value, size);
 	if(getType(columnIndex) == TYPE_CHAR && getDataCount(columnIndex) > size)
 		buffer[size] = 0;
+}
+
+void RowManipulator::setDataStringSize(const char* columnName, int size) {
+	int sizeColPos = getColumnIndex(columnName);
+	if(sizeColPos < 0 || sizeColPos > getColumnCount()) {
+		return;
+	}
+
+	if(getType(sizeColPos) != TYPE_VARCHAR_SIZE) {
+		getLogger()->log(ILog::LL_Error,
+		                 "RowManipulator: Attempt to get or set a wrong type value into column "
+		                 "%s, column is of type %s but input value is of type %s\n",
+		                 columnName,
+		                 getTypeName(getType(sizeColPos)),
+		                 getTypeName(TYPE_VARCHAR_SIZE));
+		return;
+	}
+
+	int* buffer = static_cast<int*>(getValuePtr(sizeColPos));
+	if(!buffer)
+		return;
+	int dataIndex = getDataIndex(sizeColPos);
+	int stringCol;
+	std::string originalString;
+	if(dataIndex >= 0 && dataIndex < (int) indexedStringIdx.size() && indexedStringIdx[dataIndex] >= 0) {
+		stringCol = indexedStringIdx[dataIndex];
+		const char* stringData = static_cast<const char*>(getValuePtr(stringCol));
+		if(stringData)
+			originalString = stringData;
+	} else {
+		getLogger()->log(ILog::LL_Error, "RowManipulator: VARCHAR field of index %d not found\n", dataIndex);
+		return;
+	}
+
+	if(getMaxDataCount(stringCol) < size) {
+		getLogger()->log(ILog::LL_Error,
+		                 "RowManipulator: Attempt to get or set a too long value "
+		                 "into column %s, column has length of %d but input value "
+		                 "has length of %d\n",
+		                 columnName,
+		                 getMaxDataCount(sizeColPos),
+		                 size);
+		return;
+	}
+
+	freeValue(dataIndex);
+	*buffer = size;
+	initData(dataIndex);
+	char* newString = static_cast<char*>(getValuePtr(stringCol));
+
+	int copySize = getDataCount(stringCol);
+	if(copySize > (int) originalString.size())
+		copySize = originalString.size();
+	memcpy(newString, originalString.c_str(), copySize);
 }
 
 // get a column value

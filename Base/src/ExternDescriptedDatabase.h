@@ -24,10 +24,12 @@ public:
 	                                     unsigned int rowNum);
 	virtual int DLLCALLCONV getSpecialCaseID();
 
-	virtual const char* getFilename();
+	virtual const char* DLLCALLCONV getFilename();
 
-	virtual const char* getDefaultFileName();
-	virtual const char* getDefaultTableName();
+	virtual const char* DLLCALLCONV getDefaultFileName();
+	virtual const char* DLLCALLCONV getDefaultTableName();
+
+	virtual uint64_t DLLCALLCONV getRdbDate(eDataFormat dst, eDataConvertionType mode, uint64_t originalDate);
 
 protected:
 	void* getProcAddress(const char* name, int argumentsBytes);
@@ -46,6 +48,7 @@ private:
 	typedef int(DLLCALLCONV* DLLISSPECIALPROC)();
 	typedef const char*(DLLCALLCONV* DLLDEFAULTFILENAMEPROC)();
 	typedef const char*(DLLCALLCONV* DLLDEFAULTTABLENAMEPROC)();
+	typedef uint64_t(DLLCALLCONV* DLLRDBDATEPROC)(eDataFormat dst, eDataConvertionType mode, uint64_t originalDate);
 
 	DLLREGISTERSTRUCTPROC DLLregisterDBStructure;
 	DLLSQLORDERPROC DLLgetSQLColumnOrder;
@@ -54,6 +57,7 @@ private:
 	DLLISSPECIALPROC DLLgetSpecialCaseID;
 	DLLDEFAULTFILENAMEPROC DLLgetDefaultFileName;
 	DLLDEFAULTTABLENAMEPROC DLLgetDefaultTableName;
+	DLLRDBDATEPROC DLLgetRdbDate;
 
 	std::string filename;
 	std::string fallbackDefaultFileName, fallbackDefaultTableName;

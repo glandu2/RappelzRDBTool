@@ -16,8 +16,8 @@ int RDBSkillTreeSource::prepareRead(IRowManipulator* row) {
 	return result;
 }
 
-int RDBSkillTreeSource::prepareWrite(IRowManipulator* row, unsigned int rowCount) {
-	int result = RDBSource::prepareWrite(row, rowCount);
+int RDBSkillTreeSource::prepareWrite(IRowManipulator* row, unsigned int rowCount, unsigned long long date) {
+	int result = RDBSource::prepareWrite(row, rowCount, date);
 
 	lastJobId = -1;
 	recordNumber = 0;

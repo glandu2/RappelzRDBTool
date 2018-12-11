@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 
 #ifdef __linux__
 #include <dlfcn.h>
@@ -50,6 +51,7 @@ int ExternDescriptedDatabase::open(const char* databaseName, int* systemError) {
 	DLLgetSpecialCaseID = (DLLISSPECIALPROC) getProcAddress("getSpecialCaseID", 0);
 	DLLgetDefaultFileName = (DLLDEFAULTFILENAMEPROC) getProcAddress("getDefaultFileName", 0);
 	DLLgetDefaultTableName = (DLLDEFAULTTABLENAMEPROC) getProcAddress("getDefaultTableName", 0);
+	DLLgetRdbDate = (DLLRDBDATEPROC) getProcAddress("getRdbDate", 0);
 
 	if(DLLregisterDBStructure == 0) {
 #ifdef __unix__
@@ -178,6 +180,13 @@ const char* ExternDescriptedDatabase::getDefaultTableName() {
 	fallbackDefaultTableName = filename.substr(beginPos, endPos - beginPos) + "Resource";
 
 	return fallbackDefaultTableName.c_str();
+}
+
+uint64_t ExternDescriptedDatabase::getRdbDate(eDataFormat dst, eDataConvertionType mode, uint64_t originalDate) {
+	if(DLLgetRdbDate)
+		return DLLgetRdbDate(dst, mode, originalDate);
+	else
+		return originalDate;
 }
 
 void* ExternDescriptedDatabase::getProcAddress(const char* name, int argumentsBytes) {

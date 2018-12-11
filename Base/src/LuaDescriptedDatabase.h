@@ -25,10 +25,12 @@ public:
 	                                     unsigned int rowNum);
 	virtual int DLLCALLCONV getSpecialCaseID();
 
-	virtual const char* getFilename();
+	virtual const char* DLLCALLCONV getFilename();
 
-	virtual const char* getDefaultFileName();
-	virtual const char* getDefaultTableName();
+	virtual const char* DLLCALLCONV getDefaultFileName();
+	virtual const char* DLLCALLCONV getDefaultTableName();
+
+	virtual uint64_t DLLCALLCONV getRdbDate(eDataFormat dst, eDataConvertionType mode, uint64_t originalDate);
 
 protected:
 	void freeFields();
@@ -43,6 +45,7 @@ private:
 	std::string sqlColumnOrder;
 	std::string csvColumnOrder;
 	int convertDataFunctionRef;
+	int getRdbDateFunctionRef;
 	int specialCaseId;
 	std::string overridenFilename;
 	std::string overridenTablename;

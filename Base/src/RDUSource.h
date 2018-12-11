@@ -16,7 +16,7 @@ public:
 	virtual unsigned long long int getDate() { return date; }
 
 	virtual int prepareRead(IRowManipulator* row);
-	virtual int prepareWrite(IRowManipulator* row, unsigned int rowCount);
+	virtual int prepareWrite(IRowManipulator* row, unsigned int rowCount, unsigned long long date);
 	virtual int readRow();
 	virtual int writeRow();
 

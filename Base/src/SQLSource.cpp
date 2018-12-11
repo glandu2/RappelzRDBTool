@@ -203,7 +203,7 @@ int SQLSource::prepareRead(IRowManipulator* row) {
 	return 0;
 }
 
-int SQLSource::prepareWrite(IRowManipulator* row, unsigned int rowCount) {
+int SQLSource::prepareWrite(IRowManipulator* row, unsigned int rowCount, unsigned long long date) {
 	clearBoundParameters(row->getColumnCount());
 
 	if(reuseTableSchema) {
@@ -668,9 +668,9 @@ int SQLSource::prepareReadRowQuery(SQLHSTMT hstmt) {
 				SQLGetData(
 				    hstmt, columnIndex, SQL_C_DEFAULT, buffer, sizeof(long long int), &isDataNull);  // using
 				                                                                                     // SQL_C_DEFAULT as
-				                                                                                     // SQL_C_SBIGINT has
-				                                                                                     // some problem with
-				                                                                                     // some odbc
+				                                                                                     // SQL_C_SBIGINT
+				                                                                                     // has some problem
+				                                                                                     // with some odbc
 				                                                                                     // implementation
 				if(isDataNull == SQL_NULL_DATA)
 					*static_cast<long long int*>(buffer) = 0;

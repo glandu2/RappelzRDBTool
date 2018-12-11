@@ -41,6 +41,7 @@ int RDBSource::open(const char* source, eOpenMode openMode, const char* location
 	rdbFile = fopen(source, fopenOpenMode);
 	rowRead = 0;
 	refFile = endsWith(source, ".ref");
+	date = 0;
 
 	if(!rdbFile) {
 		getLogger()->log(ILog::LL_Error, "RDBSource: Can't open file \"%s\": %s\n", source, strerror(errno));
@@ -71,13 +72,20 @@ static void copyWithNOT(char* buffer, const char* src) {
 	}
 }
 
-int RDBSource::prepareWrite(IRowManipulator* row, unsigned int rowCount) {
+int RDBSource::prepareWrite(IRowManipulator* row, unsigned int rowCount, unsigned long long date) {
 	if(!refFile) {
 		char header[0x80];
 		time_t rawtime;
 
 		memset(header, 0, 0x80);
-		time(&rawtime);
+
+		// No set date, use current date by default
+		if(date == 0) {
+			time(&rawtime);
+		} else {
+			rawtime = date;
+		}
+
 		strftime(header, 9, "%Y%m%d", localtime(&rawtime));
 		copyWithNOT(
 		    header + 16,
@@ -253,13 +261,6 @@ int RDBSource::readRow() {
 						return EINVAL;
 				}
 				break;
-		}
-
-		// Protect from negative size in TYPE_VARCHAR_SIZE
-		if(row->getType(curCol) == TYPE_VARCHAR_SIZE) {
-			if(*reinterpret_cast<int*>(buffer) < 0) {
-				*reinterpret_cast<int*>(buffer) = 0;
-			}
 		}
 
 #ifndef _MSC_VER

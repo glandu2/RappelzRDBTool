@@ -3,6 +3,7 @@
 
 #include "DataType.h"
 #include "IObject.h"
+#include <stdint.h>
 
 class IDatabaseDescription;
 
@@ -31,18 +32,18 @@ public:
 	                                     unsigned int rowNum) = 0;
 	virtual int DLLCALLCONV getSpecialCaseID() = 0;
 
-	virtual const char* getFilename() = 0;
+	virtual const char* DLLCALLCONV getFilename() = 0;
 
-	virtual const char*
-	getDefaultFileName() = 0;  // get the default filename, like db_string for StringDatabase (without extension).
-	virtual const char* getDefaultTableName() = 0;  // get the default table name for use with sql servers. (without
-	                                                // dbo. or anything before that)
+	// get the default filename, like db_string for StringDatabase (without extension).
+	virtual const char* DLLCALLCONV getDefaultFileName() = 0;
 
-	// Incoming version:
-	/*
-	virtual int getDBStructVersion();            //get the database description object version. To prevent version
-	mismash and crashs. Might also used for a compatibility layer.
-	*/
+	// get the default table name for use with sql servers.
+	// (without dbo. or anything before that)
+	virtual const char* DLLCALLCONV getDefaultTableName() = 0;
+
+	virtual uint64_t DLLCALLCONV getRdbDate(eDataFormat dst,
+	                                        eDataConvertionType mode,
+	                                        unsigned long long originalDate) = 0;
 };
 
 #endif  // DATABASEDESCRIPTION_H

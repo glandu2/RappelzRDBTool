@@ -101,6 +101,8 @@ public:
 
 	void DLLCALLCONV setDataString(const char* columnName, const char* value);
 
+	void DLLCALLCONV setDataStringSize(const char* columnName, int size);
+
 	// get a column value
 	char DLLCALLCONV getDataBit(const char* columnName);
 	char DLLCALLCONV getDataInt8(const char* columnName);
@@ -129,6 +131,7 @@ protected:
 private:
 	FieldOrder* savedOrder;
 	std::vector<int*> indexedSizePtrs;
+	std::vector<int> indexedStringIdx;
 	bool* initializedFields;
 
 	void** row;
