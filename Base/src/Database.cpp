@@ -20,6 +20,38 @@
 #include <string.h>
 #include <vector>
 
+#ifdef WIN32
+LARGE_INTEGER qpcFrequency;
+#else
+#include <arpa/inet.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <unistd.h>
+#endif
+
+#define USEC_TO_UNIX_EPOCH 11644473600000000LL
+static uint64_t getCurrentTime() {
+#ifdef WIN32
+	LARGE_INTEGER time;
+	QueryPerformanceCounter(&time);
+	return 1000000.0 * time.QuadPart / qpcFrequency.QuadPart;
+#else
+	struct timeval tv;
+	gettimeofday(&tv, nullptr);
+	return 1000000.0 * tv.tv_sec + tv.tv_usec;
+#endif
+}
+
+static void initTime() {
+#ifdef WIN32
+	static int initialized = false;
+	if(!initialized) {
+		initialized = true;
+		QueryPerformanceFrequency(&qpcFrequency);
+	}
+#endif
+}
+
 namespace RappelzRDBBase {
 
 FieldOrder Database::getFieldOrderFromColumnName(DataDescriptor* dataDescription, const char* columns) {
@@ -81,6 +113,8 @@ Database::Database(IDatabaseDescription* databaseDescription) {
 	this->sqlOrder = getFieldOrderFromColumnName(&this->dataDescription, databaseDescription->getSQLColumnOrder());
 	this->csvOrder = getFieldOrderFromColumnName(&this->dataDescription, databaseDescription->getCSVColumnOrder());
 	this->rowManipulator = new RowManipulator(&this->dataDescription);
+
+	initTime();
 }
 
 Database::~Database() {
@@ -175,6 +209,7 @@ int Database::readData(eDataSourceType type,
 	int result;
 	FieldOrder* order;
 	eDataFormat destFormat = DF_None;
+	uint64_t timestamp = getCurrentTime();
 
 	getDataSourceInfo(type, &ds, &order, &destFormat);
 	getRowManipulator()->setFieldOrder(order);
@@ -240,6 +275,8 @@ int Database::readData(eDataSourceType type,
 
 	delete ds;
 
+	getLogger()->log(ILog::LL_Info, "Database loaded in %d us\n", getCurrentTime() - timestamp);
+
 	return result;
 }
 
@@ -254,6 +291,7 @@ int Database::writeData(eDataSourceType type,
 	FieldOrder* order;
 	eDataFormat destFormat = DF_None;
 	int i, recordNumber = dataList->size();
+	uint64_t timestamp = getCurrentTime();
 
 	getDataSourceInfo(type, &ds, &order, &destFormat);
 	getRowManipulator()->setFieldOrder(order);
@@ -298,6 +336,8 @@ int Database::writeData(eDataSourceType type,
 		rowManipulator->setCurrentRow(*it);
 		databaseDescription->convertData(destFormat, DCT_Read, rowManipulator, i);
 	}
+
+	getLogger()->log(ILog::LL_Info, "Database written in %d us\n", getCurrentTime() - timestamp);
 
 	return result;
 }
