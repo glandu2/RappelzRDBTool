@@ -3,6 +3,8 @@ project(RappelzRDB)
 
 # Packaging
 
+option(BUILD_SHARED_LIBS "Build shared libs" ON)
+
 set(CPACK_NSIS_DISPLAY_NAME "Rappelz RDB Tool - Glandu2")
 set(CPACK_PACKAGE_NAME "RappelzRDBTool")
 set(CPACK_PACKAGE_VENDOR "Glandu2")
