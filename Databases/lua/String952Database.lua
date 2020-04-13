@@ -19,6 +19,7 @@ rdb.convertData = function (dst, mode, row, rowNum)
 		if row.value_size < 0 then
 			row.value = strings_data[-row.value_size]
 		else
+			row.value_size = string.len(row.value) -- remove stuff after null terminated string
 			strings_data[row.code] = row.value
 		end
 	elseif mode == DCT_Write and dst == DF_RDB then

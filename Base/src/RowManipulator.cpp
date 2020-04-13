@@ -638,9 +638,9 @@ void RowManipulator::setDataStringSize(const char* columnName, int size) {
 		return;
 	}
 
-	freeValue(dataIndex);
+	freeValue(stringCol);
 	*buffer = size;
-	initData(dataIndex);
+	initData(stringCol);
 	char* newString = static_cast<char*>(getValuePtr(stringCol));
 
 	int copySize = getDataCount(stringCol);
