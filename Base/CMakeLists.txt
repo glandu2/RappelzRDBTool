@@ -11,12 +11,15 @@ file(GLOB RappelzRDBTool_basedll_src
 
 add_library(${TARGET_NAME} ${RappelzRDBTool_basedll_src})
 target_include_directories(${TARGET_NAME} PUBLIC include)
-target_compile_definitions(${TARGET_NAME} PRIVATE BUILDING_BASE)
+if(BUILD_SHARED_LIBS)
+	target_compile_definitions(${TARGET_NAME} PRIVATE BUILDING_BASE INTERFACE USING_BASE)
+endif()
+
 target_link_libraries(${TARGET_NAME} lua iconv)
 if(WIN32)
-        target_link_libraries(${TARGET_NAME} odbc32)
+	target_link_libraries(${TARGET_NAME} odbc32)
 else()
-	    target_link_libraries(${TARGET_NAME} odbc dl)
+	target_link_libraries(${TARGET_NAME} odbc dl)
 endif()
 
 install(DIRECTORY include/ DESTINATION ./ COMPONENT "dev")

@@ -9,15 +9,19 @@
 #endif
 #define EDATABASEDLL __attribute__((visibility("default")))
 #else
+
 #if defined(BUILDING_BASE)
 #define EBASEDLL __declspec(dllexport)
-#else
+#elif defined(USING_BASE)
 #define EBASEDLL __declspec(dllimport)
+#else
+#define EBASEDLL
 #endif
+
 #define EDATABASEDLL __declspec(dllexport)
 #endif
 
-#ifdef __unix__
+#if defined(__unix__) || defined(_WIN64)
 #define DLLCALLCONV
 #else
 #define DLLCALLCONV __stdcall
