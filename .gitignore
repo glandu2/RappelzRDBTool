@@ -17,6 +17,7 @@ RappelzRDBToolQt_sample.ts
 *.qm
 CMakeLists.txt.*
 .directory
+/.cmake/
 
 #############
 ## Windows detritus
