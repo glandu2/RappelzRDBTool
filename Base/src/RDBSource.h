@@ -22,6 +22,9 @@ public:
 
 	virtual bool hasNext();
 
+private:
+	int logReadError();
+
 protected:
 	FILE* rdbFile;
 	bool refFile;
@@ -31,6 +34,9 @@ protected:
 	unsigned int rowRead;
 	void* io_buffer;
 	unsigned long long int date;
+
+	long long expectedRowSize;
+	long long minRowSize;
 };
 
 }  // namespace RappelzRDBBase

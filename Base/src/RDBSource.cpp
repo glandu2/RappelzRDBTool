@@ -121,8 +121,13 @@ int RDBSource::prepareWrite(IRowManipulator* row, unsigned int rowCount, unsigne
 int RDBSource::prepareRead(IRowManipulator* row) {
 	int rowNumber;
 
+	fseek(rdbFile, 0, SEEK_END);
+	long long rdbFileDataSize = ftell(rdbFile);
+
 	if(!refFile) {
 		char dateBuffer[9];
+
+		fseek(rdbFile, 0, SEEK_SET);
 		fread(dateBuffer, 1, 8, rdbFile);
 		dateBuffer[8] = 0;
 
@@ -143,6 +148,16 @@ int RDBSource::prepareRead(IRowManipulator* row) {
 	setRowNumber(rowNumber);
 	bitAvailable = 0;
 
+	// Used to find expected row size when failing to read a RDB
+	minRowSize = -1;
+
+	// Remove header data from data size
+	rdbFileDataSize -= ftell(rdbFile);
+	if(rowNumber > 0 && rdbFileDataSize > 0)
+		expectedRowSize = rdbFileDataSize / rowNumber;
+	else
+		expectedRowSize = -1;
+
 	return 0;
 }
 
@@ -150,6 +165,8 @@ int RDBSource::readRow() {
 	int bitRead, i, curCol, count;
 	void* buffer;
 	IRowManipulator* row = getRowManipulator();
+
+	size_t offsetStartOfRow = ftell(rdbFile);
 
 	for(i = 0; i < row->getColumnCount(); i++) {
 		curCol = i;
@@ -167,12 +184,7 @@ int RDBSource::readRow() {
 				for(; count > 0; count--) {
 					if(bitAvailable == 0) {
 						if(fread(&currentByte, 1, 1, rdbFile) != 1) {
-							getLogger()->log(
-							    ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
-							if(errno)
-								return EIO;
-							else
-								return EINVAL;
+							return logReadError();
 						}
 						bitAvailable = 8;
 					}
@@ -203,12 +215,7 @@ int RDBSource::readRow() {
 					realCount = defaultStringSize;
 				}
 				if(fread(buffer, 1, realCount, rdbFile) != realCount) {
-					getLogger()->log(
-					    ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
-					if(errno)
-						return EIO;
-					else
-						return EINVAL;
+					return logReadError();
 				}
 				break;
 			}
@@ -216,23 +223,13 @@ int RDBSource::readRow() {
 			case TYPE_VARCHAR_STR:
 			case TYPE_INT8:
 				if(fread(buffer, 1, count, rdbFile) != count) {
-					getLogger()->log(
-					    ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
-					if(errno)
-						return EIO;
-					else
-						return EINVAL;
+					return logReadError();
 				}
 				break;
 
 			case TYPE_INT16:
 				if(fread(buffer, 2, count, rdbFile) != count) {
-					getLogger()->log(
-					    ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
-					if(errno)
-						return EIO;
-					else
-						return EINVAL;
+					return logReadError();
 				}
 				break;
 
@@ -241,24 +238,14 @@ int RDBSource::readRow() {
 			case TYPE_DECIMAL:
 			case TYPE_INT32:
 				if(fread(buffer, 4, count, rdbFile) != count) {
-					getLogger()->log(
-					    ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
-					if(errno)
-						return EIO;
-					else
-						return EINVAL;
+					return logReadError();
 				}
 				break;
 
 			case TYPE_FLOAT64:
 			case TYPE_INT64:
 				if(fread(buffer, 8, count, rdbFile) != count) {
-					getLogger()->log(
-					    ILog::LL_Error, "RDBSource: Error while reading record data: %s\n", strerror(errno));
-					if(errno)
-						return EIO;
-					else
-						return EINVAL;
+					return logReadError();
 				}
 				break;
 		}
@@ -347,6 +334,11 @@ int RDBSource::readRow() {
 	}
 
 	rowRead++;
+
+	// Record minimal size of a row for debugging purpose when reading fails
+	long long rowSize = ftell(rdbFile) - offsetStartOfRow;
+	if(minRowSize == -1 || minRowSize > rowSize)
+		minRowSize = rowSize;
 
 	return 0;
 }
@@ -474,6 +466,21 @@ int RDBSource::writeRow() {
 
 bool RDBSource::hasNext() {
 	return !feof(rdbFile) && rowRead < getRowNumber();
+}
+
+int RDBSource::logReadError() {
+	getLogger()->log(
+	    ILog::LL_Error,
+	    "RDBSource: Error while reading record data: %s, min row size with current descriptor: %lld bytes, "
+	    "expected row size from file size and row number: %lld bytes\n",
+	    strerror(errno),
+	    minRowSize,
+	    expectedRowSize);
+
+	if(errno)
+		return EIO;
+	else
+		return EINVAL;
 }
 
 }  // namespace RappelzRDBBase
