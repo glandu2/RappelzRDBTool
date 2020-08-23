@@ -682,10 +682,10 @@ const char* LuaDescriptedDatabase::getDefaultFileName() {
 		beginPos++;
 
 	fallbackDefaultFileName = std::string("db_") + filename.substr(beginPos, endPos - beginPos);
-	std::transform(fallbackDefaultFileName.begin() + 3,
-	               fallbackDefaultFileName.end(),
-	               fallbackDefaultFileName.begin() + 3,
-	               ::tolower);
+
+	auto begin = fallbackDefaultFileName.begin() + 3;
+	auto end = fallbackDefaultFileName.end();
+	std::transform(begin, end, begin, ::tolower);
 
 	return fallbackDefaultFileName.c_str();
 }
