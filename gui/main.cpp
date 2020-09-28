@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QTranslator>
+#include <locale>
 #include <version.h>
 
 // Open files on command line
