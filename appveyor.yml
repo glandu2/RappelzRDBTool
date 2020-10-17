@@ -1,0 +1,20 @@
+version: 3.2.2.{build}
+image: Visual Studio 2019
+environment:
+  GENERATOR: Visual Studio 16 2019
+  BUILD_DIR: build-amd64
+build_script:
+- cmd: >-
+    mkdir %BUILD_DIR%
+
+
+    cd %BUILD_DIR%
+
+
+    cmake .. -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=TRUE -DCMAKE_PREFIX_PATH=C:\Qt\5.15.0\msvc2019_64\lib\cmake\Qt5 -DCPACK_PACKAGE_VERSION=%APPVEYOR_BUILD_VERSION%
+
+
+    cmake --build . --target package --config RelWithDebInfo -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+
+    FOR %%f in (RappelzRDBTool-*.zip) DO appveyor PushArtifact %%f
