@@ -11,7 +11,7 @@ build_script:
     cd %BUILD_DIR%
 
 
-    cmake .. -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=TRUE -DCMAKE_PREFIX_PATH=C:\Qt\5.15.0\msvc2019_64\lib\cmake\Qt5 -DCPACK_PACKAGE_VERSION=%APPVEYOR_BUILD_VERSION%
+    cmake .. -G "%GENERATOR%" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=TRUE -DCMAKE_PREFIX_PATH=C:\Qt\5.15\msvc2019_64\lib\cmake\Qt5 -DCPACK_PACKAGE_VERSION=%APPVEYOR_BUILD_VERSION%
 
 
     cmake --build . --target package --config RelWithDebInfo -- /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
